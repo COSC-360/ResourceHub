@@ -1,5 +1,5 @@
 import React from "react";
-import "../Feed.css";
+import "./css/Feed.css";
 
 const FeedPost = ({ post_props }) => {
   return (
@@ -17,11 +17,12 @@ const FeedPost = ({ post_props }) => {
         <img src={post_props.post_image} />
 
         <div className="post-footer">
-          <i class="bi bi-arrow-up"></i>
+          <i className="bi bi-arrow-up"></i>
+          {/* didn't the Ta say no icon libraries? these icons are from the bootstrap icon library */}
           <p>{post_props.up_votes}</p>
-          <i class="bi bi-arrow-down"></i>
+          <i className="bi bi-arrow-down"></i>
           <p>{post_props.down_votes}</p>
-          <i class="bi bi-chat"></i>
+          <i className="bi bi-chat"></i>
           <p>{post_props.replies}</p>
         </div>
       </div>

@@ -1,3 +1,10 @@
+import "./css/SearchBar.css"
+
 export function SearchBar(){
-    return <input id="search" placeholder="Search"></input>
+    return (
+        <div className="searchBarContainer">
+            <input id="search" placeholder="Search" className="searchBar" />
+            <img src="/src/assets/search-icon.svg" alt="search" className="searchIcon" />
+        </div>
+    )
 }
