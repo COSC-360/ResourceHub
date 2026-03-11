@@ -1,0 +1,83 @@
+.course-post {
+  width: 100%;
+  max-width: 900px;
+  margin: 16px auto;
+  border: 1px solid #d9d3e6;
+  border-radius: 14px;
+  background: #f7f4fb;
+  overflow: hidden;
+}
+
+.course-post header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px 10px 16px;
+}
+
+.course-info {
+  min-width: 0;
+}
+
+.course-info h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f1f24;
+  line-height: 1.2;
+}
+
+.course-info p {
+  margin: 6px 0 0 0;
+  font-size: 14px;
+  color: #4a4a55;
+  line-height: 1.35;
+}
+
+.menu-button {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #d9d3e6;
+  border-radius: 10px;
+  background: #ffffff;
+  display: grid;
+  place-items: center;
+  cursor: default;
+}
+
+.menu-button svg,
+.menu-button img {
+  width: 18px;
+  height: 18px;
+}
+
+.course-image {
+  display: block;
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  background: #e7e3ef;
+  border-top: 1px solid #e3ddee;
+  border-bottom: 1px solid #e3ddee;
+}
+
+.course-post footer {
+  padding: 10px 16px 14px 16px;
+}
+
+.course-post footer p {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #3e3e49;
+}
+
+.student-count-icon {
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+}

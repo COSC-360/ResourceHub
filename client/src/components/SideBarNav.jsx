@@ -30,7 +30,8 @@ function SideBarNav({ active, setActive }) {
         className={active === "popular" ? "active" : ""}
         onClick={() => setActive("popular")}
       >
-        Popular
+        {/* Formerly this is popular but we have changed the back end to be users courses so Im just changing the word */}
+        My Courses
       </li>
 
       <li
