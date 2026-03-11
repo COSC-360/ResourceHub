@@ -2,7 +2,7 @@ import { Router } from "express";
 import * as discussionController from "../controllers/discussionController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 
-export const Router = Router();
+export const discussionRoutes = Router();
 
 discussionRoutes.get("/", discussionController.getAll);
 discussionRoutes.post("/", authMiddleware, discussionController.create);

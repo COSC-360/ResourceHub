@@ -1,4 +1,4 @@
-import { discussion } from "../models/Discussion.js";
+import { Discussion } from "../models/Discussion.js";
 import * as discussionRepository from "../repositories/discussionRepository.js";
 import * as authRepository from "../repositories/authRepository.js";
 

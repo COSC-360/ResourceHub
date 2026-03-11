@@ -1,4 +1,4 @@
-import * as discussionService from "./discussion.service.js";
+import * as discussionService from "../services/discussionService.js";
 
 export function getAll(_req, res) {
   const discussions = discussionService.getAll();

@@ -16,7 +16,7 @@ export function updateProfile(req, res) {
     const id = req.body.id;
     const body = req.body.data;
 
-    if(id || typeof id !== "string" || !id.trim()){
+    if(!id || typeof id !== "string" || !id.trim()){
         res.status(400).json({ error: "Id is required" });
         return;
     }
