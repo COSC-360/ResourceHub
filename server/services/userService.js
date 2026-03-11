@@ -1,4 +1,4 @@
-import * as userRepository from "../repository/userRepository.js";
+import * as userRepository from "../repositories/userRepository.js";
 
 export function getUserById(id){
     const user = userRepository.getUserById(id);

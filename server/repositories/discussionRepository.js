@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { DATA_DIR } from "../../constants.js";
+import { DATA_DIR } from "../constants.js";
 
 const DISCUSSIONS_FILE = path.join(DATA_DIR, "discussions.json");
 
