@@ -1,0 +1,48 @@
+.profileContainer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.authButtons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.profile {
+    background-color: white;
+    border: none;
+    border-radius: 25px;
+    margin-left: 15px;
+}
+
+.icon {
+    padding: 3px 0px 0px 0px;
+    max-width: 40px;
+    max-height: 40px;
+}
+
+.adminPanel {
+    background-color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.signIn {
+    background-color: lightgray;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.register {
+    background-color: lightskyblue;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+}
