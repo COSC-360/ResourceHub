@@ -16,7 +16,7 @@ export function SearchBar(){
         } else {
             p.textContent = "No results found";
         }
-       
+        input.value = "";
     }
 
     return (
