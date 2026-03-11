@@ -1,7 +1,7 @@
-import { SearchBar } from "./SearchBar"
-import { ProfileSection } from "./ProfileSection"
-import { Logo } from "./Logo"
-import "./css/Header.css"
+import { SearchBar } from "../SearchBar/SearchBar"
+import { ProfileSection } from "../ProfileSection/ProfileSection"
+import { Logo } from "../Logo"
+import "./Header.css"
 
 /* userType undefined = unregistered
 userType "user" = registered
