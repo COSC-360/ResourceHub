@@ -10,7 +10,7 @@ function readdiscussions() {
 }
 
 function writediscussions(discussions) {
-  fs.writeFileSync(DISCUSSIONS_FILE, JSOify(discussions, null, 2));
+  fs.writeFileSync(DISCUSSIONS_FILE, JSON.stringify(discussions, null, 2));
 }
 
 export function findAll() {

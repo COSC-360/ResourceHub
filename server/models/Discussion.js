@@ -15,7 +15,7 @@ export class Discussion {
     this.createdAt = createdAt;
   }
 
-  static create(content, authorId) {
+  static create(content, authorId, image) {
     return new Discussion(
       uuidv4(),
       image,
@@ -25,7 +25,7 @@ export class Discussion {
     );
   }
 
-  static fromJSON(data) {
+  static fromJSON(data, image) {
     return new Discussion(
       data.id,
       image,
