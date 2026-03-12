@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import './css/CreateCourse.css';
 
 export default function CreateCourse() {
     const [courseData, setCourseData] = useState({
