@@ -1,0 +1,44 @@
+[
+  {
+    "id": "123",
+    "name": "Web Development",
+    "code": "COSC 304",
+    "description": "Learn full-stack web development.",
+    "image": "/images/default-course.jpg"
+  },
+  {
+    "id": "456",
+    "name": "Data Structures",
+    "code": "COSC 201",
+    "description": "Study fundamental data structures and algorithms.",
+    "image": "/images/default-course.jpg"
+  },
+  {
+    "id": "789",
+    "name": "Machine Learning",
+    "code": "COSC 450",
+    "description": "Explore machine learning concepts and techniques.",
+    "image": "/images/default-course.jpg"
+  },
+  {
+    "id": "test-id",
+    "name": "N",
+    "code": "C",
+    "description": "D",
+    "image": null
+  },
+  {
+    "id": "f94cdad6-2725-4c69-b46a-7c2023723714",
+    "name": "Service Test",
+    "code": "SVC 1",
+    "description": "Works",
+    "image": null
+  },
+  {
+    "id": "905ef7a7-3cb0-4e48-ac8f-61343bfbd10b",
+    "name": "Test Course",
+    "code": "COSC 999",
+    "description": "Created from curl",
+    "image": null
+  }
+]
