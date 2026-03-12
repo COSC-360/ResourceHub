@@ -1,10 +1,11 @@
 import * as commonService from "../services/commonService.js"
 
 export function search(req, res) {
-    const searchTerm = req.body;
+    console.log("request received");
+    const searchTerm = req.query.term;
 
-    if(!searchTerm || typeof searchTerm !== "string" || !searchTerm.trim()){
-        res.status(400).json({ error: "Id is required" });
+    if (!searchTerm || typeof searchTerm !== "string" || !searchTerm.trim()) {
+        res.status(400).json({ error: "Search term is required" });
         return;
     }
     
