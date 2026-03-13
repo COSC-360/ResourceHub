@@ -1,47 +1,18 @@
 import { v4 as uuidv4 } from "uuid";
+import mongoose from "mongoose";
 
-export class Discussion {
-  id;
-  image;
-  content;
-  authorId;
-  createdAt;
+const DiscussionSchema = new mongoose.Schema({
+  _id: { type: String, default: uuidv4 },
+  image: { type: String, default: null },
+  content: { type: String, required: true },
+  username: { type: String, required: true },
+  faculty: { type: String, default: "None" },
+  authorId: { type: String, required: true },
+  timestamp: { type: String, default: () => new Date().toISOString() },
+  upvotes: { type: Number, default: 0 },
+  downvotes: { type: Number, default: 0 },
+  replies: { type: Number, default: 0 },
+  parentid: { type: String },
+});
 
-  constructor(id, image, content, authorId, createdAt) {
-    this.id = id;
-    this.image = image;
-    this.content = content;
-    this.authorId = authorId;
-    this.createdAt = createdAt;
-  }
-
-  static create(content, authorId) {
-    return new Discussion(
-      uuidv4(),
-      image,
-      content,
-      authorId,
-      new Date().toISOString(),
-    );
-  }
-
-  static fromJSON(data) {
-    return new Discussion(
-      data.id,
-      image,
-      data.content,
-      data.authorId,
-      data.createdAt,
-    );
-  }
-
-  toJSON() {
-    return {
-      id: this.id,
-      image: this.image,
-      content: this.content,
-      authorId: this.authorId,
-      createdAt: this.createdAt,
-    };
-  }
-}
+export const Discussion = mongoose.model("Discussion", DiscussionSchema);
