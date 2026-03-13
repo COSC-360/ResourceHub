@@ -1,6 +1,5 @@
 import { Discussion } from "../models/Discussion.js";
 import * as discussionRepository from "../repositories/discussionRepository.js";
-import * as authRepository from "../repositories/authRepository.js";
 
 export function create(content, authorId) {
   const discussion = new Discussion(content, authorId);
