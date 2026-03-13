@@ -1,1 +1,15 @@
-/* App-specific styles can be added here */
+.header-area {
+  min-height: 100vh;
+}
+
+.sidebar-area {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  padding: 20px;
+}
+
+.feed-area {
+  flex: 1;
+  min-width: 0;
+}
