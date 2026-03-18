@@ -1,39 +1,63 @@
-import fs from "fs";
-import path from "path";
-import { DATA_DIR } from "../../constants.js";
+import { Discussion } from "./Discussion.js";
 
-const DISCUSSIONS_FILE = path.join(DATA_DIR, "discussions.json");
+export const DiscussionRepository = {
+  async save({ image, content, username, faculty, authorId, parentid }) {
+    const discussion = await Discussion.create({
+      image,
+      content,
+      username,
+      faculty,
+      authorId,
+      parentid,
+    });
+    return discussion;
+  },
 
-function readdiscussions() {
-  const data = fs.readFileSync(DISCUSSIONS_FILE, "utf-8");
-  return JSON.parse(data);
-}
+  async findById(id) {
+    return await Discussion.findById(id);
+  },
 
-function writediscussions(discussions) {
-  fs.writeFileSync(DISCUSSIONS_FILE, JSOify(discussions, null, 2));
-}
+  async findAll() {
+    return await Discussion.find().sort({ timestamp: -1 });
+  },
 
-export function findAll() {
-  return readdiscussions();
-}
+  async findByAuthor(authorId) {
+    return await Discussion.find({ authorId }).sort({ timestamp: -1 });
+  },
 
-export function findById(id) {
-  return readdiscussions().find((t) => t.id === id);
-}
+  async findReplies(parentid) {
+    return await Discussion.find({ parentid }).sort({ timestamp: -1 });
+  },
 
-export function save(discussion) {
-  const discussions = readdiscussions();
-  const index = discussions.findIndex((t) => t.id === discussion.id);
-  if (index >= 0) {
-    discussions[index] = discussion;
-  } else {
-    discussions.push(discussion);
-  }
-  writediscussions(discussions);
-  return discussion;
-}
+  async upvote(id) {
+    return await Discussion.findByIdAndUpdate(
+      id,
+      { $inc: { upvotes: 1 } },
+      { new: true },
+    );
+  },
 
-export function remove(id) {
-  const discussions = readdiscussions().filter((t) => t.id !== id);
-  writediscussions(discussions);
-}
+  async downvote(id) {
+    return await Discussion.findByIdAndUpdate(
+      id,
+      { $inc: { downvotes: 1 } },
+      { new: true },
+    );
+  },
+
+  async incrementReplies(parentid) {
+    return await Discussion.findByIdAndUpdate(
+      parentid,
+      { $inc: { replies: 1 } },
+      { new: true },
+    );
+  },
+
+  async update(id, fields) {
+    return await Discussion.findByIdAndUpdate(id, fields, { new: true });
+  },
+
+  async delete(id) {
+    return await Discussion.findByIdAndDelete(id);
+  },
+};

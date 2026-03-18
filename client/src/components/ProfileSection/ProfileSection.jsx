@@ -1,4 +1,4 @@
-import "./css/ProfileSection.css"
+import "./ProfileSection.css"
 
 export function ProfileSection({userType}){
     return (
