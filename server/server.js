@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import { userRoutes } from "./routes/userRoutes.js";
 import { connectDB } from "./db.js";
-import { discussionRoutes } from "./routes/discussionRoutes.js";
+import  discussionRoutes  from "./routes/discussionRoutes.js";
 import { commonRoutes } from "./routes/commonRoutes.js";
 
 const app = express();

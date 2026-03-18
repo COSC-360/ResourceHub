@@ -1,32 +1,58 @@
-import "./SearchBar.css"
+import { useState } from "react";
+import "./SearchBar.css";
 
-export function SearchBar(){
-    async function search(e){
+export function SearchBar() {
+    const [searchTerm, setSearchTerm] = useState("");
+    const [results, setResults] = useState([]);
+    const [message, setMessage] = useState("");
+
+    async function handleSearch(e) {
         e.preventDefault();
-        const input = document.getElementById("search");
-        const term = input.value;             
-        if(!term.trim()) return;
-        //TODO: Make a common api for all routes instead of making the call within the react components
-        const res = await fetch(`/api/common/search?term=${encodeURIComponent(term)}`);
-        const data = await res.json();
-        const p = document.getElementById("temp");
-        const results = data.searchResults || [];
-        if (results.length !== 0) {
-            p.textContent = results.join(", ");
-        } else {
-            p.textContent = "No results found";
+        const trimmed = searchTerm.trim();
+
+        if (!trimmed) return;
+
+        try {
+            const response = await fetch(
+                `http://localhost:3000/api/common/search?searchTerm=${encodeURIComponent(trimmed)}`
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setResults([]);
+                setMessage(data.error || "Search failed");
+                return;
+            }
+
+            if (data.searchResults.length === 0) {
+                setResults([]);
+                setMessage("No results found");
+            } else {
+                setResults(data.searchResults);
+                setMessage("");
+            }
+
+            setSearchTerm("");
+        } catch (error) {
+            console.error("Search error:", error);
+            setResults([]);
+            setMessage("Could not connect to server");
         }
-        input.value = "";
     }
 
     return (
         <div className="searchBarContainer">
-            <form id="searchForm" onSubmit={search}>
+            <form id="searchForm" onSubmit={handleSearch}>
                 <img src="/src/assets/search-icon.svg" alt="search" className="searchIcon" />
-                <input id="search" placeholder="Search" className="searchBar" />
+                <input id="search" placeholder="Search" className="searchBar" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
             </form>
             <div id="temporaryResults">
-                <p id="temp"></p>
+                {message && <p id="temp">{message}</p>}
+
+                {results.map((result, index) => (
+                    <p key={index}>{result}</p>
+                ))}
             </div>
         </div>
     )
