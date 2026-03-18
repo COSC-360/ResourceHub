@@ -1,4 +1,4 @@
-import { Discussion } from "./Discussion.js";
+import { Discussion } from "../models/Discussion.js";
 
 export const DiscussionRepository = {
   async save({ image, content, username, faculty, authorId, parentid }) {

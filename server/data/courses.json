@@ -75,5 +75,12 @@
     "code": "gurt",
     "description": "yo",
     "image": null
+  },
+  {
+    "id": "df8b35e2-bbec-4488-bdb0-e6e494b84c91",
+    "name": "Web Programming",
+    "code": "COSC360",
+    "description": "I love ifeoma",
+    "image": null
   }
 ]
