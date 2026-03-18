@@ -4,4 +4,5 @@ import { authMiddleware } from '../middleware/authMiddleware.js';
 
 export const courseRoutes = Router();
 
+courseRoutes.get('/:id', courseController.getById);
 courseRoutes.post('/', courseController.create);

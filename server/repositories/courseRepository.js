@@ -15,6 +15,11 @@ function writeCourses(courses) {
     fs.writeFileSync(COURSES_FILE, JSON.stringify(courses, null, 2));
 }
 
+export function findById(id) {
+    const courses = readCourses();
+    return courses.find((course) => course.id === id) ?? null;
+}
+
 export function save(course) {
     const courses = readCourses();
     courses.push(course);

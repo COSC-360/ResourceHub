@@ -1,7 +1,10 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './css/CreateCourse.css';
 
 export default function CreateCourse() {
+    const navigate = useNavigate();
+
     const [courseData, setCourseData] = useState({
         name: '',
         code: '',
@@ -42,6 +45,9 @@ export default function CreateCourse() {
 
             const createdCourse = await response.json();
             console.log('Created course:', createdCourse);
+            navigate(`/courses/${createdCourse.data.id}`, {
+                state: { course: createdCourse.data },
+            });
 
             setCourseData({
                 name: '',

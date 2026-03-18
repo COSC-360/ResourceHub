@@ -1,13 +1,19 @@
+import { Routes, Route, Navigate } from "react-router-dom";
 import "./components/FeedPost";
 import "./App.css";
-import Feed from "./components/Feed";
 import Header from "./components/Header";
+import CreateCourse from "./components/CreateCourse";
+import CoursePage from "./components/CoursePage";
 
 function App() {
   return (
     <>
       <Header />
-      <Feed />
+      <Routes>
+        <Route path="/" element={<CreateCourse />} />
+        <Route path="/courses/:courseId" element={<CoursePage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
     </>
   );
 }

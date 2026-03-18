@@ -1,5 +1,23 @@
 import * as courseService from '../services/courseService.js';
 
+export function getById(req, res) {
+    const { id } = req.params;
+
+    if (!id) {
+        res.status(400).json({ error: 'Course id is required' });
+        return;
+    }
+
+    const course = courseService.getById(id);
+
+    if (!course) {
+        res.status(404).json({ error: 'Course not found' });
+        return;
+    }
+
+    res.status(200).json({ data: course });
+}
+
 export function create(req, res) {
     const { id, name, code, description, image } = req.body;
 
