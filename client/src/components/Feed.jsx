@@ -1,35 +1,74 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import FeedPost from "../components/FeedPost";
+import CreateDiscussion from "./CreateDiscussion";
 
 const feed = () => {
-  const details = {
-    username: "User1234",
-    timeline: "2 days ago",
-    faculty: "Computer Science",
-    comment:
-      "Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna.",
-    up_votes: 200,
-    down_votes: 550,
-    replies: 100,
+  const [discussions, setDiscussions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const handleNewDiscussion = (newDiscussion) => {
+    // Refresh the discussion feed or add the new discussion to the list
+    const transformedDiscussion = {
+      username: newDiscussion.username,
+      timeline: newDiscussion.timestamp,
+      faculty: newDiscussion.faculty,
+      comment: newDiscussion.content,
+      up_votes: newDiscussion.upvotes || 0,
+      down_votes: newDiscussion.downvotes || 0,
+      replies: newDiscussion.replies || 0,
+      _id: newDiscussion._id,
+    };
+    setDiscussions((prev) => [transformedDiscussion, ...prev]);
   };
 
-  const detail2 = {
-    username: "User4",
-    timeline: "6 days ago",
-    faculty: "Psychology Science",
-    comment:
-      "Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna.",
-    up_votes: 200,
-    down_votes: 550,
-    replies: 100,
-  };
+  useEffect(() => {
+    const fetchDiscussions = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch("http://localhost:3000/api/discussion");
+        if (!response.ok) {
+          throw new Error("Failed to fetch discussions");
+        }
+        const result = await response.json();
+        const discussions = Array.isArray(result.data)
+          ? result.data
+          : Array.isArray(result)
+            ? result
+            : [];
+        console.log(result);
+        // Transform backend data to match FeedPost component props
+        const transformedData = discussions.map((discussion) => ({
+          username: discussion.username,
+          timeline: discussion.timestamp,
+          faculty: discussion.faculty,
+          comment: discussion.content,
+          up_votes: discussion.upvotes,
+          down_votes: discussion.downvotes,
+          replies: discussion.replies,
+          _id: discussion._id,
+        }));
 
-  const detailArray = [details, detail2];
+        setDiscussions(transformedData);
+      } catch (err) {
+        setError(err.message);
+        console.error("Error fetching discussions:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDiscussions();
+  }, []);
+
+  if (loading) return <div>Loading discussions...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <div>
-      {detailArray.map((obj, index) => (
-        <FeedPost post_props={obj} key={index} />
+      <CreateDiscussion onDiscussionCreated={handleNewDiscussion} />
+      {discussions.map((obj) => (
+        <FeedPost post_props={obj} key={obj._id} />
       ))}
     </div>
   );

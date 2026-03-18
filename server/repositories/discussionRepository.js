@@ -1,4 +1,4 @@
-import { Discussion } from "./Discussion.js";
+import { Discussion } from "../models/Discussion.js";
 
 export const DiscussionRepository = {
   async save({ image, content, username, faculty, authorId, parentid }) {
@@ -59,5 +59,15 @@ export const DiscussionRepository = {
 
   async delete(id) {
     return await Discussion.findByIdAndDelete(id);
+  },
+
+  async getLatest({ limit = 10, page = 1 } = {}) {
+    const offset = (page - 1) * limit;
+
+    return Discussion.find()
+      .sort({ timestamp: -1 })
+      .skip(offset)
+      .limit(limit)
+      .lean();
   },
 };

@@ -1,19 +1,29 @@
 import * as discussionService from "../services/discussionService.js";
 
-export function getAll(_req, res) {
-  const discussions = discussionService.getAll();
+export async function getLatest(_req, res) {
+  const discussions = await discussionService.getLatest();
   res.json({ data: discussions });
 }
 
 export function create(req, res) {
-  const { content } = req.body;
+  const { content, username, faculty } = req.body;
 
   if (!content || typeof content !== "string" || !content.trim()) {
     res.status(400).json({ error: "Content is required" });
     return;
   }
 
-  const discussion = discussionService.create(content.trim(), req.userId);
+  if (!username || typeof username !== "string" || !username.trim()) {
+    res.status(400).json({ error: "Username is required" });
+    return;
+  }
+
+  const discussion = discussionService.create(
+    content.trim(),
+    username.trim(),
+    faculty || "None",
+    req.userId || username.trim(),
+  );
   res.status(201).json({ data: discussion });
 }
 
