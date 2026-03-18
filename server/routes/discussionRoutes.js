@@ -1,7 +1,7 @@
 import { Router } from "express";
 import * as discussionController from "../controllers/discussionController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
-import getDB from "../db.js"
+import { getDB } from "../db.js"
 
 export const discussionRoutes = Router();
 
@@ -18,4 +18,4 @@ discussionRoutes.get("/", async (req, res) => {
   res.json(users);
 });
 
-module.exports = discussionRoutes;
+export default discussionRoutes;
