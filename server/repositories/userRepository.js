@@ -1,5 +1,8 @@
 import { User } from "../models/User.js";
 
+const popularCoursesByUser = {};
+const allCourses = [];
+
 export async function save(username, email, password) {
   return await User.create({
     username: username,
@@ -51,8 +54,9 @@ export function updateUserCourses(userId, courses) {
 }
 
 export function hideUserCourses(userId, courseId) {
+  const userCourses = popularCoursesByUser[userId] || [];
 
-  popularCoursesByUser[userId] = popularCoursesByUser[userId].filter(
+  popularCoursesByUser[userId] = userCourses.filter(
     (id) => String(id) !== String(courseId)
   );
 
