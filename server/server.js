@@ -17,15 +17,10 @@ app.use("/api/discussion", discussionRoutes);
 app.use("/api/common", commonRoutes);
 
 async function startServer() {
-  try {
-    await connectDB();
-  } catch (error) {
-    console.warn("Could not connect to MongoDB:", error.message);
-    console.log("Server starting without database connection...");
-  }
-
-  app.listen(3000, () => {
-    console.log("Server running on port 3000");
+  connectDB().then(() => {
+    app.listen(3000, () => {
+      console.log("Server running on port 3000");
+    });
   });
 }
 

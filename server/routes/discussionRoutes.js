@@ -1,21 +1,12 @@
 import { Router } from "express";
 import * as discussionController from "../controllers/discussionController.js";
-import { authMiddleware } from "../middleware/authMiddleware.js";
-import { getDB } from "../db.js"
+import { verifyAccessToken } from "../middleware/authMiddleware.js";
 
 export const discussionRoutes = Router();
 
-discussionRoutes.get("/", discussionController.getAll);
-discussionRoutes.post("/", authMiddleware, discussionController.create);
-discussionRoutes.patch("/:id", authMiddleware, discussionController.update);
-discussionRoutes.delete("/:id", authMiddleware, discussionController.remove);
-
-discussionRoutes.get("/", async (req, res) => {
-  const db = getDB();
-
-  const users = await db.collection("users").find().toArray();
-
-  res.json(users);
-});
+discussionRoutes.get("/", discussionController.getLatest);
+discussionRoutes.post("/", discussionController.create);
+discussionRoutes.patch("/:id", verifyAccessToken, discussionController.update);
+discussionRoutes.delete("/:id", verifyAccessToken, discussionController.remove);
 
 export default discussionRoutes;
