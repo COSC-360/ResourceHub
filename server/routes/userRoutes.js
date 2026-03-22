@@ -1,8 +1,14 @@
-import { Router } from "express"
-import * as userController from "../controllers/userController.js"
-import { authMiddleware } from "../middleware/authMiddleware.js"
+import { Router } from "express";
+import * as userController from "../controllers/userController.js";
+import { verifyAccessToken } from "../middleware/authMiddleware.js";
 
 export const userRoutes = Router();
 
-userRoutes.get("/getUserById", authMiddleware, userController.getUserById);
-userRoutes.patch("/updateProfile", authMiddleware, userController.updateProfile);
+userRoutes.get("/getUserById", verifyAccessToken, userController.getUserById);
+userRoutes.post("/signin", userController.createUser);
+userRoutes.post("/login", userController.authenticateUser);
+userRoutes.patch(
+  "/updateProfile",
+  verifyAccessToken,
+  userController.updateProfile,
+);

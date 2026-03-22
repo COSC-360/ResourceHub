@@ -1,3 +1,23 @@
-export function authMiddleware(){
-    //placeholder
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+export async function verifyAccessToken(req, res, next) {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader?.split(" ")[1];
+
+  if (!token) {
+    res.status(401).json({ error: "No access token found" });
+    next();
+  }
+
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET_KEY, (err, user) => {
+    if (err) {
+      res.status(403).json({ error: "Unauthorized" });
+      return;
+    }
+    req.user = user;
+    next();
+  });
 }
