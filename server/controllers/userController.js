@@ -61,11 +61,12 @@ export function getUserById(req, res) {
 
 export function updateProfile(req, res) {
   const id = req.user._id;
+  const data = req.body;
   if (!id || typeof id !== "string" || !id.trim()) {
     res.status(400).json({ error: "Id is required" });
     return;
   }
 
-  const user = userService.updateProfile(id, body);
+  const user = userService.updateProfile(id, data);
   res.json({ data: user });
 }
