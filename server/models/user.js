@@ -11,4 +11,15 @@ const UserSchema = new mongoose.Schema({
   pfp: { type: String },
 });
 
+const popularCoursesByUser = {};
+
 export const User = mongoose.model("User", UserSchema);
+
+
+export function getUserCourses(userId) {
+  return popularCoursesByUser[userId] || [];
+}
+
+export function findMostPopularCourses() {
+  return [...allCourses].sort((a, b) => b.likes - a.likes);
+}

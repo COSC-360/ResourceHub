@@ -12,3 +12,7 @@ userRoutes.patch(
   verifyAccessToken,
   userController.updateProfile,
 );
+userRoutes.get("/courses", authMiddleware, userController.getUserCourses);
+userRoutes.post("/save", authMiddleware, userController.saveUserCourses);
+userRoutes.put("/update", authMiddleware, userController.updateUserCourses);
+userRoutes.delete("/hide", authMiddleware, userController.hideUserCourses);
