@@ -82,5 +82,33 @@
     "code": "COSC360",
     "description": "I love ifeoma",
     "image": null
+  },
+  {
+    "id": "2e2f8560-d4ec-47c8-be96-d16f81f75c00",
+    "name": "test",
+    "code": "test",
+    "description": "test",
+    "image": null
+  },
+  {
+    "id": "bab46019-bc93-4d7e-a2fb-9a925d5cd948",
+    "name": "test",
+    "code": "test",
+    "description": "test",
+    "image": null
+  },
+  {
+    "id": "4dc6eb3c-35b5-4b44-97e1-ed30eb3f6a05",
+    "name": "calc 3",
+    "code": "math 200",
+    "description": "3",
+    "image": null
+  },
+  {
+    "id": "34c9032c-2349-4d76-a229-a572c68896ce",
+    "name": "Calculus III",
+    "code": "MATH 200",
+    "description": "great course",
+    "image": null
   }
 ]

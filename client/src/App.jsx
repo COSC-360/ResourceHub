@@ -9,18 +9,17 @@ import Sidebar from "./components/Sidebar";
 
 function App() {
   return (
-  <div className="header-area">
+    <div className="header-area">
       <Header />
-      <Routes>
-        <Route path="/" element={<CreateCourse />} />
-        <Route path="/courses/:courseId" element={<CoursePage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-
       <div className="sidebar-area">
         <Sidebar />
         <div className="feed-area">
-          <Feed />
+          <Routes>
+            <Route path="/" element={<Feed />} />
+            <Route path="/create-course" element={<CreateCourse />} />
+            <Route path="/courses/:courseId" element={<CoursePage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
         </div>
       </div>
     </div>

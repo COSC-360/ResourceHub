@@ -1,10 +1,25 @@
+import { useNavigate } from "react-router-dom";
+import Button from "./Button";
+
 function SideBarNav({ active, setActive }) {
+  const navigate = useNavigate();
+
+  function handleHomeClick() {
+    setActive("home");
+    navigate("/");
+  }
+
+  function handleCreateCourseClick() {
+    setActive("createCourse");
+    navigate("/create-course");
+  }
+
   return (
     <ul className="nav">
       <li
         style={{ cursor: "pointer", pointerEvents: "auto", userSelect: "none" }}
         className={active === "home" ? "active" : ""}
-        onClick={() => setActive("home")}
+        onClick={handleHomeClick}
       >
         Home
       </li>
@@ -40,6 +55,16 @@ function SideBarNav({ active, setActive }) {
         onClick={() => setActive("startDiscussion")}
       >
         Start Discussion
+      </li>
+
+      {/* Create Course Button, brings up CreateCourse.jsx */}
+      <li>
+        <Button
+          active={active === "createCourse"}
+          onClick={handleCreateCourseClick}
+        >
+          Create Course
+        </Button>
       </li>
     </ul>
   );
