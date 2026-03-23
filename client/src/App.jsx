@@ -6,6 +6,7 @@ import CreateCourse from "./components/CreateCourse";
 import CoursePage from "./components/CoursePage";
 import Feed from "./components/Feed";
 import Sidebar from "./components/Sidebar";
+import NotFound from "./components/NotFoundPage/NotFound";
 
 function App() {
   return (
@@ -14,7 +15,7 @@ function App() {
       <Routes>
         <Route path="/" element={<CreateCourse />} />
         <Route path="/courses/:courseId" element={<CoursePage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
 
       <div className="sidebar-area">
