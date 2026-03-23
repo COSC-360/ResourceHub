@@ -8,6 +8,8 @@ import Feed from "./components/Feed";
 import Sidebar from "./components/Sidebar";
 import NotFound from "./components/NotFoundPage/NotFound";
 
+// Main layout component that includes the header and sidebar, 
+// and an Outlet for rendering the main content based on the route
 function MainLayout() {
   return (
     <div className="app-layout">
@@ -26,12 +28,14 @@ function MainLayout() {
 function App() {
   return (
     <Routes>
+      {/* Main layout route, routes inside get rendered within the Outlet in MainLayout */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<Feed />} />
         <Route path="/courses/:courseId" element={<CoursePage />} />
       </Route>
       
-      <Route path="*" element={<NotFound />} />
+      {/* not found page renders differently */}
+      <Route path="*" element={<NotFound />} /> 
     </Routes>
   );
 }
