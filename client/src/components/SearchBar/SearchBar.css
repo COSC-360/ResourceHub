@@ -1,15 +1,19 @@
 .searchBarContainer {
-    position: relative;
-    display: flex;
-    align-items: center;
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
 }
 
 .searchBar {
-    border: none;
-    border-radius: 8px;
-    width: 400px;
-    height: 40px;
-    padding-left: 40px;
+  border: none;
+  border-radius: 8px;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 40px;
+  padding-left: 40px;
 }
 
 .searchIcon {
@@ -19,4 +23,8 @@
     width: 20px;
     height: 20px;
     pointer-events: none;
+}
+
+#searchForm {
+  width: 100%;
 }
