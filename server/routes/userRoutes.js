@@ -12,3 +12,4 @@ userRoutes.patch(
   verifyAccessToken,
   userController.updateProfile,
 );
+userRoutes.post("/verifytoken", verifyAccessToken, userController.verifyToken);
