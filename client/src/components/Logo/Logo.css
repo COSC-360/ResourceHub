@@ -1,9 +1,10 @@
 .logo {
     color: white;
     font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;    
-    font-size: 40px;
+    font-size: clamp(24px, 2.8vw, 40px);
     text-decoration: none;
     justify-content: center;
-    padding: 0px 0px 0px 40px;
+    padding: 0;
     white-space: nowrap;
+    line-height: 1;
 }
