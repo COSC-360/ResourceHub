@@ -30,7 +30,7 @@ html, body {
 }
 
 body {
-  line-height: 1;
+    line-height: inherit;
 }
 
 ol, ul {
