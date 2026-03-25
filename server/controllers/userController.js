@@ -1,5 +1,6 @@
 import * as userService from "../services/userService.js";
 import * as userRepository from "../repositories/userRepository.js";
+import { BiYen } from "react-icons/bi";
 
 export async function createUser(req, res) {
   const user = {
@@ -44,7 +45,7 @@ export async function authenticateUser(req, res) {
     res.status(401).json({ error: "Wrong email or password" });
     return;
   }
-  res.status(200).json({ accessToken: accessToken });
+  res.status(200).json({ access_token: accessToken });
 }
 
 export function getUserById(req, res) {
@@ -69,4 +70,9 @@ export function updateProfile(req, res) {
 
   const user = userService.updateProfile(id, data);
   res.json({ data: user });
+}
+
+export function verifyToken(req, res) {
+  if (req.user) return res.status(200).json("Valid access token.");
+  return res.status(403).json("Invalid access token.");
 }
