@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './css/CreateCourse.css';
+import './CreateCourse.css';
+import { apiClient } from '../../lib/api-client';
 
 export default function CreateCourse() {
     const navigate = useNavigate();
@@ -31,19 +32,10 @@ export default function CreateCourse() {
         };
 
         try {
-            const response = await fetch('http://localhost:3000/api/courses', {
+            const createdCourse = await apiClient('/api/courses', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(course),
+                body: course,
             });
-
-            if (!response.ok) {
-                throw new Error('Failed to create course');
-            }
-
-            const createdCourse = await response.json();
             console.log('Created course:', createdCourse);
             navigate(`/courses/${createdCourse.data.id}`, {
                 state: { course: createdCourse.data },

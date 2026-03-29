@@ -1,6 +1,6 @@
-import React, { useContext, useState } from "react";
-import "./css/AuthForm.css";
-import AuthContext from "../AuthContext.jsx";
+import { useContext, useState } from "react";
+import "./AuthForm.css";
+import AuthContext from "../../AuthContext.jsx";
 
 const AuthForm = () => {
   const { login } = useContext(AuthContext);

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import SideBarNav from "./SideBarNav";
-import "./css/Sidebar.css";
+import "./Sidebar.css";
 
 function SideBar() {
   const [active, setActive] = useState("home");

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { FeedPost } from "../FeedPost";
+import { FeedPost } from "../Feed/FeedPost";
+import { apiClient } from "../../lib/api-client";
 
 export function SearchResults() {
     const location = useLocation();
@@ -14,27 +15,32 @@ export function SearchResults() {
                 return;
             }
 
-            //TODO: Make a common api for all routes instead of making the call within the react components
-            const res = await fetch(`/api/common/search?term=${encodeURIComponent(term)}`);
-            const data = await res.json();
+            try {
+                const data = await apiClient(`/api/common/search?term=${encodeURIComponent(term)}`, {
+                    method: "GET",
+                });
 
-            const discussions =
-                data?.searchResults?.discussions ||
-                data?.discussions ||
-                [];
+                const discussions =
+                    data?.searchResults?.discussions ||
+                    data?.discussions ||
+                    [];
 
-            const transformedData = discussions.map((discussion) => ({
-                username: discussion.username,
-                timeline: discussion.timestamp,
-                faculty: discussion.faculty,
-                comment: discussion.content,
-                up_votes: discussion.upvotes,
-                down_votes: discussion.downvotes,
-                replies: discussion.replies,
-                _id: discussion._id,
-            }));
+                const transformedData = discussions.map((discussion) => ({
+                    username: discussion.username,
+                    timeline: discussion.timestamp,
+                    faculty: discussion.faculty,
+                    comment: discussion.content,
+                    up_votes: discussion.upvotes,
+                    down_votes: discussion.downvotes,
+                    replies: discussion.replies,
+                    _id: discussion._id,
+                }));
 
-            setResults(transformedData);
+                setResults(transformedData);
+            } catch (error) {
+                console.error("Search API error", error);
+                setResults([]);
+            }
         };
         fetchResults();
     }, [location.search]);

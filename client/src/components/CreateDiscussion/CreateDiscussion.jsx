@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import "./css/CreateDiscussion.css";
+import { useState } from "react";
+import "./CreateDiscussion.css";
+import { apiClient } from "../../lib/api-client";
 
 const CreateDiscussion = ({ onDiscussionCreated }) => {
   const [formData, setFormData] = useState({
@@ -41,30 +42,15 @@ const CreateDiscussion = ({ onDiscussionCreated }) => {
       console.log(
         "Sending POST request to http://localhost:3000/api/discussion",
       );
-      const response = await fetch("http://localhost:3000/api/discussion", {
+      const result = await apiClient("/api/discussion", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+        body: {
           username: formData.username,
           faculty: formData.faculty,
           content: formData.content,
-        }),
+        },
       });
 
-      console.log("Response status:", response.status);
-      console.log("Response ok:", response.ok);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Error response:", errorText);
-        throw new Error(
-          `Failed to create discussion: ${response.status} ${errorText}`,
-        );
-      }
-
-      const result = await response.json();
       console.log("Post created successfully:", result);
       setSuccess(true);
       setFormData({

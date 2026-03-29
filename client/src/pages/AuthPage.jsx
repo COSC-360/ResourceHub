@@ -1,7 +1,6 @@
-import React from "react";
-import AuthForm from "../components/AuthForm";
+import AuthForm from "../components/AuthForm/AuthForm.jsx";
 
-const Authpage = () => {
+const AuthPage = () => {
   return (
     <div>
       <AuthForm />
@@ -9,4 +8,4 @@ const Authpage = () => {
   );
 };
 
-export default Authpage;
+export default AuthPage;

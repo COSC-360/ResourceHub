@@ -2,6 +2,7 @@
 import { createContext, useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { apiClient } from "./lib/api-client";
 
 const AuthContext = createContext();
 
@@ -10,23 +11,20 @@ export const AuthProvider = ({ children }) => {
   const router = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem("access_token");
     const verifytoken = async () => {
       const token = localStorage.getItem("access_token");
       if (!token) return;
 
       try {
-        const response = await fetch(
-          `http://localhost:3000/api/user/verifytoken/`,
+        const data = await apiClient(
+          `/api/user/verifytoken/`,
           {
+            method: "GET",
             headers: {
               Authorization: `Bearer ${token}`,
             },
           },
         );
-        if (!response.ok) throw new Error();
-
-        const data = await response.json();
 
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
@@ -43,24 +41,16 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const params = new URLSearchParams();
-
-      params.append("email", email);
-      params.append("password", password);
-
-      const response = await axios.post(
-        "http://localhost:3000/api/user/login",
-        params,
-        {
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        },
-      );
+      const response = await apiClient("/api/user/login", {
+        method: "POST",
+        body: { email, password },
+      });
       axios.defaults.headers.common["Authorization"] =
-        `Bearer ${response.data.access_token}`;
-      localStorage.setItem("access_token", response.data.access_token);
-      localStorage.setItem("user", JSON.stringify(response.data));
+        `Bearer ${response.access_token}`;
+      localStorage.setItem("access_token", response.access_token);
+      localStorage.setItem("user", JSON.stringify(response));
 
-      const token = response.data.access_token;
+      const token = response.access_token;
       const payload = JSON.parse(atob(token.split(".")[1]));
 
       setUser({
@@ -73,34 +63,19 @@ export const AuthProvider = ({ children }) => {
       router("/"); //change this if homepage route changes
     } catch (error) {
       console.log("Login failed:", error);
-      if (error.response) {
-        console.log("Response status:", error.response.status);
-        console.log("Response data:", error.response.data);
-      } else if (error.request) {
-        console.log("No response received:", error.request);
-      } else {
-        console.log("Error message:", error.message);
-      }
       throw new Error("Login failed");
     }
   };
 
   const signup = async (username, email, password) => {
     try {
-      const params = new URLSearchParams();
-      params.append("username", username);
-      params.append("email", email);
-      params.append("password", password);
-      const response = await axios.post(
-        "http://localhost:3000/api/user/signin",
-        params,
-        {
-          headers: { "Content-Type": "application/json" },
-        },
-      );
+      const response = await apiClient("/api/user/signin", {
+        method: "POST",
+        body: { username, email, password },
+      });
       console.log(response);
 
-      const token = response.data.access_token;
+      const token = response.access_token;
 
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       localStorage.setItem("access_token", token);
@@ -112,7 +87,7 @@ export const AuthProvider = ({ children }) => {
         access_token: token,
       });
 
-      router.push("/"); //change this if homepage route changes
+      router("/"); //change this if homepage route changes
 
       return true;
     } catch (error) {

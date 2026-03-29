@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
-import FeedPost from "../components/FeedPost";
-import CreateDiscussion from "./CreateDiscussion";
+import { useState, useEffect } from "react";
+import FeedPost from "./FeedPost";
+import CreateDiscussion from "../CreateDiscussion/CreateDiscussion";
+import { apiClient } from "../../lib/api-client";
 
 const Feed = () => {
   const [discussions, setDiscussions] = useState([]);
@@ -26,11 +27,7 @@ const Feed = () => {
     const fetchDiscussions = async () => {
       try {
         setLoading(true);
-        const response = await fetch("http://localhost:3000/api/discussion");
-        if (!response.ok) {
-          throw new Error("Failed to fetch discussions");
-        }
-        const result = await response.json();
+        const result = await apiClient("/api/discussion", {});
         const discussions = Array.isArray(result.data)
           ? result.data
           : Array.isArray(result)
