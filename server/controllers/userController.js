@@ -1,6 +1,5 @@
 import * as userService from "../services/userService.js";
 import * as userRepository from "../repositories/userRepository.js";
-import { BiYen } from "react-icons/bi";
 
 export async function createUser(req, res) {
   const user = {
