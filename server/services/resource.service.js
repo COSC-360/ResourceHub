@@ -1,4 +1,4 @@
-import { Resource } from '../../../../models/resource.js';
+import { Resource } from '../models/resource.js';
 import * as resourceRepository from './resource.repository.js';
 
 export function get(id) {
