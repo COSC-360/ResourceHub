@@ -1,0 +1,42 @@
+.headerDiv {
+  background-color: #b646eb;
+  width: 100%;
+  min-height: 80px;
+  border-radius: 10px;
+
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+
+.logoDiv {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.searchBarDiv {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 50%;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.searchBarDiv > * {
+  width: 100%;
+  min-width: 0;
+}
+
+.buttonDiv {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}

@@ -18,7 +18,6 @@ const FeedPost = ({ post_props }) => {
 
         <div className="post-footer">
           <i className="bi bi-arrow-up"></i>
-          {/* didn't the Ta say no icon libraries? these icons are from the bootstrap icon library */}
           <p>{post_props.up_votes}</p>
           <i className="bi bi-arrow-down"></i>
           <p>{post_props.down_votes}</p>
