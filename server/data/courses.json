@@ -82,5 +82,12 @@
     "code": "COSC360",
     "description": "I love ifeoma",
     "image": null
+  },
+  {
+    "id": "e213532e-7cf7-44ed-8e1a-a78b595241ba",
+    "name": "math class",
+    "code": "MATH69",
+    "description": "Mathing",
+    "image": null
   }
 ]

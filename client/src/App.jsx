@@ -3,6 +3,7 @@ import "./components/FeedPost.jsx";
 import "./App.css";
 import Header from "./components/Header/Header.jsx";
 import CreateCourse from "./components/CreateCourse.jsx";
+import SearchResults from "./components/SearchResults/SearchResults.jsx";
 import CoursePage from "./components/CoursePage.jsx";
 import Feed from "./components/Feed.jsx";
 import Sidebar from "./components/Sidebar.jsx";
@@ -32,6 +33,7 @@ function App() {
       {/* Main layout route, routes inside get rendered within the Outlet in MainLayout */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<Feed />} />
+        <Route path="/search" element={<SearchResults />} />
         <Route path="/courses/:courseId" element={<CoursePage />} />
       </Route>
       {/* not found page renders differently */}

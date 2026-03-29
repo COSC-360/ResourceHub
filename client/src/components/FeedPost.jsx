@@ -1,7 +1,7 @@
 import React from "react";
 import "./css/Feed.css";
 
-const FeedPost = ({ post_props }) => {
+export const FeedPost = ({ post_props }) => {
   return (
     <div className="post">
       <img src={post_props.pfp} />

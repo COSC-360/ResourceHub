@@ -1,11 +1,9 @@
 import { useState } from "react";
 import SideBarNav from "./SideBarNav";
-import SideBarFooter from "./SideBarFooter";
 import "./css/Sidebar.css";
 
 function SideBar() {
   const [active, setActive] = useState("home");
-  const [loggedIn, setLoggedIn] = useState(false);
 
   return (
     <aside className="sidebar">
