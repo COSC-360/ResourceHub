@@ -1,6 +1,6 @@
 import { SearchBar } from "../SearchBar/SearchBar"
 import { ProfileSection } from "../ProfileSection/ProfileSection"
-import { Logo } from "../Logo"
+import { Logo } from "../Logo/Logo"
 import "./Header.css"
 
 /* userType undefined = unregistered

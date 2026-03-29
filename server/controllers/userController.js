@@ -44,7 +44,7 @@ export async function authenticateUser(req, res) {
     res.status(401).json({ error: "Wrong email or password" });
     return;
   }
-  res.status(200).json({ accessToken: accessToken });
+  res.status(200).json({ access_token: accessToken });
 }
 
 export function getUserById(req, res) {
@@ -116,4 +116,9 @@ export function hideUserCourses(req, res) {
 
     const result = userService.hideUserCourses(req.userId, courseId);
     res.json({ data: result });
+}
+
+export function verifyToken(req, res) {
+  if (req.user) return res.status(200).json("Valid access token.");
+  return res.status(403).json("Invalid access token.");
 }

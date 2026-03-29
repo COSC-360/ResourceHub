@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import FeedPost from "../components/FeedPost";
 import CreateDiscussion from "./CreateDiscussion";
 
-const feed = () => {
+const Feed = () => {
   const [discussions, setDiscussions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -74,4 +74,4 @@ const feed = () => {
   );
 };
 
-export default feed;
+export default Feed;

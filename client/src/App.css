@@ -1,15 +1,16 @@
-.header-area {
-  min-height: 100vh;
-}
-
-.sidebar-area {
+.app-layout {
   display: flex;
-  gap: 20px;
-  align-items: flex-start;
-  padding: 20px;
+  flex-direction: column;
+  min-height: 100vh;
+  padding-top: var(--header-height);
 }
 
-.feed-area {
+.body-layout {
+  display: flex;
   flex: 1;
-  min-width: 0;
+}
+
+.main-content {
+  flex: 1;
+  padding: 20px;
 }

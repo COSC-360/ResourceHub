@@ -1,6 +1,6 @@
 import * as commonService from "../services/commonService.js"
 
-export function search(req, res) {
+export async function search(req, res) {
     console.log("request received");
     const searchTerm = req.query.term;
 
@@ -9,6 +9,6 @@ export function search(req, res) {
         return;
     }
     
-    const results = commonService.search(searchTerm);
+    const results = await commonService.search(searchTerm);
     res.json({ searchResults: results });
 }

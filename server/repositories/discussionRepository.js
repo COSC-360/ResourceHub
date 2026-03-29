@@ -70,4 +70,13 @@ export const DiscussionRepository = {
       .limit(limit)
       .lean();
   },
+
+  //This is currently searching by the content field.
+  async search(searchTerm) {
+    return await Discussion.find({
+      content: { $regex: searchTerm, $options: "i" }
+    }).sort({ timestamp: -1 });
+  },
 };
+
+export default DiscussionRepository;
