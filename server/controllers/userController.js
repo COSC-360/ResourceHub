@@ -71,6 +71,53 @@ export function updateProfile(req, res) {
   res.json({ data: user });
 }
 
+
+export function getUserCourses(userId) {
+  const savedCourses = userService.getUserCourses(userId);
+
+  if (savedCourses.length > 0) {
+    return savedCourses;
+  }
+
+  return userService.findMostPopularCourses();
+}
+
+export function saveUserCourses(req, res) {
+    const { courses } = req.body;
+
+    if (getUserById(req.userId) === null) {
+        throw new Error("User not authenticated");
+    } 
+    const result = userService.saveUserCourses(req.userId, courses);
+    res.json({ data: result });
+}   
+
+
+export function updateUserCourses(req, res) {
+    const { courses } = req.body;
+
+    if (getUserById(req.userId) === null) {
+        throw new Error("User not authenticated");
+    } 
+    const result = userService.updateUserCourses(req.userId, courses);
+    res.json({ data: result });
+  }
+
+export function hideUserCourses(req, res) {
+    const { courseId } = req.body;
+
+    if (getUserById(req.userId) === null) {
+        throw new Error("User not authenticated");
+    }
+    if (!courseId) {
+      res.status(400).json({ error: "Course ID is required" });
+      return;
+    }
+
+    const result = userService.hideUserCourses(req.userId, courseId);
+    res.json({ data: result });
+}
+
 export function verifyToken(req, res) {
   if (req.user) return res.status(200).json("Valid access token.");
   return res.status(403).json("Invalid access token.");
