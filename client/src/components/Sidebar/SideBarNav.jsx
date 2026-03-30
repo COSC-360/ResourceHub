@@ -1,45 +1,28 @@
-function SideBarNav({ active, setActive }) {
+import { Link, useLocation } from "react-router-dom";
+
+function SideBarNav() {
+  const location = useLocation();
   return (
     <ul className="nav">
-      <li
-        style={{ cursor: "pointer", pointerEvents: "auto", userSelect: "none" }}
-        className={active === "home" ? "active" : ""}
-        onClick={() => setActive("home")}
-      >
-        Home
+      <li className={location.pathname === "/" ? "active" : ""}>
+        <Link to="/">Home</Link>
       </li>
 
-      <li
-        style={{ cursor: "pointer", pointerEvents: "auto", userSelect: "none" }}
-        className={active === "courseDiscussions" ? "active" : ""}
-        onClick={() => setActive("courseDiscussions")}
-      >
-        Course Discussions
+      <li className={location.pathname === "/course-discussions" ? "active" : ""}>
+        <Link to="/course-discussions">Course Discussions</Link>
       </li>
 
-      <li
-        style={{ cursor: "pointer", pointerEvents: "auto", userSelect: "none" }}
-        className={active === "courseResources" ? "active" : ""}
-        onClick={() => setActive("courseResources")}
-      >
-        Course Resources
+      <li className={location.pathname === "/course-resources" ? "active" : ""}>
+        <Link to="/course-resources">Course Resources</Link>
       </li>
 
-      <li
-        style={{ cursor: "pointer", pointerEvents: "auto", userSelect: "none" }}
-        className={active === "popular" ? "active" : ""}
-        onClick={() => setActive("popular")}
-      >
+      <li className={location.pathname === "/my-courses" ? "active" : ""}>
         {/* Formerly this is popular but we have changed the back end to be users courses so Im just changing the word */}
-        My Courses
+        <Link to="/my-courses">My Courses</Link>
       </li>
 
-      <li
-        style={{ cursor: "pointer", pointerEvents: "auto", userSelect: "none" }}
-        className={active === "startDiscussion" ? "active" : ""}
-        onClick={() => setActive("startDiscussion")}
-      >
-        Start Discussion
+      <li className={location.pathname === "/start-discussion" ? "active" : ""}>
+        <Link to="/start-discussion">Start Discussion</Link>
       </li>
     </ul>
   );
