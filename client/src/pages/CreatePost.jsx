@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import CreateDiscussion from "../components/CreateDiscussion";
+import CreateDiscussion from "../components/CreateDiscussion/CreateDiscussion.jsx";
 import { useNavigate } from "react-router-dom";
 
 const CreatePost = () => {

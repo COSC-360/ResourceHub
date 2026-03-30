@@ -1,13 +1,7 @@
-<<<<<<< HEAD:client/src/components/CreateDiscussion.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./css/CreateDiscussion.css";
-=======
-import { useState } from "react";
-import "./CreateDiscussion.css";
-import { apiClient } from "../../lib/api-client";
->>>>>>> d1912acce4e735c15ff505f1db2a82380956d555:client/src/components/CreateDiscussion/CreateDiscussion.jsx
 
 const CreateDiscussion = ({ onDiscussionCreated }) => {
   const [formData, setFormData] = useState({
@@ -45,7 +39,6 @@ const CreateDiscussion = ({ onDiscussionCreated }) => {
       console.log(
         "Sending POST request to http://localhost:3000/api/discussion",
       );
-<<<<<<< HEAD:client/src/components/CreateDiscussion.jsx
       const token = localStorage.getItem("access_token");
       const response = await axios.post(
         "http://localhost:3000/api/discussion",
@@ -73,17 +66,6 @@ const CreateDiscussion = ({ onDiscussionCreated }) => {
       }
 
       const result = await response.data;
-=======
-      const result = await apiClient("/api/discussion", {
-        method: "POST",
-        body: {
-          username: formData.username,
-          faculty: formData.faculty,
-          content: formData.content,
-        },
-      });
-
->>>>>>> d1912acce4e735c15ff505f1db2a82380956d555:client/src/components/CreateDiscussion/CreateDiscussion.jsx
       console.log("Post created successfully:", result);
       setSuccess(true);
       setFormData({
