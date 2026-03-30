@@ -4,7 +4,9 @@ import mongoose from "mongoose";
 const DiscussionSchema = new mongoose.Schema({
   _id: { type: String, default: uuidv4 },
   image: { type: String, default: null },
+  title: { type: String, default: null },
   content: { type: String, required: true },
+  pfp: { type: String, default: null },
   username: { type: String, required: true },
   faculty: { type: String, default: "None" },
   authorId: { type: String, required: true },

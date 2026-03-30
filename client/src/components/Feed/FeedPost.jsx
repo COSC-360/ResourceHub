@@ -10,6 +10,12 @@ export const FeedPost = ({ post_props }) => {
           <h2 className="username">{post_props.username}</h2>
           <p className="details">• {post_props.timeline}</p>
           <p className="details">• {post_props.faculty}</p>
+          {post_props.isAuthor ? (
+            <button className="edit">
+              <i class="bi bi-pencil-square" />
+              Edit
+            </button>
+          ) : null}
         </div>
 
         <p>{post_props.comment}</p>

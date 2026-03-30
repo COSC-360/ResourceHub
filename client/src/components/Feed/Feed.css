@@ -22,6 +22,13 @@
   gap: 5px;
 }
 
+.edit {
+  border: none;
+  color: rgb(3, 156, 228);
+  justify-self: flex-end;
+  margin-left: auto;
+}
+
 .post-header h2 {
   margin: auto 0;
 }

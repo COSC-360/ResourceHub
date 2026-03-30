@@ -48,14 +48,18 @@ export async function authenticateUser(req, res) {
 }
 
 export function getUserById(req, res) {
-  const id = req.body;
+  const id = req.user.id;
 
   if (!id || typeof id !== "string" || !id.trim()) {
-    res.status(400).json({ error: "Id is required" });
+    res.status(400).json({ error: "Invalid user ID" });
     return;
   }
 
-  const user = userService.getUserById(id.trim());
+  const user = userService.getUserById(id);
+  if (!user) {
+    res.status(404).json({ error: "User not found" });
+    return;
+  }
   res.json({ data: user });
 }
 
