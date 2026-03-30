@@ -19,6 +19,7 @@ export async function verifyAccessToken(req, res, next) {
       return;
     }
     req.user = user;
+    req.userId = user.id;
     next();
   });
 }

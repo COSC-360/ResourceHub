@@ -1,6 +1,5 @@
 import * as userService from "../services/userService.js";
 import * as userRepository from "../repositories/userRepository.js";
-import { BiYen } from "react-icons/bi";
 
 export async function createUser(req, res) {
   const user = {
@@ -74,6 +73,53 @@ export function updateProfile(req, res) {
 
   const user = userService.updateProfile(id, data);
   res.json({ data: user });
+}
+
+
+export function getUserCourses(userId) {
+  const savedCourses = userService.getUserCourses(userId);
+
+  if (savedCourses.length > 0) {
+    return savedCourses;
+  }
+
+  return userService.findMostPopularCourses();
+}
+
+export function saveUserCourses(req, res) {
+    const { courses } = req.body;
+
+    if (getUserById(req.userId) === null) {
+        throw new Error("User not authenticated");
+    } 
+    const result = userService.saveUserCourses(req.userId, courses);
+    res.json({ data: result });
+}   
+
+
+export function updateUserCourses(req, res) {
+    const { courses } = req.body;
+
+    if (getUserById(req.userId) === null) {
+        throw new Error("User not authenticated");
+    } 
+    const result = userService.updateUserCourses(req.userId, courses);
+    res.json({ data: result });
+  }
+
+export function hideUserCourses(req, res) {
+    const { courseId } = req.body;
+
+    if (getUserById(req.userId) === null) {
+        throw new Error("User not authenticated");
+    }
+    if (!courseId) {
+      res.status(400).json({ error: "Course ID is required" });
+      return;
+    }
+
+    const result = userService.hideUserCourses(req.userId, courseId);
+    res.json({ data: result });
 }
 
 export function verifyToken(req, res) {

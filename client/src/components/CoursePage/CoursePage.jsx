@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useParams, Link } from 'react-router-dom';
+import { apiClient } from '../../lib/api-client';
 
 export default function CoursePage() {
     const location = useLocation();
@@ -19,13 +20,8 @@ export default function CoursePage() {
                 setIsLoading(true);
                 setError('');
 
-                const response = await fetch(`http://localhost:3000/api/courses/${courseId}`);
+                const payload = await apiClient(`/api/courses/${courseId}`, {});
 
-                if (!response.ok) {
-                    throw new Error('Course not found');
-                }
-
-                const payload = await response.json();
                 setCourse(payload.data);
             } catch (fetchError) {
                 setError(fetchError.message || 'Failed to load course');

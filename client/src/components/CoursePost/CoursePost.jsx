@@ -1,4 +1,4 @@
-import './css/CoursePost.css';
+import './CoursePost.css';
 
 function CoursePost({ course }) {
     let courseName = course.name + " " + course.code;

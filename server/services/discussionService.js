@@ -1,6 +1,5 @@
 import { Discussion } from "../models/Discussion.js";
 import { DiscussionRepository } from "../repositories/discussionRepository.js";
-import * as authRepository from "../repositories/authRepository.js";
 
 export function getLatest() {
   return DiscussionRepository.findAll();

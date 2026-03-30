@@ -1,5 +1,8 @@
 import { User } from "../models/User.js";
 
+const popularCoursesByUser = {};
+const allCourses = [];
+
 export async function save(username, email, password) {
   return await User.create({
     username: username,
@@ -30,3 +33,36 @@ export async function updateProfile(userid, data) {
   if (data.password) await User.updateOne({ _id: userid, bio: data.username });
   return await User.findById(userid);
 }
+
+
+export function findMostPopularCourses() {
+  return [...allCourses].sort((a, b) => b.likes - a.likes);
+}
+
+export function getUserCourses(userId) {
+  return popularCoursesByUser[userId] || [];
+}
+
+export function saveUserCourses(userId, courses) {
+  popularCoursesByUser[userId] = courses;
+  return { userId, courses: popularCoursesByUser[userId] };
+}
+
+export function updateUserCourses(userId, courses) {
+  popularCoursesByUser[userId] = courses;
+  return { userId, courses: popularCoursesByUser[userId] };
+}
+
+export function hideUserCourses(userId, courseId) {
+  const userCourses = popularCoursesByUser[userId] || [];
+
+  popularCoursesByUser[userId] = userCourses.filter(
+    (id) => String(id) !== String(courseId)
+  );
+
+  return {
+    userId,
+    courses: popularCoursesByUser[userId]
+  };
+}
+

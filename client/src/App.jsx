@@ -1,12 +1,12 @@
-import { Routes, Route, Navigate, Outlet } from "react-router-dom";
-import "./components/FeedPost.jsx";
+import { Routes, Route, Outlet } from "react-router-dom";
+import "./components/Feed/FeedPost.jsx";
 import "./App.css";
 import Header from "./components/Header/Header.jsx";
-import CreateCourse from "./components/CreateCourse.jsx";
-import CoursePage from "./components/CoursePage.jsx";
-import Feed from "./pages/Feed.jsx";
-import Sidebar from "./components/Sidebar.jsx";
-import Authpage from "./pages/AuthPage.jsx";
+import SearchResults from "./components/SearchResults/SearchResults.jsx";
+import CoursePage from "./components/CoursePage/CoursePage.jsx";
+import Feed from "./pages/Feed/Feed.jsx";
+import Sidebar from "./components/Sidebar/Sidebar.jsx";
+import AuthPage from "./pages/AuthPage.jsx";
 import NotFound from "./components/NotFoundPage/NotFound.jsx";
 import CreatePost from "./pages/CreatePost.jsx";
 
@@ -33,11 +33,12 @@ function App() {
       {/* Main layout route, routes inside get rendered within the Outlet in MainLayout */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<Feed />} />
+        <Route path="/search" element={<SearchResults />} />
         <Route path="/courses/:courseId" element={<CoursePage />} />
         <Route path="/create" element={<CreatePost />} />
       </Route>
       {/* not found page renders differently */}
-      <Route path="/auth" element={<Authpage />} />
+      <Route path="/auth" element={<AuthPage />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
