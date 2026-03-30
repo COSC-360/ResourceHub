@@ -1,15 +1,17 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import "./css/CreateDiscussion.css";
 
 const CreateDiscussion = ({ onDiscussionCreated }) => {
   const [formData, setFormData] = useState({
-    username: "",
-    faculty: "",
+    title: "",
     content: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  const router = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -27,11 +29,7 @@ const CreateDiscussion = ({ onDiscussionCreated }) => {
     setSuccess(false);
 
     // Validate form data
-    if (
-      !formData.username.trim() ||
-      !formData.content.trim() ||
-      !formData.faculty.trim()
-    ) {
+    if (!formData.title.trim() || !formData.content.trim()) {
       setError("Please fill in all fields");
       setLoading(false);
       return;
@@ -41,44 +39,40 @@ const CreateDiscussion = ({ onDiscussionCreated }) => {
       console.log(
         "Sending POST request to http://localhost:3000/api/discussion",
       );
-      const response = await fetch("http://localhost:3000/api/discussion", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: formData.username,
-          faculty: formData.faculty,
+      const token = localStorage.getItem("access_token");
+      const response = await axios.post(
+        "http://localhost:3000/api/discussion",
+        {
+          title: formData.title,
           content: formData.content,
-        }),
-      });
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
 
       console.log("Response status:", response.status);
       console.log("Response ok:", response.ok);
 
-      if (!response.ok) {
-        const errorText = await response.text();
+      if (!response.status === 201) {
+        const errorText = await response.data;
         console.error("Error response:", errorText);
         throw new Error(
           `Failed to create discussion: ${response.status} ${errorText}`,
         );
       }
 
-      const result = await response.json();
+      const result = await response.data;
       console.log("Post created successfully:", result);
       setSuccess(true);
       setFormData({
-        username: "",
-        faculty: "",
+        title: "",
         content: "",
       });
-
-      if (onDiscussionCreated) {
-        const newData = result.data || result;
-        console.log("Passing to parent:", newData);
-        onDiscussionCreated(newData);
-      }
-
+      router("/");
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
       console.error("Error creating discussion:", err);
@@ -100,35 +94,16 @@ const CreateDiscussion = ({ onDiscussionCreated }) => {
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="username">Username</label>
+            <label htmlFor="title">Title</label>
             <input
               type="text"
-              id="username"
-              name="username"
-              value={formData.username}
+              id="title"
+              name="title"
+              value={formData.title}
               onChange={handleChange}
               placeholder="Enter your username"
               disabled={loading}
             />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="faculty">Faculty</label>
-            <select
-              id="faculty"
-              name="faculty"
-              value={formData.faculty}
-              onChange={handleChange}
-              disabled={loading}
-            >
-              <option value="">Select a faculty</option>
-              <option value="Engineering">Engineering</option>
-              <option value="Science">Science</option>
-              <option value="Arts">Arts</option>
-              <option value="Business">Business</option>
-              <option value="Medicine">Medicine</option>
-              <option value="Law">Law</option>
-            </select>
           </div>
 
           <div className="form-group">

@@ -20,7 +20,12 @@ export async function userSignin(email, password) {
   const match = await bcrypt.compare(password, found.password);
   if (match) {
     const accessToken = jwt.sign(
-      { id: found._id, username: found.username },
+      {
+        id: found._id,
+        username: found.username,
+        faculty: found.faculty,
+        pfp: found.pfp,
+      },
       process.env.ACCESS_TOKEN_SECRET_KEY,
       {
         expiresIn: "60m",
@@ -36,12 +41,6 @@ export function getUserById(id) {
 }
 
 export function updateProfile(id, body) {
-  const user = userRepository.getUserById(id);
-  void body; //hack to pass CI
-  void user; //hack to pass CI
-
-  const newInfo = "placeholder";
-
-  const updatedUser = userRepository.updateProfile(id, newInfo);
+  const updatedUser = userRepository.updateProfile(id, body);
   return updatedUser;
 }

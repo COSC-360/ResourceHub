@@ -1,32 +1,26 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import FeedPost from "../components/FeedPost";
-import CreateDiscussion from "./CreateDiscussion";
+import CreateDiscussion from "../components/CreateDiscussion";
+import "./css/FeedPage.css";
 
 const feed = () => {
   const [discussions, setDiscussions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  const handleNewDiscussion = (newDiscussion) => {
-    // Refresh the discussion feed or add the new discussion to the list
-    const transformedDiscussion = {
-      username: newDiscussion.username,
-      timeline: newDiscussion.timestamp,
-      faculty: newDiscussion.faculty,
-      comment: newDiscussion.content,
-      up_votes: newDiscussion.upvotes || 0,
-      down_votes: newDiscussion.downvotes || 0,
-      replies: newDiscussion.replies || 0,
-      _id: newDiscussion._id,
-    };
-    setDiscussions((prev) => [transformedDiscussion, ...prev]);
-  };
+  const router = useNavigate();
 
   useEffect(() => {
     const fetchDiscussions = async () => {
       try {
+        const token = localStorage.getItem("access_token");
         setLoading(true);
-        const response = await fetch("http://localhost:3000/api/discussion");
+        const response = await fetch("http://localhost:3000/api/discussion", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
         if (!response.ok) {
           throw new Error("Failed to fetch discussions");
         }
@@ -36,7 +30,6 @@ const feed = () => {
           : Array.isArray(result)
             ? result
             : [];
-        console.log(result);
         // Transform backend data to match FeedPost component props
         const transformedData = discussions.map((discussion) => ({
           username: discussion.username,
@@ -47,6 +40,7 @@ const feed = () => {
           down_votes: discussion.downvotes,
           replies: discussion.replies,
           _id: discussion._id,
+          isAuthor: discussion.isAuthor,
         }));
 
         setDiscussions(transformedData);
@@ -65,8 +59,11 @@ const feed = () => {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div>
-      <CreateDiscussion onDiscussionCreated={handleNewDiscussion} />
+    <div className="body">
+      <button className="create_post" onClick={() => router("/create")}>
+        <i class="bi bi-plus" />
+        New Discussion
+      </button>
       {discussions.map((obj) => (
         <FeedPost post_props={obj} key={obj._id} />
       ))}

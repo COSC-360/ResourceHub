@@ -4,10 +4,11 @@ import "./App.css";
 import Header from "./components/Header/Header.jsx";
 import CreateCourse from "./components/CreateCourse.jsx";
 import CoursePage from "./components/CoursePage.jsx";
-import Feed from "./components/Feed.jsx";
+import Feed from "./pages/Feed.jsx";
 import Sidebar from "./components/Sidebar.jsx";
 import Authpage from "./pages/AuthPage.jsx";
 import NotFound from "./components/NotFoundPage/NotFound.jsx";
+import CreatePost from "./pages/CreatePost.jsx";
 
 // Main layout component that includes the header and sidebar,
 // and an Outlet for rendering the main content based on the route
@@ -33,6 +34,7 @@ function App() {
       <Route element={<MainLayout />}>
         <Route path="/" element={<Feed />} />
         <Route path="/courses/:courseId" element={<CoursePage />} />
+        <Route path="/create" element={<CreatePost />} />
       </Route>
       {/* not found page renders differently */}
       <Route path="/auth" element={<Authpage />} />
