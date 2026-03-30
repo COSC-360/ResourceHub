@@ -4,7 +4,7 @@ import "./App.css";
 import Header from "./components/Header/Header.jsx";
 import SearchResults from "./components/SearchResults/SearchResults.jsx";
 import CoursePage from "./components/CoursePage/CoursePage.jsx";
-import Feed from "./pages/Feed/Feed.jsx";
+import Feed from "./pages/Feed.jsx";
 import Sidebar from "./components/Sidebar/Sidebar.jsx";
 import AuthPage from "./pages/AuthPage.jsx";
 import NotFound from "./components/NotFoundPage/NotFound.jsx";

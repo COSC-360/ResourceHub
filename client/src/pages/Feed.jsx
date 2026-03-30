@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import FeedPost from "../components/FeedPost";
-import CreateDiscussion from "../components/CreateDiscussion";
+import FeedPost from "../components/Feed/FeedPost";
 import "./css/FeedPage.css";
 
 const Feed = () => {
