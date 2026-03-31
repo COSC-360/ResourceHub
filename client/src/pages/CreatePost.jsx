@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useEffect } from "react";
 import CreateDiscussion from "../components/CreateDiscussion/CreateDiscussion.jsx";
 import { useNavigate } from "react-router-dom";
 
@@ -8,7 +8,7 @@ const CreatePost = () => {
   useEffect(() => {
     const accessToken = localStorage.getItem("access_token");
     if (!accessToken) router("/auth");
-  }, []);
+  }, [router]);
   return (
     <div>
       <CreateDiscussion />
