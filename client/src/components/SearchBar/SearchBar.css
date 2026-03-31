@@ -4,6 +4,10 @@
   align-items: center;
   width: 100%;
   min-width: 0;
+  height: 40px;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 .searchBar {
@@ -14,6 +18,7 @@
   min-width: 0;
   height: 40px;
   padding-left: 40px;
+  margin:0px;
 }
 
 .searchIcon {

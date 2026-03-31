@@ -8,6 +8,8 @@ import Feed from "./components/Feed/Feed.jsx";
 import Sidebar from "./components/Sidebar/Sidebar.jsx";
 import AuthPage from "./pages/AuthPage.jsx";
 import NotFound from "./components/NotFoundPage/NotFound.jsx";
+import MyCoursesPage from "./components/MyCoursesPage/MyCoursesPage.jsx";
+import AddMyCoursePage from "./components/AddMyCoursePage/AddMyCourse.jsx";
 
 // Main layout component that includes the header and sidebar,
 // and an Outlet for rendering the main content based on the route
@@ -26,26 +28,6 @@ function MainLayout() {
   );
 }
 
-function HomePage() {
-  return <Feed />;
-}
-
-function CourseDiscussionsPage() {
-  return <div>Course Discussions</div>;
-}
-
-function CourseResourcesPage() {
-  return <div>Course Resources</div>;
-}
-
-function CreateCoursePage() {
-  return <div>Create Course</div>;
-}
-
-function CreateDiscussionPage() {
-  return <div>Create Discussion</div>;
-}
-
 function App() {
   return (
     <Routes>
@@ -54,10 +36,8 @@ function App() {
         <Route path="/" element={<Feed />} />
         <Route path="/search" element={<SearchResults />} />
         <Route path="/courses/:courseId" element={<CoursePage />} />
-        <Route path="/course-discussions" element={<CourseDiscussionsPage />} />
-        <Route path="/course-resources" element={<CourseResourcesPage />} />
-        <Route path="/my-courses" element={<CreateCoursePage />} />
-        <Route path="/start-discussion" element={<CreateDiscussionPage />} />
+        <Route path="/my-courses" element={<MyCoursesPage />} />
+        <Route path="/my-courses/add" element={<AddMyCoursePage />} />
       </Route>
       {/* not found page renders differently */}
       <Route path="/auth" element={<AuthPage />} />

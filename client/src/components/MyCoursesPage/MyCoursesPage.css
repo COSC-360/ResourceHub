@@ -1,0 +1,44 @@
+.my-courses-page {
+  padding: 24px;
+}
+
+.mycourses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 180px));
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.mycourse-square {
+  width: 180px;
+  height: 180px;
+  border-radius: 12px;
+  background: white;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 16px;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.add-course-square {
+  cursor: pointer;
+  border: 2px dashed #b646eb;
+  background: #faf5ff;
+}
+
+.plus-sign {
+  font-size: 40px;
+  font-weight: bold;
+  line-height: 1;
+  margin-bottom: 10px;
+}
+
+.mycourses-error {
+  color: #b00020;
+}
