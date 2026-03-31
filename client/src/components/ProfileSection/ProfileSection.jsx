@@ -1,13 +1,14 @@
 import "./ProfileSection.css"
+import { Link } from "react-router-dom";
 
 export function ProfileSection({userType}){
     return (
         <>
             <div className="profileContainer">
                 {userType === "admin" && (
-                    <a href="admin.jsx">
+                    <Link to="/admin">
                         <button className="adminPanel">Admin Panel</button>
-                    </a>
+                    </Link>
                 )}
                 {(userType === "admin" || userType === "user") && (
                     <button className="profile"><img src="/src/assets/profile.svg" alt="profile" className="icon" /></button>
@@ -15,8 +16,8 @@ export function ProfileSection({userType}){
             </div>
             {!userType && (
                 <div className="authButtons">
-                    <button className="signIn">Sign In</button>
-                    <button className="register">Register</button>
+                    <Link to="/auth/login"><button className="signIn">Log In</button></Link>
+                    <Link to="/auth/register"><button className="register">Register</button></Link>
                 </div>
             )}
         </>

@@ -1,13 +1,17 @@
+import { useContext } from "react";
 import { SearchBar } from "../SearchBar/SearchBar"
 import { ProfileSection } from "../ProfileSection/ProfileSection"
 import { Logo } from "../Logo/Logo"
 import "./Header.css"
 import Breadcrumbs from "../Breadcrumbs/Breadcrumbs";
+import AuthContext from "../../AuthContext.jsx";
 
 /* userType undefined = unregistered
 userType "user" = registered
 userType "admin" = registered */
-export function Header({userType}){
+export function Header(){
+    const { user } = useContext(AuthContext);
+
     return (
         <>
             <div className="headerDiv">
@@ -21,7 +25,7 @@ export function Header({userType}){
                     <SearchBar />
                 </div>
                 <div className="buttonDiv">
-                    <ProfileSection userType={userType}/>
+                    <ProfileSection userType={user ? "user" : undefined}/>
                 </div>
             </div>
         </>

@@ -16,4 +16,4 @@ userRoutes.get("/courses", verifyAccessToken, userController.getUserCourses);
 userRoutes.post("/save", verifyAccessToken, userController.saveUserCourses);
 userRoutes.put("/update", verifyAccessToken, userController.updateUserCourses);
 userRoutes.delete("/hide", verifyAccessToken, userController.hideUserCourses);
-userRoutes.post("/verifytoken", verifyAccessToken, userController.verifyToken);
+userRoutes.get("/verifytoken", verifyAccessToken, userController.verifyToken);
