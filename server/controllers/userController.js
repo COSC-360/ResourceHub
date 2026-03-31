@@ -93,8 +93,8 @@ export function saveUserCourses(req, res) {
 
 
 export function updateUserCourses(req, res) {
-    const { courses } = req.body;
-    const result = userService.updateUserCourses(req.userId, courseIds);
+    const { courseIDs } = req.body;
+    const result = userService.updateUserCourses(req.userId, courseIDs);
     res.json({ data: result });
   }
 
