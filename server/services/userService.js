@@ -47,13 +47,7 @@ export function updateProfile(id, body) {
 
 
 export function getUserCourses(userId) {
-  const savedCourses = userRepository.getUserCourses(userId);
-
-  if (savedCourses.length > 0) {
-    return savedCourses;
-  }
-  
-  return userRepository.findMostPopularCourses();
+  return userRepository.getUserCourses(userId);
 }
 
 

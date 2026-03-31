@@ -76,34 +76,25 @@ export function updateProfile(req, res) {
 }
 
 
-export function getUserCourses(userId) {
-  const savedCourses = userService.getUserCourses(userId);
-
-  if (savedCourses.length > 0) {
-    return savedCourses;
-  }
-
-  return userService.findMostPopularCourses();
+export function getUserCourses(req, res) {
+  const savedCourses = userService.getUserCourses(req.userId);
+  res.status(200).json({ data: savedCourses });
 }
 
 export function saveUserCourses(req, res) {
-    const { courses } = req.body;
+    const { courseId } = req.body;
 
     if (getUserById(req.userId) === null) {
         throw new Error("User not authenticated");
     } 
-    const result = userService.saveUserCourses(req.userId, courses);
+    const result = userService.saveUserCourses(req.userId, courseId);
     res.json({ data: result });
 }   
 
 
 export function updateUserCourses(req, res) {
-    const { courses } = req.body;
-
-    if (getUserById(req.userId) === null) {
-        throw new Error("User not authenticated");
-    } 
-    const result = userService.updateUserCourses(req.userId, courses);
+    const { courseIDs } = req.body;
+    const result = userService.updateUserCourses(req.userId, courseIDs);
     res.json({ data: result });
   }
 

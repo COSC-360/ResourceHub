@@ -1,4 +1,4 @@
-export async function apiClient(url, options){
+export async function apiClient(url, options = {}){
   const { method = "GET", body, headers: customHeaders = {} } = options;
 
   const headers = {
