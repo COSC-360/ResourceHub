@@ -37,10 +37,6 @@ function App() {
         <Route path="/" element={<Feed />} />
         <Route path="/search" element={<SearchResults />} />
         <Route path="/courses/:courseId" element={<CoursePage />} />
-        <Route path="/course-discussions" element={<CourseDiscussionsPage />} />
-        <Route path="/course-resources" element={<CourseResourcesPage />} />
-        <Route path="/my-courses" element={<CreateCoursePage />} />
-        <Route path="/start-discussion" element={<CreateDiscussionPage />} />
         <Route path="/create" element={<CreatePost />} />
         <Route path="/my-courses" element={<MyCoursesPage />} />
         <Route path="/my-courses/add" element={<AddMyCoursePage />} />
