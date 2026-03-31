@@ -5,13 +5,8 @@ export function getLatest() {
   return DiscussionRepository.findAll();
 }
 
-export function create(content, username, faculty, authorId) {
-  const discussion = new Discussion({
-    content,
-    username,
-    faculty,
-    authorId,
-  });
+export function create(data) {
+  const discussion = new Discussion(data);
   if (!discussion) throw new Error("Discussion creation failed");
   return DiscussionRepository.save(discussion.toJSON());
 }

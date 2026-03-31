@@ -4,12 +4,13 @@ import "./App.css";
 import Header from "./components/Header/Header.jsx";
 import SearchResults from "./components/SearchResults/SearchResults.jsx";
 import CoursePage from "./components/CoursePage/CoursePage.jsx";
-import Feed from "./components/Feed/Feed.jsx";
+import Feed from "./pages/Feed.jsx";
 import Sidebar from "./components/Sidebar/Sidebar.jsx";
 import AuthPage from "./pages/AuthPage.jsx";
 import NotFound from "./components/NotFoundPage/NotFound.jsx";
 import MyCoursesPage from "./components/MyCoursesPage/MyCoursesPage.jsx";
 import AddMyCoursePage from "./components/AddMyCoursePage/AddMyCourse.jsx";
+import CreatePost from "./pages/CreatePost.jsx";
 
 // Main layout component that includes the header and sidebar,
 // and an Outlet for rendering the main content based on the route
@@ -36,6 +37,11 @@ function App() {
         <Route path="/" element={<Feed />} />
         <Route path="/search" element={<SearchResults />} />
         <Route path="/courses/:courseId" element={<CoursePage />} />
+        <Route path="/course-discussions" element={<CourseDiscussionsPage />} />
+        <Route path="/course-resources" element={<CourseResourcesPage />} />
+        <Route path="/my-courses" element={<CreateCoursePage />} />
+        <Route path="/start-discussion" element={<CreateDiscussionPage />} />
+        <Route path="/create" element={<CreatePost />} />
         <Route path="/my-courses" element={<MyCoursesPage />} />
         <Route path="/my-courses/add" element={<AddMyCoursePage />} />
       </Route>

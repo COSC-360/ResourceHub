@@ -1,29 +1,44 @@
 import * as discussionService from "../services/discussionService.js";
 
-export async function getLatest(_req, res) {
+export async function getLatest(req, res) {
   const discussions = await discussionService.getLatest();
-  res.json({ data: discussions });
+  const discussionsWithAuthor = discussions.map((discussion) => {
+    const obj = discussion.toJSON();
+
+    return {
+      ...obj,
+      isAuthor: obj.authorId === req.user?.id,
+    };
+  });
+
+  res.json({
+    data: discussionsWithAuthor,
+  });
 }
 
 export function create(req, res) {
-  const { content, username, faculty } = req.body;
+  const { content, title, image, parentid } = req.body;
 
   if (!content || typeof content !== "string" || !content.trim()) {
     res.status(400).json({ error: "Content is required" });
     return;
   }
 
-  if (!username || typeof username !== "string" || !username.trim()) {
-    res.status(400).json({ error: "Username is required" });
+  if (!parentid && (!title || typeof title !== "string" || !title.trim())) {
+    res.status(400).json({ error: "Title is required" });
     return;
   }
-
-  const discussion = discussionService.create(
-    content.trim(),
-    username.trim(),
-    faculty || "None",
-    req.userId || username.trim(),
-  );
+  console.log(content);
+  const discussion = discussionService.create({
+    content: content,
+    title: title,
+    image: image,
+    username: req.user.username,
+    authorId: req.user.id,
+    parentid: parentid,
+    faculty: req.user?.faculty,
+    pfp: req.user?.pfp,
+  });
   res.status(201).json({ data: discussion });
 }
 
