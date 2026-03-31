@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { apiClient } from "../../lib/api-client";
 import "../CreateDiscussion/CreateDiscussion.css";
 
 const CreateDiscussion = ({ onDiscussionCreated }) => {
@@ -37,43 +37,33 @@ const CreateDiscussion = ({ onDiscussionCreated }) => {
 
     try {
       console.log(
-        "Sending POST request to http://localhost:3000/api/discussion",
+        "Sending POST request to /api/discussion",
       );
-      const token = localStorage.getItem("access_token");
-      const response = await axios.post(
-        "http://localhost:3000/api/discussion",
+      const result = await apiClient(
+        "/api/discussion",
         {
-          title: formData.title,
-          content: formData.content,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+          method: "POST",
+          body: {
+            title: formData.title,
+            content: formData.content,
           },
         },
       );
 
-      console.log("Response status:", response.status);
-      console.log("Response ok:", response.ok);
-
-      if (!response.status === 201) {
-        const errorText = await response.data;
-        console.error("Error response:", errorText);
-        throw new Error(
-          `Failed to create discussion: ${response.status} ${errorText}`,
-        );
-      }
-
-      const result = await response.data;
       console.log("Post created successfully:", result);
       setSuccess(true);
       setFormData({
         title: "",
         content: "",
       });
-      router("/");
-      setTimeout(() => setSuccess(false), 3000);
+
+      if (onDiscussionCreated) {
+        const newData = result.data || result;
+        console.log("Passing to parent:", newData);
+        onDiscussionCreated(newData);
+      } else {
+        setTimeout(() => router("/"), 1500);
+      }
     } catch (err) {
       console.error("Error creating discussion:", err);
       setError(err.message || "Failed to create discussion");

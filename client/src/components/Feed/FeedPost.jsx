@@ -1,4 +1,3 @@
-import React from "react";
 import "./Feed.css";
 
 export const FeedPost = ({ post_props }) => {
