@@ -7,7 +7,8 @@ import './CourseHeader.css';
 export function CourseHeader({ courseId }) {
     const [course, setCourse] = useState(null);
     const [isJoined, setIsJoined] = useState(false);
-    const [memberCount, setMemberCount] = useState(1);
+    // replace with actual member count from db when that gets implemented, for now just a placeholder
+    const [memberCount, setMemberCount] = useState(1); 
 
     useEffect(() => {
         async function fetchCourse() {
