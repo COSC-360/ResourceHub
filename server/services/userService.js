@@ -12,6 +12,20 @@ export async function createUser(user) {
   return userRepository.save(user.username, user.email, passwordHashed);
 }
 
+export function issueAccessToken(userDoc) {
+  const u = userDoc.toJSON ? userDoc.toJSON() : userDoc;
+  return jwt.sign(
+    {
+      id: u._id,
+      username: u.username,
+      faculty: u.faculty,
+      pfp: u.pfp,
+    },
+    process.env.ACCESS_TOKEN_SECRET_KEY,
+    { expiresIn: "60m" },
+  );
+}
+
 export async function userSignin(email, password) {
   const found_user = await userRepository.getUserByEmail(email);
   if (!found_user) return;

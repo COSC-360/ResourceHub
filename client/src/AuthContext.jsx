@@ -72,8 +72,12 @@ export const AuthProvider = ({ children }) => {
       console.log(response);
 
       const token = response.access_token;
+      if (!token || typeof token !== "string") {
+        throw new Error("Signup succeeded but no access token was returned");
+      }
 
       localStorage.setItem("access_token", token);
+      localStorage.setItem("user", JSON.stringify(response));
 
       const payload = JSON.parse(atob(token.split(".")[1]));
 
