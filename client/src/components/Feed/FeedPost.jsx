@@ -46,7 +46,7 @@ export const FeedPost = ({ post_props }) => {
         `http://localhost:3000/api/discussion/${post_props._id}`,
         {
           title: formData.title,
-          content: formData.content,
+          content: formData.content ? formData.content : post_props.comment,
         },
         {
           headers: {
