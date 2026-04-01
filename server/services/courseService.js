@@ -1,4 +1,4 @@
-import { Course } from '../models/Course.js';
+import { Course } from '../models/course.js';
 import * as courseRepository from '../repositories/courseRepository.js';
 
 export function create(course) {
