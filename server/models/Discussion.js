@@ -6,7 +6,6 @@ const DiscussionSchema = new mongoose.Schema({
   image: { type: String, default: null },
   title: { type: String, default: null },
   content: { type: String, required: true },
-  timestamp: { type: String, default: () => new Date().toISOString() },
   upvotes: { type: Number, default: 0 },
   downvotes: { type: Number, default: 0 },
   replies: { type: Number, default: 0 },
