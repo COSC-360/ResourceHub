@@ -12,6 +12,8 @@ import MyCoursesPage from "./components/MyCoursesPage/MyCoursesPage.jsx";
 import AddMyCoursePage from "./components/AddMyCoursePage/AddMyCourse.jsx";
 import CreatePost from "./pages/CreatePost.jsx";
 
+import CreateCourse from "./components/CreateCourse/CreateCourse.jsx";
+
 // Main layout component that includes the header and sidebar,
 // and an Outlet for rendering the main content based on the route
 function MainLayout() {
@@ -43,6 +45,7 @@ function App() {
       </Route>
       {/* not found page renders differently */}
       <Route path="/auth" element={<AuthPage />} />
+      <Route path="/courses" element={<CreateCourse />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
