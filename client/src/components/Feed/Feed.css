@@ -9,6 +9,11 @@
   padding: 10px;
 }
 
+.post-title {
+  font-weight: 500;
+  font-size: x-large;
+}
+
 .post img {
   border-radius: 100%;
   height: 30px;
@@ -23,10 +28,37 @@
 }
 
 .edit {
-  border: none;
   color: rgb(3, 156, 228);
+  border: none;
   justify-self: flex-end;
   margin-left: auto;
+}
+
+.error {
+  color: red;
+}
+
+.faded {
+  display: block;
+  color: rgb(177, 177, 177);
+  margin: 0 20px;
+}
+
+.post :hover {
+  cursor: pointer;
+}
+
+.cancel {
+  color: rgb(3, 228, 119);
+  border: none;
+  justify-self: flex-end;
+  margin-left: auto;
+}
+
+.delete {
+  color: rgb(238, 29, 60);
+  border: none;
+  justify-self: flex-end;
 }
 
 .post-header h2 {
