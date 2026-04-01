@@ -10,7 +10,7 @@ const DiscussionSchema = new mongoose.Schema({
   upvotes: { type: Number, default: 0 },
   downvotes: { type: Number, default: 0 },
   replies: { type: Number, default: 0 },
-  parentid: { type: String },
+  parentId: { type: mongoose.Schema.Types.ObjectId, ref: "Discussion", default: null }
 }, { timestamps: true }); // Automatically adds createdAt and updatedAt fields
 
 export const Discussion = mongoose.model("Discussion", DiscussionSchema);
