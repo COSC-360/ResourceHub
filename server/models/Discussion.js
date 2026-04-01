@@ -1,15 +1,14 @@
-import { v4 as uuidv4 } from "uuid";
 import mongoose from "mongoose";
 
 const DiscussionSchema = new mongoose.Schema({
-  _id: { type: String, default: uuidv4 },
+  courseId: { type: mongoose.Schema.Types.ObjectId, ref: "Course", required: true },
+  authorId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   image: { type: String, default: null },
   title: { type: String, default: null },
   content: { type: String, required: true },
   pfp: { type: String, default: null },
   username: { type: String, required: true },
   faculty: { type: String, default: "None" },
-  authorId: { type: String, required: true },
   timestamp: { type: String, default: () => new Date().toISOString() },
   upvotes: { type: Number, default: 0 },
   downvotes: { type: Number, default: 0 },
