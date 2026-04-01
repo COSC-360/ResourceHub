@@ -20,16 +20,15 @@
 }
 
 .searchBarDiv {
-  flex: 1 1 0;
+  flex: 1;
   min-width: 0;
-  max-width: 50%;
+  max-width: 400px;
   display: flex;
-  justify-content: center;
-  overflow: hidden;
+  align-items:center;
 }
 
 .searchBarDiv > * {
-  width: 100%;
+  flex:1;
   min-width: 0;
 }
 

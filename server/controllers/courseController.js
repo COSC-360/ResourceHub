@@ -48,3 +48,8 @@ export function create(req, res) {
     const createdCourse = courseService.create(course);
     res.status(201).json({ data: createdCourse });
 }
+
+export function getAll(req, res) {
+  const courses = courseService.getAll();
+  res.status(200).json({ data: courses });
+}

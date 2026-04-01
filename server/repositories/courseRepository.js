@@ -26,3 +26,7 @@ export function save(course) {
     writeCourses(courses);
     return course;
 }
+
+export function findAll() {
+  return readCourses();
+}

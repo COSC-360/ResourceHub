@@ -1,7 +1,7 @@
-import { User } from "../models/User.js";
+import { User } from "../models/user.js";
+import * as courseRepository from "./courseRepository.js";
 
-const popularCoursesByUser = {};
-const allCourses = [];
+const savedCourseIdsByUser = {};
 
 export async function save(username, email, password) {
   return await User.create({
@@ -34,35 +34,37 @@ export async function updateProfile(userid, data) {
   return await User.findById(userid);
 }
 
-
-export function findMostPopularCourses() {
-  return [...allCourses].sort((a, b) => b.likes - a.likes);
-}
-
 export function getUserCourses(userId) {
-  return popularCoursesByUser[userId] || [];
+  const savedIds = savedCourseIdsByUser[userId] || [];
+  const allCourses = courseRepository.findAll();
+  return allCourses.filter((course) => savedIds.includes(course.id));
 }
 
-export function saveUserCourses(userId, courses) {
-  popularCoursesByUser[userId] = courses;
-  return { userId, courses: popularCoursesByUser[userId] };
+export function saveUserCourses(userId, courseId) {
+  const existingIds = savedCourseIdsByUser[userId] || [];
+
+  if (!existingIds.includes(courseId)) {
+    savedCourseIdsByUser[userId] = [...existingIds, courseId];
+  }
+
+  return getUserCourses(userId);
 }
 
-export function updateUserCourses(userId, courses) {
-  popularCoursesByUser[userId] = courses;
-  return { userId, courses: popularCoursesByUser[userId] };
+export function updateUserCourses(userId, courseIds) {
+  savedCourseIdsByUser[userId] = Array.isArray(courseIds)
+    ? [...new Set(courseIds)]
+    : [];
+
+  return getUserCourses(userId);
 }
 
 export function hideUserCourses(userId, courseId) {
-  const userCourses = popularCoursesByUser[userId] || [];
+  const existingIds = savedCourseIdsByUser[userId] || [];
 
-  popularCoursesByUser[userId] = userCourses.filter(
+  savedCourseIdsByUser[userId] = existingIds.filter(
     (id) => String(id) !== String(courseId)
   );
 
-  return {
-    userId,
-    courses: popularCoursesByUser[userId]
-  };
+  return getUserCourses(userId);
 }
 

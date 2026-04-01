@@ -9,3 +9,7 @@ export function create(course) {
 export function getById(id) {
     return courseRepository.findById(id);
 }
+
+export function getAll() {
+  return courseRepository.findAll();
+}

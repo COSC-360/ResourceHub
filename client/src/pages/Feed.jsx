@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import FeedPost from "../components/Feed/FeedPost";
+import { apiClient } from "../lib/api-client";
 import "./css/FeedPage.css";
 
 const Feed = () => {
@@ -12,21 +13,9 @@ const Feed = () => {
   useEffect(() => {
     const fetchDiscussions = async () => {
       try {
-        const token = localStorage.getItem("access_token");
         setLoading(true);
 
-        const response = await fetch("http://localhost:3000/api/discussion", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch discussions");
-        }
-
-        const result = await response.json();
+        const result = await apiClient("/api/discussion", {});
 
         const discussions = Array.isArray(result.data)
           ? result.data

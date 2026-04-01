@@ -5,3 +5,4 @@ export const courseRoutes = Router();
 
 courseRoutes.get("/:id", courseController.getById);
 courseRoutes.post("/", courseController.create);
+courseRoutes.get("/", courseController.getAll);
