@@ -10,10 +10,7 @@ export async function getLatest(req, res) {
       isAuthor: obj.authorId === req.user?.id,
     };
   });
-
-  res.json({
-    data: discussionsWithAuthor,
-  });
+  res.json(discussionsWithAuthor);
 }
 
 export function create(req, res) {
@@ -47,6 +44,7 @@ export async function update(req, res) {
   const { content, title } = req.body;
 
   try {
+    console.log(content + title);
     const discussion = await discussionService.update(id, {
       _id: id,
       title: title,

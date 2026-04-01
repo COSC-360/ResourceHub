@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiClient } from "../../lib/api-client";
 import "../CreateDiscussion/CreateDiscussion.css";
+import axios from "axios";
 
 const CreateDiscussion = ({ onDiscussionCreated }) => {
   const [formData, setFormData] = useState({
@@ -28,7 +29,6 @@ const CreateDiscussion = ({ onDiscussionCreated }) => {
     setError(null);
     setSuccess(false);
 
-    // Validate form data
     if (!formData.title.trim() || !formData.content.trim()) {
       setError("Please fill in all fields");
       setLoading(false);
@@ -37,13 +37,20 @@ const CreateDiscussion = ({ onDiscussionCreated }) => {
 
     try {
       console.log("Sending POST request to /api/discussion");
-      const result = await apiClient("/api/discussion", {
-        method: "POST",
-        body: {
+      const token = localStorage.getItem("access_token");
+      const response = await axios.post(
+        "/api/discussion",
+        {
           title: formData.title,
           content: formData.content,
         },
-      });
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
 
       console.log("Response status:", response.status);
       console.log("Response ok:", response.data);

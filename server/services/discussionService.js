@@ -20,7 +20,6 @@ export async function update(id, data) {
   if (discussion.authorId !== data.authorId) {
     throw new Error("Not authorized");
   }
-  console.log("hi");
   discussion.set(data);
   return DiscussionRepository.save(discussion);
 }

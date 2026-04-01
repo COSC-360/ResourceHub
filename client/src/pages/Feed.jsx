@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import FeedPost from "../components/Feed/FeedPost";
+import axios from "axios";
 import { apiClient } from "../lib/api-client";
 import "./css/FeedPage.css";
 
@@ -14,14 +15,13 @@ const Feed = () => {
     const fetchDiscussions = async () => {
       try {
         setLoading(true);
-
-        const result = await apiClient("/api/discussion", {});
-
-        const discussions = Array.isArray(result.data)
-          ? result.data
-          : Array.isArray(result)
-            ? result
-            : [];
+        const token = localStorage.getItem("access_token");
+        const result = await axios.get(`http://localhost:3000/api/discussion`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const discussions = result.data;
         const transformedData = discussions.map((discussion) => ({
           username: discussion.username,
           title: discussion.title,
