@@ -1,5 +1,15 @@
 import mongoose from "mongoose";
 
+/*
+Represents a course in the system, containing properties such as:
+    name: The name of the course
+    code: A unique code for the course (e.g., "COSC360")
+    description: A brief description of the course
+    image: An optional image representing the course
+    memberCount: cached, The number of members enrolled in the course
+    postCount: cached, The number of posts associated with the course
+*/
+
 const CourseSchema = new mongoose.Schema({
     name: { type: String, required: true },
     code: { type: String, required: true, unique: true },
