@@ -15,7 +15,7 @@ export async function getById(req, res) {
         const course = await courseService.getById(id);
 
         if (!course) {
-        return res.status(404).json({ error: "Course not found" });
+            return res.status(404).json({ error: "Course not found" });
         }
 
         return res.status(200).json({ data: course });
@@ -24,38 +24,67 @@ export async function getById(req, res) {
     }
 }
 
-export function create(req, res) {
-    const { id, name, code, description, image } = req.body;
+export async function create(req, res) {
+    try {
+        // 1. extract course data from the request body
+        const { name, code, description } = req.body;
+        console.log('Received course data:', { name, code, description });
 
-    if (!name || typeof name !== 'string') {
-        res.status(400).json({ error: 'Course name is required and must be a string' });
-        return;
+        // 2. validate the course data (basic validation)
+        if (!name || typeof name !== 'string') {
+            return res.status(400).json({ error: 'Course name is required and must be a string' });
+        }
+
+        if (!code || typeof code !== 'string') {
+            return res.status(400).json({ error: 'Course code is required and must be a string' });
+        }
+
+        const course = {
+            name: name.trim(),
+            code: code.trim(),
+            description: typeof description === "string" ? description.trim() : "",
+        };
+
+        const createdCourse = await courseService.create(course);
+        return res.status(201).json({ data: createdCourse });
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
     }
-
-    if (!code || typeof code !== 'string') {
-        res.status(400).json({ error: 'Course code is required and must be a string' });
-        return;
-    }
-
-    if (!description || typeof description !== 'string') {
-        res.status(400).json({ error: 'Course description is required and must be a string' });
-        return;
-    }
-    console.log('Received course data:', { id, name, code, description, image });
-
-    const course = {
-        id,
-        name: name.trim(),
-        code: code.trim(),
-        description: description.trim(),
-        image: image ?? null,
-    };
-
-    const createdCourse = courseService.create(course);
-    res.status(201).json({ data: createdCourse });
 }
 
-export function getAll(req, res) {
-  const courses = courseService.getAll();
-  res.status(200).json({ data: courses });
+export async function getAll(req, res) {
+    const courses = await courseService.getAll();
+    return res.status(200).json({ data: courses });
+}
+
+export async function update(req, res) {
+    //empty
+}
+
+export async function updateImage(req, res) {
+    //empty
+}
+
+export async function deleteCourse(req, res) {
+    //empty
+}
+
+export async function join(req, res) {
+    //empty
+}
+
+export async function leave(req, res) {
+    //empty
+}
+
+export async function getDiscussions(req, res) {
+    //empty
+}
+
+export async function getResources(req, res) {
+    //empty
+}
+
+export async function getMembers(req, res) {
+    //empty
 }

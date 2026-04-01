@@ -6,12 +6,7 @@ export function getById(id) {
 }
 
 export function create(course) {
-    return courseRepository.save({
-        name: course.name,
-        code: course.code,
-        description: course.description,
-        image: course.image,
-    });
+    return courseRepository.save(course);
 }
 
 export function getAll() {

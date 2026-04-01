@@ -11,6 +11,7 @@ export const courseRepository = {
     },
 
     async save(course) {
+        console.log('Saving course:', course);
         const savedCourse = await Course.create(course);
         return savedCourse;
     },

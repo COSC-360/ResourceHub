@@ -13,7 +13,7 @@ courseRoutes.patch("/:id", courseController.update); // update a course by id
 courseRoutes.patch("/:id/image", courseController.updateImage); // update a course's image by id
 
 // TODO: delete a course by id, probably want auth 
-courseRoutes.delete("/:id", courseController.delete); 
+courseRoutes.delete("/:id", courseController.deleteCourse); // delete a course by id
 
 // join and leave routes
 courseRoutes.post("/:id/join", courseController.join); // join a course by id
