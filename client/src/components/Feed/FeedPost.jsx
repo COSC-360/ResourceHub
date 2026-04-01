@@ -45,7 +45,7 @@ export const FeedPost = ({ post_props }) => {
       const response = await axios.patch(
         `http://localhost:3000/api/discussion/${post_props._id}`,
         {
-          title: formData.title,
+          title: formData.title ? formData.title : post_props.title,
           content: formData.content ? formData.content : post_props.comment,
         },
         {
