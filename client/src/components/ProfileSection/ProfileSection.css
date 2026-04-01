@@ -10,11 +10,44 @@
     gap: 10px;
 }
 
+.profileMenuWrapper {
+    position: relative;
+    margin-left: 15px;
+}
+
 .profile {
     background-color: white;
     border: none;
     border-radius: 25px;
-    margin-left: 15px;
+    cursor: pointer;
+}
+
+.profileMenu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    min-width: 140px;
+    padding: 6px 0;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+}
+
+.profileMenuItem {
+    display: block;
+    width: 100%;
+    padding: 8px 14px;
+    border: none;
+    background: transparent;
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+    color: #222;
+}
+
+.profileMenuItem:hover {
+    background: #f0f0f0;
 }
 
 .icon {

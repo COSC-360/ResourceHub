@@ -1,7 +1,35 @@
 import "./ProfileSection.css"
+import { useContext, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import AuthContext from "../../AuthContext.jsx";
 
-export function ProfileSection({userType}){
+export function ProfileSection({ userType }) {
+    const { logout } = useContext(AuthContext);
+    const [menuOpen, setMenuOpen] = useState(false);
+    const menuRef = useRef(null);
+
+    const menuItems = [
+        { id: "logout", label: "Logout", onSelect: () => logout() },
+    ];
+
+    useEffect(() => {
+        if (!menuOpen) return;
+        const onPointerDown = (e) => {
+            if (menuRef.current && !menuRef.current.contains(e.target)) {
+                setMenuOpen(false);
+            }
+        };
+        const onKeyDown = (e) => {
+            if (e.key === "Escape") setMenuOpen(false);
+        };
+        document.addEventListener("pointerdown", onPointerDown);
+        document.addEventListener("keydown", onKeyDown);
+        return () => {
+            document.removeEventListener("pointerdown", onPointerDown);
+            document.removeEventListener("keydown", onKeyDown);
+        };
+    }, [menuOpen]);
+
     return (
         <>
             <div className="profileContainer">
@@ -11,7 +39,40 @@ export function ProfileSection({userType}){
                     </Link>
                 )}
                 {(userType === "admin" || userType === "user") && (
-                    <button className="profile"><img src="/src/assets/profile.svg" alt="profile" className="icon" /></button>
+                    <div className="profileMenuWrapper" ref={menuRef}>
+                        <button
+                            type="button"
+                            className="profile"
+                            aria-haspopup="menu"
+                            aria-expanded={menuOpen}
+                            aria-controls="profile-dropdown-menu"
+                            onClick={() => setMenuOpen((o) => !o)}
+                        >
+                            <img src="/src/assets/profile.svg" alt="profile" className="icon" />
+                        </button>
+                        {menuOpen && (
+                            <div
+                                id="profile-dropdown-menu"
+                                className="profileMenu"
+                                role="menu"
+                            >
+                                {menuItems.map((item) => (
+                                    <button
+                                        key={item.id}
+                                        type="button"
+                                        className="profileMenuItem"
+                                        role="menuitem"
+                                        onClick={() => {
+                                            setMenuOpen(false);
+                                            item.onSelect();
+                                        }}
+                                    >
+                                        {item.label}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 )}
             </div>
             {!userType && (
