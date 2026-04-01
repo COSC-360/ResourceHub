@@ -55,17 +55,17 @@ const CreateDiscussion = ({ onDiscussionCreated }) => {
       );
 
       console.log("Response status:", response.status);
-      console.log("Response ok:", response.ok);
+      console.log("Response ok:", response.data);
 
-      if (!response.status === 201) {
-        const errorText = await response.data;
+      if (response.status !== 201) {
+        const errorText = response.data;
         console.error("Error response:", errorText);
         throw new Error(
           `Failed to create discussion: ${response.status} ${errorText}`,
         );
       }
 
-      const result = await response.data;
+      const result = response.data;
       console.log("Post created successfully:", result);
       setSuccess(true);
       setFormData({

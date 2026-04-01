@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
 
       try {
         const data = await apiClient(
-          `/api/user/verifytoken/`,
+          `http://localhost:3000/api/user/verifytoken/`,
           {
             method: "GET",
             headers: {
@@ -25,14 +25,14 @@ export const AuthProvider = ({ children }) => {
             },
           },
         );
-
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
         setUser({
           ...data,
           access_token: token,
         });
-      } catch {
+      } catch (e) {
+        console.log(e);
         localStorage.removeItem("access_token");
       }
     };
@@ -100,7 +100,7 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     delete axios.defaults.headers.common["Authorization"];
     localStorage.removeItem("access_token");
-    router.push("/");
+    router("/auth");
   };
 
   return (

@@ -42,18 +42,19 @@ export function create(req, res) {
   res.status(201).json({ data: discussion });
 }
 
-export function update(req, res) {
+export async function update(req, res) {
   const { id } = req.params;
-  const { content } = req.body;
-
-  if (!content || typeof content !== "string" || !content.trim()) {
-    res.status(400).json({ error: "Content is required" });
-    return;
-  }
+  const { content, title } = req.body;
 
   try {
-    const discussion = discussionService.update(id, content.trim(), req.userId);
-    res.json({ data: discussion });
+    const discussion = await discussionService.update(id, {
+      _id: id,
+      title: title,
+      edited: true,
+      content: content,
+      authorId: req.userId,
+    });
+    res.status(200).json({ data: discussion });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
     const status = message === "Not authorized" ? 403 : 404;
@@ -61,12 +62,11 @@ export function update(req, res) {
   }
 }
 
-export function remove(req, res) {
+export async function remove(req, res) {
   const { id } = req.params;
-
   try {
-    const result = discussionService.remove(id, req.userId);
-    res.json({ data: result });
+    const result = await discussionService.remove(id, req.userId);
+    res.status(200).json({ data: result });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
     const status = message === "Not authorized" ? 403 : 404;

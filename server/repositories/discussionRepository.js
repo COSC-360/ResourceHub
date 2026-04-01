@@ -1,15 +1,8 @@
 import { Discussion } from "../models/Discussion.js";
 
 export const DiscussionRepository = {
-  async save({ image, content, username, faculty, authorId, parentid }) {
-    const discussion = await Discussion.create({
-      image,
-      content,
-      username,
-      faculty,
-      authorId,
-      parentid,
-    });
+  async save(data) {
+    const discussion = await Discussion.create(data);
     return discussion;
   },
 
@@ -74,7 +67,7 @@ export const DiscussionRepository = {
   //This is currently searching by the content field.
   async search(searchTerm) {
     return await Discussion.find({
-      content: { $regex: searchTerm, $options: "i" }
+      title: { $regex: searchTerm, $options: "i" },
     }).sort({ timestamp: -1 });
   },
 };

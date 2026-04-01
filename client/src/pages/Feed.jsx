@@ -33,9 +33,9 @@ const Feed = () => {
           : Array.isArray(result)
             ? result
             : [];
-
         const transformedData = discussions.map((discussion) => ({
           username: discussion.username,
+          title: discussion.title,
           timeline: discussion.timestamp,
           faculty: discussion.faculty,
           comment: discussion.content,
@@ -44,6 +44,7 @@ const Feed = () => {
           replies: discussion.replies,
           _id: discussion._id,
           isAuthor: discussion.isAuthor,
+          edited: discussion.edited,
         }));
 
         setDiscussions(transformedData);
