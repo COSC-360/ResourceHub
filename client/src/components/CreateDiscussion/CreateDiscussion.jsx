@@ -105,7 +105,7 @@ const CreateDiscussion = ({ onDiscussionCreated }) => {
               name="title"
               value={formData.title}
               onChange={handleChange}
-              placeholder="Enter dicussion title"
+              placeholder="Enter discussion title"
               disabled={loading}
             />
           </div>
