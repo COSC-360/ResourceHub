@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import FeedPost from "../components/Feed/FeedPost";
-import axios from "axios";
 import { apiClient } from "../lib/api-client";
 import "./css/FeedPage.css";
 
@@ -16,12 +15,9 @@ const Feed = () => {
       try {
         setLoading(true);
         const token = localStorage.getItem("access_token");
-        const result = await axios.get(`http://localhost:3000/api/discussion`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        const discussions = await apiClient("/api/discussion", {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
-        const discussions = result.data;
         const transformedData = discussions.map((discussion) => ({
           username: discussion.username,
           title: discussion.title,
