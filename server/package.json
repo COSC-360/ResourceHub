@@ -8,7 +8,7 @@
     "dev": "nodemon server.js",
     "lint": "eslint .",
     "build": "node --check server.js && npm run lint",
-    "test": "echo \"No tests specified\""
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
