@@ -1,46 +1,86 @@
-import "./ProfileSection.css";
-import { useEffect, useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
-import AuthContext from "../../AuthContext";
+import "./ProfileSection.css"
+import { useContext, useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
+import AuthContext from "../../AuthContext.jsx";
 
 export function ProfileSection({ userType }) {
-  const [loggedIn, setLoggedIn] = useState(false);
-  const router = useNavigate();
-  const { logout } = useContext(AuthContext);
+    const { logout } = useContext(AuthContext);
+    const [menuOpen, setMenuOpen] = useState(false);
+    const menuRef = useRef(null);
 
-  useEffect(() => {
-    const token = localStorage.getItem("access_token");
-    setLoggedIn(token ? true : false);
-  }, []);
+    const menuItems = [
+        { id: "logout", label: "Logout", onSelect: () => logout() },
+    ];
 
-  return (
-    <>
-      <div className="profileContainer">
-        {userType === "admin" && (
-          <a href="admin.jsx">
-            <button className="adminPanel">Admin Panel</button>
-          </a>
-        )}
-        {(userType === "admin" || userType === "user") && (
-          <button className="profile">
-            <img src="/src/assets/profile.svg" alt="profile" className="icon" />
-          </button>
-        )}
-      </div>
-      {!userType && !loggedIn && (
-        <div className="authButtons">
-          <button className="signIn" onClick={() => router("/auth")}>
-            Sign In
-          </button>
-        </div>
-      )}
-      {loggedIn && (
-        <div className="authButtons">
-          <button className="signIn" onClick={() => logout()}>
-            Log out
-          </button>
-        </div>
-      )}
-    </>
-  );
+    useEffect(() => {
+        if (!menuOpen) return;
+        const onPointerDown = (e) => {
+            if (menuRef.current && !menuRef.current.contains(e.target)) {
+                setMenuOpen(false);
+            }
+        };
+        const onKeyDown = (e) => {
+            if (e.key === "Escape") setMenuOpen(false);
+        };
+        document.addEventListener("pointerdown", onPointerDown);
+        document.addEventListener("keydown", onKeyDown);
+        return () => {
+            document.removeEventListener("pointerdown", onPointerDown);
+            document.removeEventListener("keydown", onKeyDown);
+        };
+    }, [menuOpen]);
+
+    return (
+        <>
+            <div className="profileContainer">
+                {userType === "admin" && (
+                    <Link to="/admin">
+                        <button className="adminPanel">Admin Panel</button>
+                    </Link>
+                )}
+                {(userType === "admin" || userType === "user") && (
+                    <div className="profileMenuWrapper" ref={menuRef}>
+                        <button
+                            type="button"
+                            className="profile"
+                            aria-haspopup="menu"
+                            aria-expanded={menuOpen}
+                            aria-controls="profile-dropdown-menu"
+                            onClick={() => setMenuOpen((o) => !o)}
+                        >
+                            <img src="/src/assets/profile.svg" alt="profile" className="icon" />
+                        </button>
+                        {menuOpen && (
+                            <div
+                                id="profile-dropdown-menu"
+                                className="profileMenu"
+                                role="menu"
+                            >
+                                {menuItems.map((item) => (
+                                    <button
+                                        key={item.id}
+                                        type="button"
+                                        className="profileMenuItem"
+                                        role="menuitem"
+                                        onClick={() => {
+                                            setMenuOpen(false);
+                                            item.onSelect();
+                                        }}
+                                    >
+                                        {item.label}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+            {!userType && (
+                <div className="authButtons">
+                    <Link to="/auth/login"><button className="signIn">Log In</button></Link>
+                    <Link to="/auth/register"><button className="register">Register</button></Link>
+                </div>
+            )}
+        </>
+    )
 }

@@ -41,3 +41,9 @@ jobs:
         npm run build --if-present
       env:
         CI: true
+    - name: Test Server
+      working-directory: ./server
+      run: |
+        npm test
+      env:
+        CI: true

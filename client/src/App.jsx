@@ -6,7 +6,8 @@ import SearchResults from "./components/SearchResults/SearchResults.jsx";
 import CoursePage from "./components/CoursePage/CoursePage.jsx";
 import Feed from "./pages/Feed.jsx";
 import Sidebar from "./components/Sidebar/Sidebar.jsx";
-import AuthPage from "./pages/AuthPage.jsx";
+import LoginForm from "./components/AuthForms/LoginForm.jsx";
+import SignupForm from "./components/AuthForms/SignupForm.jsx";
 import NotFound from "./components/NotFoundPage/NotFound.jsx";
 import MyCoursesPage from "./components/MyCoursesPage/MyCoursesPage.jsx";
 import AddMyCoursePage from "./components/AddMyCoursePage/AddMyCourse.jsx";
@@ -42,6 +43,8 @@ function App() {
         <Route path="/create" element={<CreatePost />} />
         <Route path="/my-courses" element={<MyCoursesPage />} />
         <Route path="/my-courses/add" element={<AddMyCoursePage />} />
+        <Route path="/auth/login" element={<LoginForm />} />
+        <Route path="/auth/register" element={<SignupForm />} />
       </Route>
       {/* not found page renders differently */}
       <Route path="/auth" element={<AuthPage />} />
