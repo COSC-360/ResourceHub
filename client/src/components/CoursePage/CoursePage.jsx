@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useParams, Link } from 'react-router-dom';
-import { apiClient } from '../../lib/api-client';
+import { apiClient } from '../../lib/api-client'; 
 
 export default function CoursePage() {
     const location = useLocation();
