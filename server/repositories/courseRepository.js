@@ -1,32 +1,19 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { Course } from '../models/course.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const COURSES_FILE = path.resolve(__dirname, '../data/courses.json');
+export const courseRepository = {
+    async findById(id) {
+        const course = await Course.findById(id);
+        return course;
+    },
 
-function readCourses() {
-    const data = fs.readFileSync(COURSES_FILE, 'utf8');
-    return JSON.parse(data);
-}
+    async findAll() {
+        return await Course.find().sort({ createdAt: -1 }); // Sort by creation date, newest first
+    },
 
-function writeCourses(courses) {
-    fs.writeFileSync(COURSES_FILE, JSON.stringify(courses, null, 2));
-}
+    async save(course) {
+        const savedCourse = await Course.create(course);
+        return savedCourse;
+    },
+};
 
-export function findById(id) {
-    const courses = readCourses();
-    return courses.find((course) => course.id === id) ?? null;
-}
-
-export function save(course) {
-    const courses = readCourses();
-    courses.push(course);
-    writeCourses(courses);
-    return course;
-}
-
-export function findAll() {
-  return readCourses();
-}
+export default courseRepository;
