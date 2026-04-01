@@ -1,4 +1,4 @@
-import { Discussion } from "../models/Discussion.js";
+import { Discussion } from "../models/discussion.js";
 import { DiscussionRepository } from "../repositories/discussionRepository.js";
 
 export function getLatest() {
