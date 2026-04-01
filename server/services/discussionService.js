@@ -7,19 +7,20 @@ export function getLatest() {
 
 export function create(data) {
   const discussion = new Discussion(data);
+
   if (!discussion) throw new Error("Discussion creation failed");
   return DiscussionRepository.save(discussion.toJSON());
 }
 
-export function update(id, content, userId) {
-  const discussion = DiscussionRepository.findById(id);
+export async function update(id, data) {
+  const discussion = await DiscussionRepository.findById(id);
   if (!discussion) {
     throw new Error("discussion not found");
   }
-  if (discussion.authorId !== userId) {
+  if (discussion.authorId !== data.authorId) {
     throw new Error("Not authorized");
   }
-  discussion.content = content;
+  discussion.set(data);
   return DiscussionRepository.save(discussion);
 }
 
@@ -35,8 +36,9 @@ export function findByAuthor(authorId) {
   return discussions;
 }
 
-export function remove(id, userId) {
-  const discussion = DiscussionRepository.findById(id);
+export async function remove(id, userId) {
+  const discussion = await DiscussionRepository.findById(id);
+  console.log(discussion);
   if (!discussion) {
     throw new Error(`No discussions with the id ${id} found`);
   }
