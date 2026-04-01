@@ -6,6 +6,7 @@ const DiscussionSchema = new mongoose.Schema({
   image: { type: String, default: null },
   title: { type: String, default: null },
   content: { type: String, required: true },
+  edited: { type: Boolean, default: false },
   pfp: { type: String, default: null },
   username: { type: String, required: true },
   faculty: { type: String, default: "None" },
