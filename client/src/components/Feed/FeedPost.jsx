@@ -1,5 +1,5 @@
-import React, { use, useState } from "react";
-import axios from "axios";
+import React, { useState } from "react";
+import { apiClient } from "../../lib/api-client";
 import "./Feed.css";
 import defaultProfile from "../../assets/profile.svg";
 
@@ -14,61 +14,45 @@ export const FeedPost = ({ post_props }) => {
   };
 
   const handleDelete = () => {
-    async function deleteRequest() {
-      const token = localStorage.getItem("access_token");
-      const response = await axios.delete(
-        `http://localhost:3000/api/discussion/${post_props._id}`,
-        {},
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-      if (response.status !== 200) {
-        console.log("Response failed: " + response.data);
-        setError(response.data);
-        return;
+    (async () => {
+      try {
+        const token = localStorage.getItem("access_token");
+        await apiClient(`/api/discussion/${post_props._id}`, {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setEdit(false);
+        window.location.reload();
+      } catch (err) {
+        setError(err.message || "Delete failed");
       }
-      setEdit(false);
-      return;
-    }
-    deleteRequest();
-    window.location.reload();
+    })();
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    async function submitForm() {
-      const token = localStorage.getItem("access_token");
-      const response = await axios.patch(
-        `http://localhost:3000/api/discussion/${post_props._id}`,
-        {
-          title: formData.title ? formData.title : post_props.title,
-          content: formData.content ? formData.content : post_props.comment,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+    (async () => {
+      try {
+        const token = localStorage.getItem("access_token");
+        await apiClient(`/api/discussion/${post_props._id}`, {
+          method: "PATCH",
+          body: {
+            title: formData.title ? formData.title : post_props.title,
+            content: formData.content ? formData.content : post_props.comment,
           },
-        },
-      );
-      console.log(response.data);
-      if (response.status === 403) {
-        alert("Access token expired please login and try again!");
-        return;
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setEdit(false);
+        window.location.reload();
+      } catch (err) {
+        const msg = err.message || "";
+        if (msg.includes("Unauthorized") || msg.includes("No access token")) {
+          alert("Access token expired please login and try again!");
+        } else {
+          setError(msg);
+        }
       }
-      if (!response.status === 200) {
-        setError(response.data);
-        return;
-      }
-      setEdit(false);
-      return;
-    }
-    submitForm();
-    window.location.reload();
+    })();
   };
 
   return (

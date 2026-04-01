@@ -19,7 +19,8 @@ export async function createUser(req, res) {
     return;
   }
   const created = await userService.createUser(user);
-  res.status(201).json({ data: created });
+  const access_token = userService.issueAccessToken(created);
+  res.status(201).json({ data: created, access_token });
   return;
 }
 

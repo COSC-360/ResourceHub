@@ -1,6 +1,5 @@
 "use client";
 import { createContext, useState, useEffect } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { apiClient } from "./lib/api-client";
 
@@ -25,7 +24,6 @@ export const AuthProvider = ({ children }) => {
             },
           },
         );
-        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
         setUser({
           ...data,
@@ -45,8 +43,6 @@ export const AuthProvider = ({ children }) => {
         method: "POST",
         body: { email, password },
       });
-      axios.defaults.headers.common["Authorization"] =
-        `Bearer ${response.access_token}`;
       localStorage.setItem("access_token", response.access_token);
       localStorage.setItem("user", JSON.stringify(response));
 
@@ -76,9 +72,12 @@ export const AuthProvider = ({ children }) => {
       console.log(response);
 
       const token = response.access_token;
+      if (!token || typeof token !== "string") {
+        throw new Error("Signup succeeded but no access token was returned");
+      }
 
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       localStorage.setItem("access_token", token);
+      localStorage.setItem("user", JSON.stringify(response));
 
       const payload = JSON.parse(atob(token.split(".")[1]));
 
@@ -98,7 +97,6 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     setUser(null);
-    delete axios.defaults.headers.common["Authorization"];
     localStorage.removeItem("access_token");
     router("/");
   };
