@@ -19,4 +19,4 @@ const CourseSchema = new mongoose.Schema({
     postCount: { type: Number, default: 0 },
 }, { timestamps: true }); // Automatically adds createdAt and updatedAt fields
 
-export const CourseModel = mongoose.model("Course", CourseSchema);
+export const Course = mongoose.model("Course", CourseSchema);
