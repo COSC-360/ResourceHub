@@ -25,3 +25,20 @@ if you run into import/module issues, try running:
 ~~~
 npm install
 ~~~
+
+## To Run CI Locally:
+
+To run the linter on the frontend, make sure your current directory is `.../client`, then run:
+~~~
+npm run lint
+~~~
+
+To run the linter on the backend, make sure your current directory is `.../server`, then run:
+~~~
+npm run lint
+~~~
+
+To run tests on the backend, make sure your current directory is `.../server`, then run:
+~~~
+npm run test
+~~~
