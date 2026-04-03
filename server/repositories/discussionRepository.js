@@ -1,9 +1,8 @@
 import { Discussion } from "../models/discussion.js";
 
 export const DiscussionRepository = {
-  async save(data) {
-    const discussion = await Discussion.create(data);
-    return discussion;
+  async save(discussion) {
+    return discussion.save();
   },
 
   async findById(id) {

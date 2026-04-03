@@ -9,12 +9,23 @@ It includes properties like:
     value: The value of the vote (1 for upvote, -1 for downvote)
 */
 
-const VoteSchema = new mongoose.Schema({
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    targetType: { type: String, enum: ['resource', 'discussion'], required: true },
+const VoteSchema = new mongoose.Schema(
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    targetType: {
+      type: String,
+      enum: ["resource", "discussion"],
+      required: true,
+    },
     targetId: { type: mongoose.Schema.Types.ObjectId, required: true },
     value: { type: Number, enum: [1, -1], required: true }, // 1 for upvote, -1 for downvote
-}, { timestamps: true }); // Automatically adds createdAt and updatedAt fields
+  },
+  { timestamps: true },
+); // Automatically adds createdAt and updatedAt fields
 
 // Ensure a user can only vote once per target
 VoteSchema.index({ userId: 1, targetType: 1, targetId: 1 }, { unique: true });

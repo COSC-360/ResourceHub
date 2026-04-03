@@ -9,6 +9,7 @@ const CreateDiscussion = ({ onDiscussionCreated }) => {
     content: "",
   });
   const [loading, setLoading] = useState(false);
+  const [file, setFile] = useState(null);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   const router = useNavigate();
@@ -19,6 +20,10 @@ const CreateDiscussion = ({ onDiscussionCreated }) => {
       ...prev,
       [name]: value,
     }));
+  };
+
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
   };
 
   const handleSubmit = async (e) => {
@@ -36,13 +41,18 @@ const CreateDiscussion = ({ onDiscussionCreated }) => {
 
     try {
       console.log("Sending POST request to /api/discussion");
+
+      const data = new FormData();
+      data.append("title", formData.title);
+      data.append("content", formData.content);
+
+      if (file) {
+        data.append("file", file);
+      }
       const token = localStorage.getItem("access_token");
       const result = await apiClient("/api/discussion", {
         method: "POST",
-        body: {
-          title: formData.title,
-          content: formData.content,
-        },
+        body: data,
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -106,6 +116,24 @@ const CreateDiscussion = ({ onDiscussionCreated }) => {
               disabled={loading}
             />
           </div>
+
+          <div className="form-group">
+            <label htmlFor="file">Attach an image:</label>
+            <input
+              type="file"
+              id="file"
+              name="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              disabled={loading}
+            />
+          </div>
+
+          {file && (
+            <div>
+              <img src={URL.createObjectURL(file)} alt="preview" width={100} />
+            </div>
+          )}
 
           <button type="submit" className="submit-btn" disabled={loading}>
             {loading ? "Posting..." : "Post Discussion"}

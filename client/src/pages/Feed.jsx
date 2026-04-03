@@ -21,7 +21,7 @@ const Feed = () => {
         const transformedData = discussions.map((discussion) => ({
           username: discussion.username,
           title: discussion.title,
-          timeline: discussion.timestamp,
+          timeline: discussion.updatedAt,
           faculty: discussion.faculty,
           comment: discussion.content,
           up_votes: discussion.upvotes,
@@ -30,6 +30,7 @@ const Feed = () => {
           _id: discussion._id,
           isAuthor: discussion.isAuthor,
           edited: discussion.edited,
+          hasImage: discussion.hasImage,
         }));
 
         setDiscussions(transformedData);
