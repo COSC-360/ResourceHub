@@ -5,11 +5,12 @@ export function getLatest() {
   return DiscussionRepository.findAll();
 }
 
-export function create(data) {
+export async function create(data) {
   const discussion = new Discussion(data);
+  console.log(data);
 
   if (!discussion) throw new Error("Discussion creation failed");
-  return DiscussionRepository.save(discussion.toJSON());
+  return await DiscussionRepository.save(discussion);
 }
 
 export async function update(id, data) {
@@ -17,7 +18,7 @@ export async function update(id, data) {
   if (!discussion) {
     throw new Error("discussion not found");
   }
-  if (discussion.authorId !== data.authorId) {
+  if (discussion.authorId.toString() !== data.authorId) {
     throw new Error("Not authorized");
   }
   discussion.set(data);
@@ -47,4 +48,12 @@ export async function remove(id, userId) {
   }
   DiscussionRepository.delete(id);
   return { id };
+}
+
+export async function findImageById(id) {
+  const discussion = await findById(id);
+  return {
+    contentType: discussion.image.contentType,
+    data: discussion.image.data,
+  };
 }

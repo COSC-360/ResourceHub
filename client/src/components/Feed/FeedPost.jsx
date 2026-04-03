@@ -1,16 +1,32 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { apiClient } from "../../lib/api-client";
 import "./Feed.css";
 import defaultProfile from "../../assets/profile.svg";
 
 export const FeedPost = ({ post_props }) => {
   const [edit, setEdit] = useState(false);
+  const [file, setFile] = useState(null);
+  const [removeImage, setRemoveImage] = useState(false);
   const [formData, setFormData] = useState({ title: "", content: "" });
   const [error, setError] = useState("");
+  const fileInputRef = useRef(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+    if (removeImage) setRemoveImage(false);
+  };
+
+  const resetFile = () => {
+    if (file && fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+    setFile(null);
+    if (!file) setRemoveImage(true);
   };
 
   const handleDelete = () => {
@@ -34,12 +50,21 @@ export const FeedPost = ({ post_props }) => {
     (async () => {
       try {
         const token = localStorage.getItem("access_token");
+        const data = new FormData();
+        data.append(
+          "title",
+          formData.title ? formData.title : post_props.title,
+        );
+        data.append(
+          "content",
+          formData.content ? formData.content : post_props.comment,
+        );
+        data.append("updatedImage", file ? true : removeImage);
+        if (file || removeImage) data.append("file", file);
+
         await apiClient(`/api/discussion/${post_props._id}`, {
           method: "PATCH",
-          body: {
-            title: formData.title ? formData.title : post_props.title,
-            content: formData.content ? formData.content : post_props.comment,
-          },
+          body: data,
           headers: { Authorization: `Bearer ${token}` },
         });
         setEdit(false);
@@ -60,6 +85,7 @@ export const FeedPost = ({ post_props }) => {
       <img
         src={post_props.pfp ? post_props.post_image : defaultProfile}
         alt="profile photo"
+        className="pfp"
       />
       <div className="post-container">
         <div className="post-header">
@@ -89,7 +115,7 @@ export const FeedPost = ({ post_props }) => {
         </div>
         <form onSubmit={handleSubmit}>
           {post_props.title && edit ? (
-            <fieldset>
+            <div className="form-group">
               <label htmlFor="edited_title">Edit Title:</label>
               <input
                 type="text"
@@ -97,13 +123,13 @@ export const FeedPost = ({ post_props }) => {
                 name="title"
                 onChange={handleChange}
               />
-            </fieldset>
+            </div>
           ) : (
             <h1 className="post-title">{post_props.title}</h1>
           )}
 
           {edit ? (
-            <fieldset>
+            <div className="form-group">
               <label htmlFor="edited_comment">Edit Comment:</label>
               <input
                 type="text"
@@ -111,18 +137,61 @@ export const FeedPost = ({ post_props }) => {
                 name="content"
                 onChange={handleChange}
               />
-            </fieldset>
+            </div>
           ) : (
             <p>{post_props.comment}</p>
+          )}
+
+          {edit && (
+            <div className="form-group">
+              <label htmlFor="file">
+                {post_props.hasImage ? "Update image:" : "Attach an image:"}
+              </label>
+              <input
+                type="file"
+                id="file"
+                ref={fileInputRef}
+                name="file"
+                accept="image/*"
+                onChange={handleFileChange}
+              />
+            </div>
+          )}
+
+          {edit && (file || post_props.hasImage) && !removeImage && (
+            <div>
+              <img
+                src={
+                  file
+                    ? URL.createObjectURL(file)
+                    : post_props.hasImage && !removeImage
+                      ? `http://localhost:3000/api/discussion/${post_props._id}/image`
+                      : null
+                }
+                alt="preview"
+                width={100}
+              />
+              <button
+                className="remove_image"
+                type="button"
+                onClick={() => resetFile()}
+              >
+                <i className="bi bi-trash3-fill" /> Remove image
+              </button>
+            </div>
           )}
 
           {edit && <span className="error">{error}</span>}
 
           {edit ? <input type="submit" className="edit" value="Post" /> : null}
         </form>
-        {post_props.post_image ? (
-          <img src={post_props.post_image} alt="attached image" />
+        {!edit && post_props.hasImage ? (
+          <img
+            src={`http://localhost:3000/api/discussion/${post_props._id}/image`}
+            alt="attached image"
+          />
         ) : null}
+
         <div className="post-footer">
           <i className="bi bi-arrow-up"></i>
           <p>{post_props.up_votes}</p>

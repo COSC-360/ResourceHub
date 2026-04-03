@@ -5,6 +5,7 @@ dotenv.config();
 const uri = process.env.MONGO_URI;
 
 async function connectDB() {
+  mongoose.Schema.Types.ObjectId.get((v) => v?.toString());
   try {
     await mongoose.connect(uri, {
       serverApi: {

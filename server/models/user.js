@@ -12,36 +12,38 @@ Represents a user in the system, containing properties such as:
     pfp: An optional profile picture URL (from multer) for the user
 */
 
-const UserSchema = new mongoose.Schema({
-  username: {
+const UserSchema = new mongoose.Schema(
+  {
+    username: {
       type: String,
       required: true,
       unique: true,
       trim: true,
     },
-  email: {
+    email: {
       type: String,
       required: true,
       unique: true,
       trim: true,
       lowercase: true,
     },
-  password: { type: String, required: true }, // it's hashed
-  bio: {
+    password: { type: String, required: true }, // it's hashed
+    bio: {
       type: String,
       default: "",
     },
-  posts: { type: Number, default: 0 },
-  comments: { type: Number, default: 0 },
-  faculty: {
+    posts: { type: Number, default: 0 },
+    comments: { type: Number, default: 0 },
+    faculty: {
       type: String,
-      default: "",
+      default: "None",
     },
-  pfp: {
-      type: String,
+    pfp: {
+      type: Buffer,
       default: null,
     },
-}, { timestamps: true }); // Automatically adds createdAt and updatedAt fields
+  },
+  { timestamps: true },
+); // Automatically adds createdAt and updatedAt fields
 
 export const User = mongoose.model("User", UserSchema);
-
