@@ -1,5 +1,6 @@
 import VoteRepository from "../repositories/voteRepository";
 import DiscussionRepository from "../repositories/discussionRepository";
+import { Vote } from "../models/vote";
 
 export async function createUpvote(data) {
   if (data._id) delete data._id;

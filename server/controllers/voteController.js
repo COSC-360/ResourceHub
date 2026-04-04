@@ -58,7 +58,8 @@ export async function getVotes(req, res) {
   try {
     const userId = req.user.userId;
     const votes = VoteService.getVotesByUserId(userId);
-  } catch (error) {
+    res.status(200).json(votes);
+  } catch (err) {
     res.status(500).json({ error: err });
   }
 }
