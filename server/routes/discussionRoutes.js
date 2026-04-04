@@ -10,6 +10,11 @@ export const discussionRoutes = Router();
 
 discussionRoutes.get("/", decodeAccessToken, discussionController.getLatest);
 discussionRoutes.get("/:id/image", discussionController.getImage);
+discussionRoutes.get(
+  "/replies/:id",
+  decodeAccessToken,
+  discussionController.getReplies,
+);
 discussionRoutes.post(
   "/",
   verifyAccessToken,

@@ -10,15 +10,19 @@ export const DiscussionRepository = {
   },
 
   async findAll() {
-    return await Discussion.find().sort({ timestamp: -1 });
+    return await Discussion.find({ parentId: null }).sort({ timestamp: -1 });
   },
 
-  async findByAuthor(authorId) {
-    return await Discussion.find({ authorId }).sort({ timestamp: -1 });
+  async findByAuthor(authorid) {
+    return await Discussion.find({ authorId: authorid }).sort({
+      timestamp: -1,
+    });
   },
 
-  async findReplies(parentid) {
-    return await Discussion.find({ parentid }).sort({ timestamp: -1 });
+  async findByParentId(parentid) {
+    return await Discussion.find({ parentId: parentid }).sort({
+      timestamp: -1,
+    });
   },
 
   async upvote(id) {

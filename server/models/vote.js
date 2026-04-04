@@ -18,10 +18,14 @@ const VoteSchema = new mongoose.Schema(
     },
     targetType: {
       type: String,
-      enum: ["resource", "discussion"],
+      enum: ["Resource", "Discussion"],
       required: true,
     },
-    targetId: { type: mongoose.Schema.Types.ObjectId, required: true },
+    targetId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      refPath: "targetType",
+    },
     value: { type: Number, enum: [1, -1], required: true }, // 1 for upvote, -1 for downvote
   },
   { timestamps: true },
