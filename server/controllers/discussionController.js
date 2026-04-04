@@ -42,7 +42,7 @@ export async function create(req, res) {
       : null,
     username: req.user.username,
     authorId: req.user.id,
-    parentid: parentid,
+    parentId: parentid,
     hasImage: req.file ? true : false,
   });
   res.status(201).json({ data: discussion });
@@ -97,4 +97,19 @@ export async function remove(req, res) {
     const status = message === "Not authorized" ? 403 : 404;
     res.status(status).json({ error: message });
   }
+}
+
+export async function getReplies(req, res) {
+  const { id } = req.params;
+
+  const discussions = await discussionService.findReplies(id);
+  const discussionsWithAuthor = discussions.map((discussion) => {
+    const obj = discussion.toJSON();
+
+    return {
+      ...obj,
+      isAuthor: discussion.authorId?.toString() === req.user?.id,
+    };
+  });
+  res.status(200).json(discussionsWithAuthor);
 }

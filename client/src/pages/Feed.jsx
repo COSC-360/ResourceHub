@@ -26,6 +26,7 @@ const Feed = () => {
           comment: discussion.content,
           up_votes: discussion.upvotes,
           down_votes: discussion.downvotes,
+          parentid: discussion.parentId,
           replies: discussion.replies,
           _id: discussion._id,
           isAuthor: discussion.isAuthor,
@@ -56,7 +57,7 @@ const Feed = () => {
       </button>
 
       {discussions.map((obj) => (
-        <FeedPost post_props={obj} key={obj._id} />
+        <FeedPost post_props={obj} key={obj._id} depth={0} />
       ))}
     </div>
   );
