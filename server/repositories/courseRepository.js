@@ -15,5 +15,5 @@ export function save(course) {
 }
 
 export function findAll() {
-    void(id); //unimplemented
+    //Unimplemented
 }
