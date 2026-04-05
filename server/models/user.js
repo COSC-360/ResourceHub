@@ -42,6 +42,10 @@ const UserSchema = new mongoose.Schema(
       type: Buffer,
       default: null,
     },
+    isAdmin: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true },
 ); // Automatically adds createdAt and updatedAt fields

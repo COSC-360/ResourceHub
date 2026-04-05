@@ -68,7 +68,10 @@ export async function remove(id, userId) {
     parent.set({ replies: replies });
     await DiscussionRepository.save(parent);
   }
-  DiscussionRepository.delete(id);
+  if (discussion.replies > 0) {
+    discussion.set({ content: "[deleted]", title: "[deleted]", deleted: true });
+    DiscussionRepository.save(discussion);
+  } else DiscussionRepository.delete(id);
   return { id };
 }
 

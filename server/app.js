@@ -4,6 +4,7 @@ import { userRoutes } from "./routes/userRoutes.js";
 import { courseRoutes } from "./routes/courseRoutes.js";
 import { discussionRoutes } from "./routes/discussionRoutes.js";
 import { commonRoutes } from "./routes/commonRoutes.js";
+import { voteRoutes } from "./routes/voteRoutes.js";
 
 const app = express();
 
@@ -25,5 +26,6 @@ app.use("/api/user", userRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/discussion", discussionRoutes);
 app.use("/api/common", commonRoutes);
+app.use("/api/vote", voteRoutes);
 
 export default app;

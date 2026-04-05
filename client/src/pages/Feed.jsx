@@ -32,6 +32,9 @@ const Feed = () => {
           isAuthor: discussion.isAuthor,
           edited: discussion.edited,
           hasImage: discussion.hasImage,
+          hasUpvote: discussion.hasUpvote,
+          hasDownvote: discussion.hasDownvote,
+          deleted: discussion.deleted,
         }));
 
         setDiscussions(transformedData);
