@@ -1,8 +1,8 @@
-function readCourses() {
+export function readCourses() {
     //Unimplemented
 }
 
-function writeCourses(courses) {
+export function writeCourses(courses) {
     void(courses); //unimplemented
 }
 
