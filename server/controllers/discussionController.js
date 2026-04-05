@@ -1,14 +1,30 @@
 import * as discussionService from "../services/discussionService.js";
+import * as voteService from "../services/voteService.js";
 
 export async function getLatest(req, res) {
   const discussions = await discussionService.getLatest();
-  const discussionsWithAuthor = discussions.map((discussion) => {
-    const obj = discussion.toJSON();
-    return {
-      ...obj,
-      isAuthor: discussion.authorId?.toString() === req.user?.id,
-    };
-  });
+  const discussionsWithAuthor = await Promise.all(
+    discussions.map(async (discussion) => {
+      const obj = discussion.toJSON();
+      const hasUpvote = await voteService.hasUpvote(
+        discussion._id,
+        req.user?.id,
+        "Discussion",
+      );
+      const hasDownvote = await voteService.hasDownvote(
+        discussion._id,
+        req.user?.id,
+        "Discussion",
+      );
+      return {
+        ...obj,
+        isAuthor: discussion.authorId?.toString() === req.user?.id,
+        hasUpvote: hasUpvote,
+        hasDownvote: hasDownvote,
+        hasImage: discussion.image.contentType ? true : false,
+      };
+    }),
+  );
   res.json(discussionsWithAuthor);
 }
 
@@ -43,7 +59,6 @@ export async function create(req, res) {
     username: req.user.username,
     authorId: req.user.id,
     parentId: parentid,
-    hasImage: req.file ? true : false,
   });
   res.status(201).json({ data: discussion });
 }

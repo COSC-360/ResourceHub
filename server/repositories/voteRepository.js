@@ -1,4 +1,4 @@
-import { Vote } from "../models/vote";
+import { Vote } from "../models/vote.js";
 
 export const VoteRepository = {
   async save(vote) {
@@ -11,6 +11,10 @@ export const VoteRepository = {
 
   async findAll() {
     return await Vote.find().sort({ timestamp: -1 });
+  },
+
+  async findByFields(fields) {
+    return await Vote.find(fields);
   },
 
   async findByUserId(userid) {
@@ -36,7 +40,7 @@ export const VoteRepository = {
   },
 
   async deleteByFields(fields) {
-    return await Vote.deleteOne(fields);
+    return await Vote.findOneAndDelete(fields);
   },
 
   async deleteManyByTargetId(targetid) {

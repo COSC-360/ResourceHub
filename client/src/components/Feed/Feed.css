@@ -41,6 +41,29 @@
   gap: 2px;
 }
 
+.footer_button.red {
+  color: red;
+}
+
+.deleted {
+  font-style: italic;
+  color: grey;
+}
+
+.details {
+  font-style: italic;
+  color: grey;
+}
+
+.course {
+  display: flex;
+  flex-direction: column;
+}
+
+.footer_button.green {
+  color: green;
+}
+
 .post .pfp {
   border-radius: 100%;
   height: 30px;

@@ -1,10 +1,11 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { apiClient } from "../../lib/api-client";
 import "./Feed.css";
 import defaultProfile from "../../assets/profile.svg";
 import Comment from "../Comment/Comment";
+import { useNavigate } from "react-router-dom";
 
-export const FeedPost = ({ post_props, depth }) => {
+export const FeedPost = ({ post_props, depth, expandDown }) => {
   const [edit, setEdit] = useState(false);
   const [file, setFile] = useState(null);
   const [removeImage, setRemoveImage] = useState(false);
@@ -13,10 +14,19 @@ export const FeedPost = ({ post_props, depth }) => {
   const [error, setError] = useState("");
   const fileInputRef = useRef(null);
 
-  const [numComments, setNumComments] = useState(0);
+  const [upvotes, setUpvotes] = useState(post_props.up_votes);
+  const [hasUpvote, setHasUpvote] = useState(post_props.hasUpvote);
+  const [downvotes, setDownvotes] = useState(post_props.down_votes);
+  const [hasDownvote, setHasDownvote] = useState(post_props.hasDownvote);
+  const [replies, setReplies] = useState(post_props.replies);
+  const [date, setDate] = useState("");
+
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showComments, setShowComments] = useState(false);
+  const [deleted, setDeleted] = useState(post_props.deleted);
+
+  const router = useNavigate();
 
   const fetchComments = () => {
     setShowComments(!showComments);
@@ -45,9 +55,11 @@ export const FeedPost = ({ post_props, depth }) => {
           parentid: discussion.parentId,
           edited: discussion.edited,
           hasImage: discussion.hasImage,
+          hasUpvote: discussion.hasUpvote,
+          hasDownvote: discussion.hasDownvote,
+          deleted: discussion.deleted,
         }));
         setComments(transformedData);
-        setNumComments(comments.length);
       } catch (err) {
         console.log(err);
       } finally {
@@ -83,11 +95,89 @@ export const FeedPost = ({ post_props, depth }) => {
           headers: { Authorization: `Bearer ${token}` },
         });
         setEdit(false);
-        window.location.reload();
+        setDeleted(true);
       } catch (err) {
         setError(err.message || "Delete failed");
       }
     })();
+  };
+
+  const handleUpvote = () => {
+    try {
+      (async () => {
+        const token = localStorage.getItem("access_token");
+        if (!token) {
+          router("/auth/login");
+          return;
+        }
+        let result = null;
+        if (hasUpvote || hasDownvote) {
+          result = await apiClient("/api/vote/remove", {
+            body: { targetType: "Discussion", targetId: post_props._id },
+            method: "DELETE",
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (hasDownvote) {
+            setDownvotes(downvotes - 1);
+            setHasDownvote(false);
+          }
+        }
+        if (!hasUpvote) {
+          result = await apiClient("/api/vote/up", {
+            body: { targetType: "Discussion", targetId: post_props._id },
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          setUpvotes(upvotes + 1);
+          setHasUpvote(true);
+        } else {
+          setUpvotes(upvotes - 1);
+          setHasUpvote(false);
+        }
+        console.log(result.data);
+      })();
+    } catch (error) {
+      console.log("Could not vote: " + error);
+    }
+  };
+
+  const handleDownvote = () => {
+    try {
+      (async () => {
+        const token = localStorage.getItem("access_token");
+        if (!token) {
+          router("/auth/login");
+          return;
+        }
+        let result = null;
+        if (hasUpvote || hasDownvote) {
+          result = await apiClient("/api/vote/remove", {
+            body: { targetType: "Discussion", targetId: post_props._id },
+            method: "DELETE",
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (hasUpvote) {
+            setUpvotes(upvotes - 1);
+            setHasUpvote(false);
+          }
+        }
+        if (!hasDownvote) {
+          result = await apiClient("/api/vote/down", {
+            body: { targetType: "Discussion", targetId: post_props._id },
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          setDownvotes(downvotes + 1);
+          setHasDownvote(true);
+        } else {
+          setDownvotes(downvotes - 1);
+          setHasDownvote(false);
+        }
+        console.log(result.data);
+      })();
+    } catch (error) {
+      console.log("Could not vote: " + error);
+    }
   };
 
   const handleSubmit = (e) => {
@@ -125,6 +215,37 @@ export const FeedPost = ({ post_props, depth }) => {
     })();
   };
 
+  const timeAgo = (date, currentDate) => {
+    if (!date || !currentDate) return "Undefined";
+
+    const seconds = Math.floor((currentDate - date) / 1000);
+
+    if (seconds < 60) return `${seconds} seconds ago`;
+
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes} minute${minutes !== 1 ? "s" : ""} ago`;
+
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours} hour${hours !== 1 ? "s" : ""} ago`;
+
+    const days = Math.floor(hours / 24);
+    if (days < 30) return `${days} day${days !== 1 ? "s" : ""} ago`;
+
+    const months = Math.floor(days / 30);
+    if (months < 12) return `${months} month${months !== 1 ? "s" : ""} ago`;
+
+    const years = Math.floor(months / 12);
+    return `${years} year${years !== 1 ? "s" : ""} ago`;
+  };
+
+  useEffect(() => {
+    if (expandDown) fetchComments();
+  }, [expandDown]);
+
+  useEffect(() => {
+    setDate(timeAgo(new Date(post_props.timeline), new Date()));
+  }, []);
+
   return (
     <div
       className={
@@ -141,128 +262,147 @@ export const FeedPost = ({ post_props, depth }) => {
           alt="profile photo"
           className="pfp"
         />
+
         <div className="post-container">
-          <div className="post-header">
-            <h2 className="username">{post_props.username}</h2>
-            <p className="details">• {post_props.timeline}</p>
-            <p className="details">• {post_props.faculty}</p>
-            {post_props.edited && <p className="details faded"> edited</p>}
-            {post_props.isAuthor ? (
-              <button
-                className={edit ? "cancel" : "edit"}
-                onClick={() => setEdit(!edit)}
-              >
-                {edit ? (
-                  <i className="bi bi-x" />
-                ) : (
-                  <i className="bi bi-pencil-square" />
+          {deleted ? (
+            <span className="deleted">This post has been deleted</span>
+          ) : (
+            <>
+              <div className="post-header">
+                <div>
+                  {!post_props.parentid ? (
+                    <h2 className="course">c/{post_props.coursename}</h2>
+                  ) : null}
+                  <h2 className="username">{post_props.username}</h2>
+                </div>
+                <p className="details">• {date}</p>
+                <p className="details">• {post_props.faculty}</p>
+                {post_props.edited && <p className="details faded"> edited</p>}
+                {post_props.isAuthor ? (
+                  <button
+                    className={edit ? "cancel" : "edit"}
+                    onClick={() => setEdit(!edit)}
+                  >
+                    {edit ? (
+                      <i className="bi bi-x" />
+                    ) : (
+                      <i className="bi bi-pencil-square" />
+                    )}
+                    {edit ? "Cancel" : "Edit"}
+                  </button>
+                ) : null}
+                {edit && (
+                  <button className="delete" onClick={handleDelete}>
+                    <i className="bi bi-trash3-fill" />
+                    Delete
+                  </button>
                 )}
-                {edit ? "Cancel" : "Edit"}
-              </button>
-            ) : null}
-            {edit && (
-              <button className="delete" onClick={handleDelete}>
-                <i className="bi bi-trash3-fill" />
-                Delete
-              </button>
-            )}
-          </div>
-          <form onSubmit={handleSubmit}>
-            {post_props.title && edit ? (
-              <div className="form-group">
-                <label htmlFor="edited_title">Edit Title:</label>
-                <input
-                  type="text"
-                  defaultValue={post_props.title}
-                  name="title"
-                  onChange={handleChange}
-                />
               </div>
-            ) : (
-              <h1 className="post-title">{post_props.title}</h1>
-            )}
+              <form onSubmit={handleSubmit}>
+                {post_props.title && edit ? (
+                  <div className="form-group">
+                    <label htmlFor="edited_title">Edit Title:</label>
+                    <input
+                      type="text"
+                      defaultValue={post_props.title}
+                      name="title"
+                      onChange={handleChange}
+                    />
+                  </div>
+                ) : (
+                  <h1 className="post-title">{post_props.title}</h1>
+                )}
 
-            {edit ? (
-              <div className="form-group">
-                <label htmlFor="edited_comment">Edit Comment:</label>
-                <input
-                  type="text"
-                  defaultValue={post_props.comment}
-                  name="content"
-                  onChange={handleChange}
-                />
-              </div>
-            ) : (
-              <p>{post_props.comment}</p>
-            )}
+                {edit ? (
+                  <div className="form-group">
+                    <label htmlFor="edited_comment">Edit Comment:</label>
+                    <input
+                      type="text"
+                      defaultValue={post_props.comment}
+                      name="content"
+                      onChange={handleChange}
+                    />
+                  </div>
+                ) : (
+                  <p>{post_props.comment}</p>
+                )}
 
-            {edit && (
-              <div className="form-group">
-                <label htmlFor="file">
-                  {post_props.hasImage ? "Update image:" : "Attach an image:"}
-                </label>
-                <input
-                  type="file"
-                  id="file"
-                  ref={fileInputRef}
-                  name="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                />
-              </div>
-            )}
+                {edit && (
+                  <div className="form-group">
+                    <label htmlFor="file">
+                      {post_props.hasImage
+                        ? "Update image:"
+                        : "Attach an image:"}
+                    </label>
+                    <input
+                      type="file"
+                      id="file"
+                      ref={fileInputRef}
+                      name="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                    />
+                  </div>
+                )}
 
-            {edit && (file || post_props.hasImage) && !removeImage && (
-              <div>
+                {edit && (file || post_props.hasImage) && !removeImage && (
+                  <div>
+                    <img
+                      src={
+                        file
+                          ? URL.createObjectURL(file)
+                          : post_props.hasImage && !removeImage
+                            ? `http://localhost:3000/api/discussion/${post_props._id}/image`
+                            : null
+                      }
+                      alt="preview"
+                      width={100}
+                    />
+                    <button
+                      className="remove_image"
+                      type="button"
+                      onClick={() => resetFile()}
+                    >
+                      <i className="bi bi-trash3-fill" /> Remove image
+                    </button>
+                  </div>
+                )}
+
+                {edit && <span className="error">{error}</span>}
+
+                {edit ? (
+                  <input type="submit" className="edit" value="Post" />
+                ) : null}
+              </form>
+              {!edit && post_props.hasImage ? (
                 <img
-                  src={
-                    file
-                      ? URL.createObjectURL(file)
-                      : post_props.hasImage && !removeImage
-                        ? `http://localhost:3000/api/discussion/${post_props._id}/image`
-                        : null
-                  }
-                  alt="preview"
-                  width={100}
+                  src={`http://localhost:3000/api/discussion/${post_props._id}/image`}
+                  alt="attached image"
                 />
-                <button
-                  className="remove_image"
-                  type="button"
-                  onClick={() => resetFile()}
-                >
-                  <i className="bi bi-trash3-fill" /> Remove image
-                </button>
-              </div>
-            )}
-
-            {edit && <span className="error">{error}</span>}
-
-            {edit ? (
-              <input type="submit" className="edit" value="Post" />
-            ) : null}
-          </form>
-          {!edit && post_props.hasImage ? (
-            <img
-              src={`http://localhost:3000/api/discussion/${post_props._id}/image`}
-              alt="attached image"
-            />
-          ) : null}
-
+              ) : null}
+            </>
+          )}
           <div className="post-footer">
-            <button className="footer_button">
+            <button
+              className={hasUpvote ? "footer_button green" : "footer_button"}
+              onClick={handleUpvote}
+            >
               <i className="bi bi-arrow-up"></i>
-              <p>{post_props.up_votes}</p>
+              <p>{upvotes}</p>
             </button>
-            <button className="footer_button">
+            <button
+              className={hasDownvote ? "footer_button red" : "footer_button"}
+              onClick={handleDownvote}
+            >
               <i className="bi bi-arrow-down"></i>
-              <p>{post_props.down_votes}</p>
+              <p>{downvotes}</p>
             </button>
             <button
               className="footer_button"
               onClick={() => showCommentBox(!commentBox)}
             >
               <i className="bi bi-chat"></i>
-              <p>{post_props.replies}</p>
+              <p>{replies}</p>
             </button>
           </div>
         </div>
@@ -274,12 +414,14 @@ export const FeedPost = ({ post_props, depth }) => {
           parentid={post_props._id}
           onSubmit={() => {
             showCommentBox(false);
-            window.location.reload();
+            setShowComments(true);
+            fetchComments();
+            setReplies(replies + 1);
           }}
         />
       )}
 
-      {post_props.replies > 0 && (
+      {replies > 0 && (
         <button onClick={fetchComments}>
           {!showComments ? "Show Replies" : "Show Less"}
         </button>
@@ -287,7 +429,12 @@ export const FeedPost = ({ post_props, depth }) => {
 
       {showComments &&
         comments.map((obj) => (
-          <FeedPost post_props={obj} key={obj._id} depth={depth + 1} />
+          <FeedPost
+            post_props={obj}
+            key={obj._id}
+            depth={depth + 1}
+            expandDown={showComments}
+          />
         ))}
     </div>
   );

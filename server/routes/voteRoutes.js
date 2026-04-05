@@ -1,10 +1,10 @@
 import { Router } from "express";
-import * as VoteController from "../controllers/voteController";
-import { verifyAccessToken } from "../middleware/authMiddleware";
+import * as VoteController from "../controllers/voteController.js";
+import { verifyAccessToken } from "../middleware/authMiddleware.js";
 
-const voteRouter = Router();
+export const voteRoutes = Router();
 
-voteRouter.post("/up", verifyAccessToken, VoteController.upVoteTarget);
-voteRouter.post("/down", verifyAccessToken, VoteController.downVoteTarget);
-voteRouter.delete("/remove", verifyAccessToken, VoteController.removeVote);
-voteRouter.get("/", verifyAccessToken, VoteController.getVotes);
+voteRoutes.post("/up", verifyAccessToken, VoteController.upVoteTarget);
+voteRoutes.post("/down", verifyAccessToken, VoteController.downVoteTarget);
+voteRoutes.delete("/remove", verifyAccessToken, VoteController.removeVote);
+voteRoutes.get("/", verifyAccessToken, VoteController.getVotes);
