@@ -12,8 +12,8 @@ Represents a course in the system, containing properties such as:
 
 const CourseSchema = new mongoose.Schema(
   {
-    coursename: { type: String, required: true },
-    coursecode: { type: String, required: true, unique: true }, // can't have two COSC221 courses, that would cause the end of the world
+    name: { type: String, required: true },
+    code: { type: String, required: true, unique: true }, // can't have two COSC221 courses, that would cause the end of the world
     description: { type: String, default: "" },
     image: { type: String, default: null }, // since multer will store the image as a URL or file path
     memberCount: { type: Number, default: 0 },

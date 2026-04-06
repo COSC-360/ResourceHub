@@ -22,7 +22,9 @@ export default function CoursePage() {
                 setIsLoading(true);
                 setError('');
 
-                const payload = await apiClient(`/api/courses/${courseId}`, {});
+                const payload = await apiClient(`/api/courses/${courseId}`, {
+                    method: 'GET',
+                });
 
                 setCourse(payload.data);
             } catch (fetchError) {
