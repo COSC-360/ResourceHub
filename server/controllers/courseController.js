@@ -1,5 +1,6 @@
 import * as courseService from '../services/courseService.js';
 import mongoose from 'mongoose';
+import { CourseCodeAlreadyExistsError } from '../errors/courseErrors.js';
 
 export async function getById(req, res) {
     try {
@@ -48,6 +49,15 @@ export async function create(req, res) {
         const createdCourse = await courseService.create(course);
         return res.status(201).json({ data: createdCourse });
     } catch (error) {
+        if (error instanceof CourseCodeAlreadyExistsError) {
+            return res.status(409).json({ error: error.message });
+        }
+
+        // Handles unique-index collisions even if two requests pass pre-check simultaneously
+        if (error?.code === 11000 && error?.keyPattern?.code) {
+            return res.status(409).json({ error: "Course with this code already exists" });
+        }
+
         return res.status(500).json({ error: error.message });
     }
 }
