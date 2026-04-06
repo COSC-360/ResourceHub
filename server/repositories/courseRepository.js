@@ -7,7 +7,16 @@ export const courseRepository = {
     },
 
     async findAll() {
+        /**
+         * Retreives all courses from the database, sorted by creation date (newest first).
+         * @returns {Promise<Array>} An array of course objects.
+         */
         return await Course.find().sort({ createdAt: -1 }); // Sort by creation date, newest first
+    },
+
+    async findByCode(code) {
+        const course = await Course.findOne({ code: code });
+        return course;
     },
 
     async save(course) {
