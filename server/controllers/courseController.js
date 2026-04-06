@@ -58,7 +58,22 @@ export async function getAll(req, res) {
 }
 
 export async function update(req, res) {
-    //empty
+    try {
+        // 1. extract the course id from the request parameters (in URL)
+        const { id } = req.params;
+        //    extract the updated course data from the request body
+        const { name, code, description } = req.body;
+
+        // 2. validate the course id (must be a valid MongoDB ObjectId)
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ error: "Invalid course id" });
+        }
+
+        // 3. validate the updated course data (basic validation)
+        // - at least one field must be provided for update
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
 }
 
 export async function updateImage(req, res) {

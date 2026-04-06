@@ -7,7 +7,7 @@ courseRoutes.get("/", courseController.getAll); // get all courses
 courseRoutes.get("/:id", courseController.getById); // get one course by id
 
 
-courseRoutes.post("/", courseController.create); // create a new course
+courseRoutes.post("/create", courseController.create); // create a new course
 
 courseRoutes.patch("/:id", courseController.update); // update a course by id
 courseRoutes.patch("/:id/image", courseController.updateImage); // update a course's image by id
