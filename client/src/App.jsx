@@ -12,6 +12,7 @@ import NotFound from "./components/NotFoundPage/NotFound.jsx";
 import MyCoursesPage from "./components/MyCoursesPage/MyCoursesPage.jsx";
 import AddMyCoursePage from "./components/AddMyCoursePage/AddMyCourse.jsx";
 import CreatePost from "./pages/CreatePost.jsx";
+import ProfilePage from "./components/ProfilePage/ProfilePage.jsx";
 
 // Main layout component that includes the header and sidebar,
 // and an Outlet for rendering the main content based on the route
@@ -43,6 +44,7 @@ function App() {
         <Route path="/my-courses/add" element={<AddMyCoursePage />} />
         <Route path="/auth/login" element={<LoginForm />} />
         <Route path="/auth/register" element={<SignupForm />} />
+        <Route path="/profile" element={<ProfilePage />} />
       </Route>
       {/* not found page renders differently */}
       <Route path="*" element={<NotFound />} />

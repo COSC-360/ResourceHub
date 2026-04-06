@@ -67,7 +67,7 @@ export const DiscussionRepository = {
       .lean();
   },
 
-  //This is currently searching by the content field.
+  //This is currently searching by the title field.
   async search(searchTerm) {
     return await Discussion.find({
       title: { $regex: searchTerm, $options: "i" },

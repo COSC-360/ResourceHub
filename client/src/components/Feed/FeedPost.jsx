@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { apiClient } from "../../lib/api-client";
 import "./Feed.css";
 import defaultProfile from "../../assets/profile.svg";
@@ -19,53 +19,56 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
   const [downvotes, setDownvotes] = useState(post_props.down_votes);
   const [hasDownvote, setHasDownvote] = useState(post_props.hasDownvote);
   const [replies, setReplies] = useState(post_props.replies);
-  const [date, setDate] = useState("");
 
   const [comments, setComments] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [deleted, setDeleted] = useState(post_props.deleted);
 
   const router = useNavigate();
 
+  const loadReplies = useCallback(async () => {
+    if (post_props.replies <= 0) return;
+    try {
+      const auth = localStorage.getItem("access_token");
+      const discussions = await apiClient(
+        `/api/discussion/replies/${post_props._id}`,
+        {
+          headers: auth ? { Authorization: `Bearer ${auth}` } : {},
+        },
+      );
+      const transformedData = discussions.map((discussion) => ({
+        username: discussion.username,
+        title: discussion.title,
+        timeline: discussion.updatedAt,
+        faculty: discussion.faculty,
+        comment: discussion.content,
+        up_votes: discussion.upvotes,
+        down_votes: discussion.downvotes,
+        replies: discussion.replies,
+        _id: discussion._id,
+        isAuthor: discussion.isAuthor,
+        parentid: discussion.parentId,
+        edited: discussion.edited,
+        hasImage: discussion.hasImage,
+        hasUpvote: discussion.hasUpvote,
+        hasDownvote: discussion.hasDownvote,
+        deleted: discussion.deleted,
+      }));
+      setComments(transformedData);
+    } catch (err) {
+      console.log(err);
+    }
+  }, [post_props._id, post_props.replies]);
+
   const fetchComments = () => {
-    setShowComments(!showComments);
-    if (post_props.replies <= 0 || showComments) return;
-    (async () => {
-      try {
-        setLoading(true);
-        const token = localStorage.getItem("access_token");
-        const discussions = await apiClient(
-          `/api/discussion/replies/${post_props._id}`,
-          {
-            headers: token ? { Authorization: `Bearer ${token}` } : {},
-          },
-        );
-        const transformedData = discussions.map((discussion) => ({
-          username: discussion.username,
-          title: discussion.title,
-          timeline: discussion.updatedAt,
-          faculty: discussion.faculty,
-          comment: discussion.content,
-          up_votes: discussion.upvotes,
-          down_votes: discussion.downvotes,
-          replies: discussion.replies,
-          _id: discussion._id,
-          isAuthor: discussion.isAuthor,
-          parentid: discussion.parentId,
-          edited: discussion.edited,
-          hasImage: discussion.hasImage,
-          hasUpvote: discussion.hasUpvote,
-          hasDownvote: discussion.hasDownvote,
-          deleted: discussion.deleted,
-        }));
-        setComments(transformedData);
-      } catch (err) {
-        console.log(err);
-      } finally {
-        setLoading(false);
-      }
-    })();
+    if (post_props.replies <= 0) {
+      setShowComments((open) => !open);
+      return;
+    }
+    setShowComments((open) => {
+      if (!open) void loadReplies();
+      return !open;
+    });
   };
 
   const handleChange = (e) => {
@@ -238,13 +241,18 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
     return `${years} year${years !== 1 ? "s" : ""} ago`;
   };
 
-  useEffect(() => {
-    if (expandDown) fetchComments();
-  }, [expandDown]);
+  const date = useMemo(
+    () => timeAgo(new Date(post_props.timeline), new Date()),
+    [post_props.timeline],
+  );
 
   useEffect(() => {
-    setDate(timeAgo(new Date(post_props.timeline), new Date()));
-  }, []);
+    if (!expandDown || post_props.replies <= 0) return;
+    const id = setTimeout(() => {
+      void loadReplies();
+    }, 0);
+    return () => clearTimeout(id);
+  }, [expandDown, post_props.replies, loadReplies]);
 
   return (
     <div
