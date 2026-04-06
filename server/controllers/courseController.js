@@ -174,14 +174,6 @@ export async function deleteCourse(req, res) {
     //empty
 }
 
-export async function join(req, res) {
-    //empty
-}
-
-export async function leave(req, res) {
-    //empty
-}
-
 export async function getDiscussions(req, res) {
     //empty
 }

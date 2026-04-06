@@ -14,10 +14,6 @@ courseRoutes.patch("/:id/updateimage", upload.single("image"), courseController.
 // TODO: delete a course by id, probably want auth 
 courseRoutes.delete("/:id", courseController.deleteCourse); // delete a course by id
 
-// join and leave routes
-courseRoutes.post("/:id/join", courseController.join); // join a course by id
-courseRoutes.delete("/:id/join", courseController.leave); // leave a course by id
-
 // additional routes for discussions, resources, and members specific pages
 courseRoutes.get("/:id/discussions", courseController.getDiscussions); // get all discussions for a course by id
 courseRoutes.get("/:id/resources", courseController.getResources); // get all resources for a course by id
