@@ -96,8 +96,9 @@ export async function update(req, res) {
     }
     res.status(200).json({ data: discussion });
   } catch (err) {
+    console.log(err);
     const message = err instanceof Error ? err.message : "Unknown error";
-    const status = message === "Not authorized" ? 403 : 404;
+    const status = message === "Not authorized" ? 403 : 500;
     res.status(status).json({ error: message });
   }
 }

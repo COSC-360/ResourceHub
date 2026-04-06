@@ -25,7 +25,7 @@ export async function update(id, data) {
   if (!discussion) {
     throw new Error("discussion not found");
   }
-  if (discussion.authorid.toString() !== data.authorid) {
+  if (discussion.authorId.toString() !== data.authorId) {
     throw new Error("Not authorized");
   }
   discussion.set(data);
