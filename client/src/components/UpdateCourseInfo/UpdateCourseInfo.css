@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@reference "tailwindcss";
+
+@layer components {
+  .update-course-page {
+    @apply min-h-screen bg-slate-50 px-4 py-10;
+  }
+
+  .update-course-card {
+    @apply mx-auto w-full max-w-2xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm;
+  }
+
+  .update-course-title {
+    @apply mb-6 text-2xl font-bold text-slate-900;
+  }
+
+  .update-course-form {
+    @apply flex flex-col gap-3;
+  }
+
+  .update-course-label {
+    @apply text-sm font-medium text-slate-700;
+  }
+
+  .update-course-input,
+  .update-course-textarea {
+    @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200;
+  }
+
+  .update-course-error {
+    @apply text-sm text-red-600;
+  }
+
+  .update-course-success {
+    @apply text-sm text-green-600;
+  }
+
+  .update-course-actions {
+    @apply mt-3 flex justify-end gap-3;
+  }
+
+  .update-course-btn {
+    @apply rounded-lg px-4 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .update-course-btn-primary {
+    @apply bg-blue-600 text-white hover:bg-blue-700;
+  }
+
+  .update-course-btn-secondary {
+    @apply border border-slate-300 bg-white text-slate-700 hover:bg-slate-100;
+  }
+}

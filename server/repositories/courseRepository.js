@@ -24,6 +24,15 @@ export const courseRepository = {
         const savedCourse = await Course.create(course);
         return savedCourse;
     },
+
+    async update(id, updatedData) {
+        const updatedCourse = await Course.findByIdAndUpdate(
+            id, 
+            { $set: updatedData },
+            { new: true, runValidators: true }
+        );
+        return updatedCourse;
+    },
 };
 
 export default courseRepository;

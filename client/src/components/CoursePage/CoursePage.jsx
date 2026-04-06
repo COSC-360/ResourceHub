@@ -60,11 +60,7 @@ export default function CoursePage() {
     return (
         <div>
             <CourseHeader
-                imageSrc={course.image}
-                title={course.name}
-                description={course.description}
-                isJoined={false} // replace with actual membership check
-                memberCount={course.memberCount}
+                course={course}
             />
         </div>
     );

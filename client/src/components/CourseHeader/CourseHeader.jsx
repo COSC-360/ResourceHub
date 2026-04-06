@@ -15,39 +15,39 @@ function PeopleIcon() {
     );
 }
 
-export function CourseHeader({
-    imageSrc,
-    title,
-    description,
-    isJoined = false, // check membership route for this instead
-    memberCount = 0, // check course details route for this instead
-}) {
+export function CourseHeader({ course }) {
     return (
         <section className="course-header">
             <div className="course-header__image-wrap">
-                <img className="course-header__image" src={imageSrc} alt={title} />
+                <img className="course-header__image" src={course.image} alt={course.name} />
             </div>
 
             <div className="course-header__content">
                 <div className="course-header__main">
-                    <h1 className="course-header__title">{title}</h1>
-                    <p className="course-header__description">{description}</p>
+                    <h1 className="course-header__title">{course.name}</h1>
+                    <p className="course-header__description">{course.description}</p>
                 </div>
 
                 <div className="course-header__side">
-                    <button
+                    <button // TODO: implement join/leave functionality
                         type="button"
-                        className={`course-header__join ${isJoined ? "is-joined" : ""}`}
+                        className={`course-header__join`}
                     >
-                        {isJoined ? "Joined" : "Join"}
+                        Join
                     </button>
+                    <a 
+                        href={`/courses/${course._id}/update`} // TODO: implement update course page
+                        className="course-header__edit-link"
+                    >
+                        Edit
+                    </a>
 
                     <div
                         className="course-header__members"
-                        aria-label={`${memberCount} members`}
+                        aria-label={`${course.memberCount} members`}
                     >
                         <PeopleIcon />
-                        <span className="course-header__members-count">{memberCount}</span>
+                        <span className="course-header__members-count">{course.memberCount}</span>
                     </div>
                 </div>
             </div>
