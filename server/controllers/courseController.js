@@ -140,7 +140,34 @@ export async function update(req, res) {
 }
 
 export async function updateImage(req, res) {
-    //empty
+    try {
+        const { id } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ error: "Invalid course id" });
+        }
+
+        if (!req.file) {
+            return res.status(400).json({ error: "No image file uploaded" });
+        }
+
+        const imageUrl = `/uploads/${req.file.filename}`;
+        const updatedCourse = await courseService.updateImage(id, imageUrl);
+
+        if (!updatedCourse) {
+            return res.status(404).json({ error: "Course not found" });
+        }
+
+        return res.status(200).json({ data: updatedCourse });
+    } catch (error) {
+        if (error?.message === "Only image files are allowed") {
+            return res.status(400).json({ error: error.message });
+        }
+        if (error?.code === "LIMIT_FILE_SIZE") {
+            return res.status(400).json({ error: "Image too large (max 5MB)" });
+        }
+        return res.status(500).json({ error: error.message });
+    }
 }
 
 export async function deleteCourse(req, res) {

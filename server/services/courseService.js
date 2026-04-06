@@ -13,18 +13,19 @@ export function getById(id) {
     return courseRepository.findById(id);
 }
 
-export async function create(course) {
-    console.log('Creating course:', course);
-    // check that course doesnt already exist with same code
-    await checkCourseCodeUnique(course.code);
-    console.log('Course code is unique, proceeding to save');
-    return courseRepository.save(course);
-}
-
 export function getAll() {
     return courseRepository.findAll();
 }
 
+export async function create(course) {
+    await checkCourseCodeUnique(course.code);
+    return courseRepository.save(course);
+}
+
 export function update(id, updatedData) {
     return courseRepository.update(id, updatedData);
+}
+
+export function updateImage(id, imageUrl) {
+    return courseRepository.updateImage(id, imageUrl);
 }
