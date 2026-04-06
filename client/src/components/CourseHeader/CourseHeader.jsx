@@ -1,0 +1,56 @@
+import "./CourseHeader.css";
+
+function PeopleIcon() {
+    return (
+        <svg
+            className="course-header__members-icon"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+        >
+            <path
+                d="M16 11c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3Zm-8 0c1.66 0 3-1.34 3-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3Zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13Zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.96 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5Z"
+                fill="currentColor"
+            />
+        </svg>
+    );
+}
+
+export function CourseHeader({
+    imageSrc,
+    title,
+    description,
+    isJoined = false, // check membership route for this instead
+    memberCount = 0, // check course details route for this instead
+}) {
+    return (
+        <section className="course-header">
+            <div className="course-header__image-wrap">
+                <img className="course-header__image" src={imageSrc} alt={title} />
+            </div>
+
+            <div className="course-header__content">
+                <div className="course-header__main">
+                    <h1 className="course-header__title">{title}</h1>
+                    <p className="course-header__description">{description}</p>
+                </div>
+
+                <div className="course-header__side">
+                    <button
+                        type="button"
+                        className={`course-header__join ${isJoined ? "is-joined" : ""}`}
+                    >
+                        {isJoined ? "Joined" : "Join"}
+                    </button>
+
+                    <div
+                        className="course-header__members"
+                        aria-label={`${memberCount} members`}
+                    >
+                        <PeopleIcon />
+                        <span className="course-header__members-count">{memberCount}</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
+}

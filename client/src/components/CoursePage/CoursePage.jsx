@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useLocation, useParams, Link } from 'react-router-dom';
 import { apiClient } from '../../lib/api-client'; 
 
+import { CourseHeader } from '../CourseHeader/CourseHeader.jsx';
+
 export default function CoursePage() {
     const location = useLocation();
     const { courseId } = useParams();
@@ -55,10 +57,13 @@ export default function CoursePage() {
 
     return (
         <div>
-            <h2>{course.name}</h2>
-            <p><strong>Course Code:</strong> {course.code}</p>
-            <p><strong>Description:</strong> {course.description}</p>
-            <Link to="/">Create another course</Link>
+            <CourseHeader
+                imageSrc={course.image}
+                title={course.name}
+                description={course.description}
+                isJoined={false} // replace with actual membership check
+                memberCount={course.memberCount}
+            />
         </div>
     );
 }
