@@ -30,7 +30,7 @@ export default function CreateCourse() {
         };
 
         try {
-            const createdCourse = await apiClient('/api/courses', {
+            const createdCourse = await apiClient('/api/courses/create', {
                 method: 'POST',
                 body: course,
             });
