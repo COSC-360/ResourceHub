@@ -48,32 +48,47 @@ export async function authenticateUser(req, res) {
   res.status(200).json({ access_token: accessToken });
 }
 
-export function getUserById(req, res) {
-  const id = req.user.id;
+export async function getUserById(req, res) {
+  const id = req.user?.id;
 
-  if (!id || typeof id !== "string" || !id.trim()) {
+  if (id == null || String(id).trim() === "") {
     res.status(400).json({ error: "Invalid user ID" });
     return;
   }
 
-  const user = userService.getUserById(id);
-  if (!user) {
-    res.status(404).json({ error: "User not found" });
-    return;
+  try {
+    const user = await userService.getUserById(String(id));
+    if (!user) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+    res.json({ data: user });
+  } catch {
+    res.status(500).json({ error: "Failed to fetch user" });
   }
-  res.json({ data: user });
 }
 
-export function updateProfile(req, res) {
-  const id = req.user._id;
-  const data = req.body;
-  if (!id || typeof id !== "string" || !id.trim()) {
-    res.status(400).json({ error: "Id is required" });
+export async function updateProfile(req, res) {
+  const id = req.user?.id;
+  if (id == null || String(id).trim() === "") {
+    res.status(400).json({ error: "Invalid user ID" });
     return;
   }
 
-  const user = userService.updateProfile(id, data);
-  res.json({ data: user });
+  try {
+    const updated = await userService.updateProfile(String(id), req.body);
+    if (!updated) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+    res.json({ data: updated });
+  } catch (e) {
+    if (e.code === 11000) {
+      res.status(409).json({ error: "Email or username already taken" });
+      return;
+    }
+    res.status(500).json({ error: "Failed to update profile" });
+  }
 }
 
 

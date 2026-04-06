@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { SearchBar } from "../SearchBar/SearchBar"
-import { ProfileSection } from "../ProfileSection/ProfileSection"
+import { ProfileHeader } from "../ProfileHeader/ProfileHeader"
 import { Logo } from "../Logo/Logo"
 import "./Header.css"
 import Breadcrumbs from "../Breadcrumbs/Breadcrumbs";
@@ -25,7 +25,7 @@ export function Header(){
                     <SearchBar />
                 </div>
                 <div className="buttonDiv">
-                    <ProfileSection userType={user ? "user" : undefined}/>
+                    <ProfileHeader userType={user ? "user" : undefined}/>
                 </div>
             </div>
         </>
