@@ -21,15 +21,20 @@ const Feed = () => {
         const transformedData = discussions.map((discussion) => ({
           username: discussion.username,
           title: discussion.title,
-          timeline: discussion.timestamp,
+          timeline: discussion.updatedAt,
           faculty: discussion.faculty,
           comment: discussion.content,
           up_votes: discussion.upvotes,
           down_votes: discussion.downvotes,
+          parentid: discussion.parentId,
           replies: discussion.replies,
           _id: discussion._id,
           isAuthor: discussion.isAuthor,
           edited: discussion.edited,
+          hasImage: discussion.hasImage,
+          hasUpvote: discussion.hasUpvote,
+          hasDownvote: discussion.hasDownvote,
+          deleted: discussion.deleted,
         }));
 
         setDiscussions(transformedData);
@@ -55,7 +60,7 @@ const Feed = () => {
       </button>
 
       {discussions.map((obj) => (
-        <FeedPost post_props={obj} key={obj._id} />
+        <FeedPost post_props={obj} key={obj._id} depth={0} />
       ))}
     </div>
   );

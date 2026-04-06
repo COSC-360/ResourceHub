@@ -19,19 +19,30 @@ export async function getUsersByUsername(username) {
   return await User.findOne({ username: username });
 }
 
-export function getUserById(id) {
-  void id;
-  //Not implemented yet
+export async function getUserById(id) {
+  if (!id) return null;
+  return User.findById(id).select("-password").lean();
 }
 
 export async function updateProfile(userid, data) {
-  if (!userid) return;
-  if (data.email) await User.updateOne({ _id: userid, email: data.email });
-  if (data.bio) await User.updateOne({ _id: userid, bio: data.bio });
-  if (data.pfp) await User.updateOne({ _id: userid, pfp: data.pfp });
-  if (data.username) await User.updateOne({ _id: userid, bio: data.username });
-  if (data.password) await User.updateOne({ _id: userid, bio: data.username });
-  return await User.findById(userid);
+  if (!userid) return null;
+
+  const $set = {};
+  if (data.username != null && String(data.username).trim()) {
+    $set.username = String(data.username).trim();
+  }
+  if (data.email != null && String(data.email).trim()) {
+    $set.email = String(data.email).trim().toLowerCase();
+  }
+  if (data.bio != null) {
+    $set.bio = String(data.bio);
+  }
+
+  if (Object.keys($set).length > 0) {
+    await User.updateOne({ _id: userid }, { $set });
+  }
+
+  return User.findById(userid).select("-password").lean();
 }
 
 export function getUserCourses(userId) {

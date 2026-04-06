@@ -1,9 +1,8 @@
 import { Discussion } from "../models/discussion.js";
 
 export const DiscussionRepository = {
-  async save(data) {
-    const discussion = await Discussion.create(data);
-    return discussion;
+  async save(discussion) {
+    return discussion.save();
   },
 
   async findById(id) {
@@ -11,15 +10,19 @@ export const DiscussionRepository = {
   },
 
   async findAll() {
-    return await Discussion.find().sort({ timestamp: -1 });
+    return await Discussion.find({ parentId: null }).sort({ timestamp: -1 });
   },
 
-  async findByAuthor(authorId) {
-    return await Discussion.find({ authorId }).sort({ timestamp: -1 });
+  async findByAuthor(authorid) {
+    return await Discussion.find({ authorId: authorid }).sort({
+      timestamp: -1,
+    });
   },
 
-  async findReplies(parentid) {
-    return await Discussion.find({ parentid }).sort({ timestamp: -1 });
+  async findByParentId(parentid) {
+    return await Discussion.find({ parentId: parentid }).sort({
+      timestamp: -1,
+    });
   },
 
   async upvote(id) {
@@ -64,7 +67,7 @@ export const DiscussionRepository = {
       .lean();
   },
 
-  //This is currently searching by the content field.
+  //This is currently searching by the title field.
   async search(searchTerm) {
     return await Discussion.find({
       title: { $regex: searchTerm, $options: "i" },

@@ -1,14 +1,16 @@
-import "./ProfileSection.css"
+import "./ProfileHeader.css"
 import { useContext, useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AuthContext from "../../AuthContext.jsx";
 
-export function ProfileSection({ userType }) {
+export function ProfileHeader({ userType }) {
+    const navigate = useNavigate();
     const { logout } = useContext(AuthContext);
     const [menuOpen, setMenuOpen] = useState(false);
     const menuRef = useRef(null);
 
     const menuItems = [
+        { id: "profile", label: "Profile", onSelect: () => navigate("/profile") },
         { id: "logout", label: "Logout", onSelect: () => logout() },
     ];
 

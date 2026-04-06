@@ -15,17 +15,45 @@ It includes properties like:
     parentId: If this discussion is a reply, this field references the parent discussion's ID. Otherwise, it is null.
 */
 
-const DiscussionSchema = new mongoose.Schema({
-  courseId: { type: mongoose.Schema.Types.ObjectId, ref: "Course", required: true },
-  authorId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  image: { type: String, default: null },
-  title: { type: String, default: null },
-  content: { type: String, required: true },
-  edited: { type: Boolean, default: false },
-  upvotes: { type: Number, default: 0 },
-  downvotes: { type: Number, default: 0 },
-  replies: { type: Number, default: 0 },
-  parentId: { type: mongoose.Schema.Types.ObjectId, ref: "Discussion", default: null }
-}, { timestamps: true }); // Automatically adds createdAt and updatedAt fields
+const DiscussionSchema = new mongoose.Schema(
+  {
+    courseId: { type: mongoose.Schema.Types.ObjectId, ref: "Course" },
+    authorId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    coursename: { type: String, ref: "Course" },
+    coursecode: { type: String, ref: "Course" },
+    username: { type: String, ref: "User" },
+    pfp: { type: Buffer, ref: "User" },
+    faculty: { type: String, ref: "User", default: "None" },
+    image: {
+      data: { type: Buffer, default: null },
+      contentType: { type: String, default: null },
+    },
+    deleted: { type: Boolean, default: false },
+    title: { type: String, default: null },
+    content: { type: String, required: true },
+    edited: { type: Boolean, default: false },
+    upvotes: { type: Number, default: 0 },
+    downvotes: { type: Number, default: 0 },
+    replies: { type: Number, default: 0 },
+    parentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Discussion",
+      default: null,
+    },
+    forum: { type: mongoose.Schema.Types.ObjectId },
+  },
+  { timestamps: true },
+); // Automatically adds createdAt and updatedAt fields
+
+DiscussionSchema.set("toJSON", {
+  transform: function (doc, ret) {
+    delete ret.image;
+    return ret;
+  },
+});
 
 export const Discussion = mongoose.model("Discussion", DiscussionSchema);

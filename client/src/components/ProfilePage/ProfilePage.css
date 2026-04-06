@@ -1,0 +1,82 @@
+.profile-page {
+  max-width: 480px;
+}
+
+.profile-page h1 {
+  margin: 0 0 1rem;
+  font-size: 1.35rem;
+}
+
+.profile-card {
+  background: #fff;
+  border: 1px solid #e8e0ef;
+  border-radius: 10px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.profile-photo-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.profile-avatar {
+  border-radius: 50%;
+  border: 2px solid #b646eb;
+}
+
+.profile-photo-note {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.profile-card p {
+  margin: 0.5rem 0;
+}
+
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.profile-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.profile-form input,
+.profile-form textarea {
+  font: inherit;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.profile-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.profile-actions button {
+  font: inherit;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #888;
+  background: #f4f4f4;
+  cursor: pointer;
+}
+
+.profile-error {
+  color: #b42318;
+  margin: 0;
+  width: 100%;
+}
