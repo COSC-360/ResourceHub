@@ -1,4 +1,4 @@
-import React, { useState, useRef, use } from "react";
+import React, { useState, useRef } from "react";
 import defaultProfile from "../../assets/profile.svg";
 import "./Comment.css";
 import { apiClient } from "../../lib/api-client";
@@ -35,7 +35,7 @@ const Comment = ({ onSubmit, parentid, parentUsername }) => {
           throw new Error("Cannot post comment without reference.");
         data.append("parentid", parentid);
         if (file) data.append("file", file);
-        const result = await apiClient("/api/discussion", {
+        await apiClient("/api/discussion", {
           method: "POST",
           body: data,
           headers: {
@@ -60,7 +60,6 @@ const Comment = ({ onSubmit, parentid, parentUsername }) => {
       fileInputRef.current.value = "";
     }
     setFile(null);
-    if (!file) setRemoveImage(true);
   };
 
   return (

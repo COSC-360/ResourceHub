@@ -38,7 +38,6 @@ export async function userSignin(email, password) {
         id: found._id,
         username: found.username,
         faculty: found.faculty,
-        pfp: found.pfp,
       },
       process.env.ACCESS_TOKEN_SECRET_KEY,
       {
@@ -49,14 +48,12 @@ export async function userSignin(email, password) {
   }
 }
 
-export function getUserById(id) {
-  const user = userRepository.getUserById(id);
-  return user;
+export async function getUserById(id) {
+  return userRepository.getUserById(id);
 }
 
-export function updateProfile(id, body) {
-  const updatedUser = userRepository.updateProfile(id, body);
-  return updatedUser;
+export async function updateProfile(id, body) {
+  return userRepository.updateProfile(id, body);
 }
 
 
