@@ -24,7 +24,7 @@ export function CourseHeader({ course }) {
 
             <div className="course-header__content">
                 <div className="course-header__main">
-                    <h1 className="course-header__title">{course.name}</h1>
+                    <h1 className="course-header__title">{course.name} - {course.code}</h1>
                     <p className="course-header__description">{course.description}</p>
                 </div>
 
