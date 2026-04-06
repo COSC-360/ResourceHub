@@ -47,7 +47,7 @@ function App() {
         <Route path="/auth/register" element={<SignupForm />} />
       </Route>
       {/* not found page renders differently */}
-      <Route path="/courses" element={<CreateCourse />} />
+      <Route path="/courses/create" element={<CreateCourse />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
