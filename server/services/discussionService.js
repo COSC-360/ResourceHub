@@ -43,7 +43,7 @@ export async function findReplies(id) {
     const discussion = await DiscussionRepository.findByParentId(id);
     return discussion;
   } catch (err) {
-    throw new Error(`No discussion with the id ${id} found`);
+    throw new Error(`No discussion with the id ${id} found. ${err.message}`);
   }
 }
 
