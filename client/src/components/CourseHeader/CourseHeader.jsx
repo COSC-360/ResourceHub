@@ -41,6 +41,32 @@ export function CourseHeader({ course }) {
                     >
                         Edit
                     </a>
+                    <button // TODO: implement delete course functionality
+                        type="button"
+                        className="course-header__delete-link"
+                        onClick={() => {
+                            if (window.confirm("Are you sure you want to delete this course? This action cannot be undone.")) {
+                                // hit /courses/:id DELETE endpoint, then redirect to homepage
+                                fetch(`/api/courses/${course._id}`, {
+                                    method: 'DELETE',
+                                })
+                                .then(response => {
+                                    if (response.ok) {
+                                        alert("Course deleted successfully.");
+                                        window.location.href = "/"; // redirect to homepage
+                                    } else {
+                                        alert("Failed to delete course.");
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error("Error deleting course:", error);
+                                    alert("An error occurred while deleting the course.");
+                                });
+                            }
+                        }}
+                    >
+                        Delete
+                    </button>
 
                     <div
                         className="course-header__members"

@@ -108,11 +108,6 @@ export async function update(req, res) {
             }
             updates.code = updates.code.trim();
         }
-
-        // check uniqueness of course code if it's being updated
-        if ("code" in updates) {
-            await courseService.checkCourseCodeUnique(updates.code);
-        }
         
         if ("description" in updates) {
             if (typeof updates.description !== 'string') {
@@ -172,7 +167,23 @@ export async function updateImage(req, res) {
 }
 
 export async function deleteCourse(req, res) {
-    //empty
+    try {
+        const { id } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ error: "Invalid course id" });
+        }
+
+        const deletedCourse = await courseService.deleteCourse(id);
+
+        if (!deletedCourse) {
+            return res.status(404).json({ error: "Course not found" });
+        }
+
+        return res.status(200).json({ data: deletedCourse });
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
 }
 
 export async function getDiscussions(req, res) {

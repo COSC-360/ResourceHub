@@ -37,6 +37,10 @@ export const courseRepository = {
             { new: true, runValidators: true },
         );
     },
+
+    async deleteCourse(id) {
+        return Course.findByIdAndDelete(id);
+    },
 };
 
 export default courseRepository;
