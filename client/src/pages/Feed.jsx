@@ -35,6 +35,7 @@ const Feed = () => {
           hasUpvote: discussion.hasUpvote,
           hasDownvote: discussion.hasDownvote,
           deleted: discussion.deleted,
+          authorid: discussion.authorId,
         }));
 
         setDiscussions(transformedData);

@@ -24,6 +24,18 @@ export async function createUser(req, res) {
   return;
 }
 
+export async function getProfilePhoto(req, res) {
+  const { id } = req.params;
+  let found = null;
+  try {
+    found = await userService.getUserById(id);
+  } catch (err) {
+    return res.status(404).json({ message: "user not found" });
+  }
+  res.set("Content-Type", found.pfp.contentType);
+  res.status(200).send(found.pfp.data.buffer);
+}
+
 export async function authenticateUser(req, res) {
   if (
     !req.body.password ||
@@ -49,7 +61,7 @@ export async function authenticateUser(req, res) {
 }
 
 export async function getUserById(req, res) {
-  const id = req.user?.id;
+  const { id } = req.params;
 
   if (id == null || String(id).trim() === "") {
     res.status(400).json({ error: "Invalid user ID" });
@@ -58,12 +70,14 @@ export async function getUserById(req, res) {
 
   try {
     const user = await userService.getUserById(String(id));
+    delete user.pfp;
     if (!user) {
       res.status(404).json({ error: "User not found" });
       return;
     }
     res.json({ data: user });
-  } catch {
+  } catch (err) {
+    console.log(err);
     res.status(500).json({ error: "Failed to fetch user" });
   }
 }
@@ -76,7 +90,10 @@ export async function updateProfile(req, res) {
   }
 
   try {
-    const updated = await userService.updateProfile(String(id), req.body);
+    const updated = await userService.updateProfile(String(id), {
+      ...req.body,
+      file: req.file,
+    });
     if (!updated) {
       res.status(404).json({ error: "User not found" });
       return;
@@ -87,10 +104,10 @@ export async function updateProfile(req, res) {
       res.status(409).json({ error: "Email or username already taken" });
       return;
     }
+    console.log(e);
     res.status(500).json({ error: "Failed to update profile" });
   }
 }
-
 
 export function getUserCourses(req, res) {
   const savedCourses = userService.getUserCourses(req.userId);
@@ -98,35 +115,34 @@ export function getUserCourses(req, res) {
 }
 
 export function saveUserCourses(req, res) {
-    const { courseId } = req.body;
+  const { courseId } = req.body;
 
-    if (getUserById(req.userId) === null) {
-        throw new Error("User not authenticated");
-    } 
-    const result = userService.saveUserCourses(req.userId, courseId);
-    res.json({ data: result });
-}   
-
+  if (getUserById(req.userId) === null) {
+    throw new Error("User not authenticated");
+  }
+  const result = userService.saveUserCourses(req.userId, courseId);
+  res.json({ data: result });
+}
 
 export function updateUserCourses(req, res) {
-    const { courseIDs } = req.body;
-    const result = userService.updateUserCourses(req.userId, courseIDs);
-    res.json({ data: result });
-  }
+  const { courseIDs } = req.body;
+  const result = userService.updateUserCourses(req.userId, courseIDs);
+  res.json({ data: result });
+}
 
 export function hideUserCourses(req, res) {
-    const { courseId } = req.body;
+  const { courseId } = req.body;
 
-    if (getUserById(req.userId) === null) {
-        throw new Error("User not authenticated");
-    }
-    if (!courseId) {
-      res.status(400).json({ error: "Course ID is required" });
-      return;
-    }
+  if (getUserById(req.userId) === null) {
+    throw new Error("User not authenticated");
+  }
+  if (!courseId) {
+    res.status(400).json({ error: "Course ID is required" });
+    return;
+  }
 
-    const result = userService.hideUserCourses(req.userId, courseId);
-    res.json({ data: result });
+  const result = userService.hideUserCourses(req.userId, courseId);
+  res.json({ data: result });
 }
 
 export function verifyToken(req, res) {

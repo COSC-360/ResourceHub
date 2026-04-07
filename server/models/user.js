@@ -39,8 +39,8 @@ const UserSchema = new mongoose.Schema(
       default: "None",
     },
     pfp: {
-      type: Buffer,
-      default: null,
+      data: { type: Buffer, default: null },
+      contentType: { type: String, default: null },
     },
     isAdmin: {
       type: Boolean,
