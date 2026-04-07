@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useLocation, useParams, Link } from 'react-router-dom';
-import { apiClient } from '../../lib/api-client'; 
+import { apiClient } from '../../lib/api-client';
 import { CourseHeader } from '../CourseHeader/CourseHeader.jsx';
 import HybridFeed from '../HybridFeed/HybridFeed.jsx';
+import CreateDiscussion from '../CreateDiscussion/CreateDiscussion.jsx';
 
 export default function CoursePage() {
     const location = useLocation();
@@ -10,6 +11,7 @@ export default function CoursePage() {
     const [course, setCourse] = useState(location.state?.course ?? null);
     const [isLoading, setIsLoading] = useState(!location.state?.course);
     const [error, setError] = useState('');
+    const [feedVersion, setFeedVersion] = useState(0);
 
     useEffect(() => {
         async function fetchCourse() {
@@ -37,6 +39,15 @@ export default function CoursePage() {
         fetchCourse();
     }, [courseId, location.state?.course]);
 
+    const handleMembershipChanged = useCallback((isNowMember) => {
+        setCourse((prev) => {
+            if (!prev) return prev;
+            const current = Number(prev.memberCount ?? 0);
+            const next = isNowMember ? current + 1 : Math.max(0, current - 1);
+            return { ...prev, memberCount: next };
+        });
+    }, []);
+
     if (isLoading) {
         return (
             <div className="course-page">
@@ -61,8 +72,18 @@ export default function CoursePage() {
         <div>
             <CourseHeader
                 course={course}
+                onMembershipChanged={handleMembershipChanged}
             />
-            <HybridFeed 
+
+            <CreateDiscussion
+                courseId={courseId}
+                buttonLabel="New Discussion"
+                embedded={false}
+                onDiscussionCreated={() => setFeedVersion((v) => v + 1)}
+            />
+
+            <HybridFeed
+                key={feedVersion}
                 courseId={courseId}
                 courseIds={[courseId]}
                 showDiscussions={true}

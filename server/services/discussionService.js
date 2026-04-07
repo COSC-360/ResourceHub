@@ -20,15 +20,24 @@ export function getAllDiscussionsByCourse(courseId) {
 
 export async function create(data) {
   if (data._id) delete data._id;
-  const discussion = new Discussion(data);
+
+  if (!data.courseId) {
+    throw new Error("courseId is required");
+  }
+
   if (data.parentId) {
     const parent = await findById(data.parentId);
-    let replies = Number(parent.replies);
-    replies++;
-    parent.set({ replies: replies });
+
+    if (parent.courseId?.toString() !== data.courseId.toString()) {
+      throw new Error("Reply must belong to the same course");
+    }
+
+    const replies = Number(parent.replies || 0) + 1;
+    parent.set({ replies });
     await DiscussionRepository.save(parent);
   }
-  if (!discussion) throw new Error("Discussion creation failed");
+
+  const discussion = new Discussion(data);
   return await DiscussionRepository.save(discussion);
 }
 

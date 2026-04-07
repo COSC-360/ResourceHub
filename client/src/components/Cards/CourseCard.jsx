@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import MemberCount from '../MemberCount/MemberCount.jsx';
 import './CourseCard.css';
 
 export default function CourseCard({ data }) {
@@ -9,7 +10,7 @@ export default function CourseCard({ data }) {
     const code = data.code || data.coursecode || '';
     const description = data.description || 'No description yet.';
     const image = data.image || '';
-    const memberCount = data.memberCount ?? 0;
+    const memberCount = Number(data.memberCount ?? data.numberOfStudents ?? 0);
 
     return (
         <Link
@@ -32,7 +33,7 @@ export default function CourseCard({ data }) {
                     {name} {code ? `(${code})` : ''}
                 </h3>
                 <p className="course-card__description">{description}</p>
-                <p className="course-card__meta">{memberCount} members</p>
+                <MemberCount count={memberCount} className="course-card__meta" />
             </div>
         </Link>
     );

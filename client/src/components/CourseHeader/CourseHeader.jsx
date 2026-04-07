@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { apiClient } from "../../lib/api-client";
+import CourseMembershipButton from "../CourseMembershipButton/CourseMembershipButton.jsx";
+import MemberCount from "../MemberCount/MemberCount.jsx";
 import "./CourseHeader.css";
 
 function PeopleIcon() {
@@ -17,29 +19,13 @@ function PeopleIcon() {
     );
 }
 
-export function CourseHeader({ course }) {
+export function CourseHeader({ course, onMembershipChanged }) {
     const navigate = useNavigate();
+    const courseId = course._id || course.id;
 
-    const handleDelete = async () => {
-        const shouldDelete = window.confirm(
-            "Are you sure you want to delete this course? This action cannot be undone.",
-        );
-
-        if (!shouldDelete) {
-            return;
-        }
-
-        try {
-            await apiClient(`/api/courses/${course._id}`, {
-                method: "DELETE",
-            });
-            alert("Course deleted successfully.");
-            navigate("/");
-        } catch (error) {
-            console.error("Error deleting course:", error);
-            alert(error.message || "An error occurred while deleting the course.");
-        }
-    };
+    const memberCount = Number(
+        course.memberCount ?? course.numberOfStudents ?? 0
+    );
 
     return (
         <section className="course-header">
@@ -54,32 +40,33 @@ export function CourseHeader({ course }) {
                 </div>
 
                 <div className="course-header__side">
-                    <button // TODO: implement join/leave functionality
-                        type="button"
-                        className={`course-header__join`}
-                    >
-                        Join
-                    </button>
+                    <CourseMembershipButton
+                        courseId={courseId}
+                        onMembershipChanged={onMembershipChanged}
+                    />
                     <a
                         href={`/courses/${course._id}/update`} // TODO: implement update course page
                         className="course-header__edit-link"
                     >
                         Edit
                     </a>
-                    <button // TODO: implement delete course functionality
+                    {/* <button // TODO: implement delete course functionality
                         type="button"
                         className="course-header__delete-link"
                         onClick={handleDelete}
                     >
                         Delete
-                    </button>
+                    </button> */}
 
                     <div
                         className="course-header__members"
-                        aria-label={`${course.memberCount} members`}
+                        aria-label={`${memberCount} members`}
                     >
                         <PeopleIcon />
-                        <span className="course-header__members-count">{course.memberCount}</span>
+                        <MemberCount
+                            count={memberCount}
+                            className="course-header__members-text"
+                        />
                     </div>
                 </div>
             </div>

@@ -17,7 +17,7 @@ It includes properties like:
 
 const DiscussionSchema = new mongoose.Schema(
   {
-    courseId: { type: mongoose.Schema.Types.ObjectId, ref: "Course" },
+    courseId: { type: mongoose.Schema.Types.ObjectId, ref: "Course", required: true },
     authorId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
