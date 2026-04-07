@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import AuthContext from "../../AuthContext.jsx";
 import { apiClient } from "../../lib/api-client";
@@ -19,11 +19,25 @@ export function ProfilePage() {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState({ username: "", email: "", bio: "" });
   const [saveErr, setSaveErr] = useState(null);
+  const [file, setFile] = useState(null);
+  const userid = localStorage.getItem("userid");
+  const fileRef = useRef(null);
+
+  const resetFile = () => {
+    if (file && fileRef.current) {
+      fileRef.current = "";
+    }
+    setFile(null);
+  };
+
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
 
   useEffect(() => {
     if (!t) return;
     let cancelled = false;
-    apiClient("/api/user/getUserById", {
+    apiClient(`/api/user/getUserById/${userid}`, {
       headers: { Authorization: `Bearer ${t}` },
     })
       .then(({ data }) => {
@@ -81,10 +95,15 @@ export function ProfilePage() {
     }
     setSaveErr(null);
     try {
+      const formData = new FormData();
+      formData.append("username", username);
+      formData.append("email", email);
+      formData.append("bio", draft.bio);
+      formData.append("file", file);
       const { data } = await apiClient("/api/user/updateProfile", {
         method: "PATCH",
         headers: { Authorization: `Bearer ${t}` },
-        body: { username, email, bio: draft.bio },
+        body: formData,
       });
       setProfile(data);
       setEditing(false);
@@ -102,18 +121,28 @@ export function ProfilePage() {
           {/* Placeholder until image storage is decided */}
           <img
             className="profile-avatar"
-            src={defaultAvatar}
+            src={
+              editing && file
+                ? URL.createObjectURL(file)
+                : `http://localhost:3000/api/user/getProfilePhoto/${userid}`
+            }
             alt=""
             width={96}
             height={96}
+            onError={(e) => (e.target.src = defaultAvatar)}
           />
-          {editing && (
-            <span className="profile-photo-note">Photo upload — later</span>
-          )}
         </div>
 
         {editing ? (
           <div className="profile-form">
+            <label htmlFor="file">Change profile photo:</label>
+            <input
+              type="file"
+              name="file"
+              onChange={handleFileChange}
+              ref={fileRef}
+            />
+            {file && <button onClick={resetFile}>Remove photo</button>}
             <label>
               Username:
               <input
