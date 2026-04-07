@@ -5,6 +5,15 @@ export function getLatest() {
   return DiscussionRepository.findAll();
 }
 
+export function findAll() {
+  return DiscussionRepository.findAll();
+}
+
+// ids = courseIds
+export function findByIds(ids) {
+  return DiscussionRepository.findByIds(ids);
+}
+
 export function getAllDiscussionsByCourse(courseId) {
   return DiscussionRepository.findAll({ courseId });
 }

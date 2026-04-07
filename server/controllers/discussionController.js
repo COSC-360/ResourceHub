@@ -2,7 +2,15 @@ import * as discussionService from "../services/discussionService.js";
 import * as voteService from "../services/voteService.js";
 
 export async function getLatest(req, res) {
-  const discussions = await discussionService.getLatest();
+  const courseIds = (req.query.courseIds ?? "")
+    .split(",")
+    .map((id) => id.trim())
+    .filter(Boolean);
+
+  const discussions = courseIds.length
+    ? await discussionService.findByIds(courseIds)
+    : await discussionService.findAll();
+
   const discussionsWithAuthor = await Promise.all(
     discussions.map(async (discussion) => {
       const obj = discussion.toJSON();
@@ -19,12 +27,13 @@ export async function getLatest(req, res) {
       return {
         ...obj,
         isAuthor: discussion.authorId?.toString() === req.user?.id,
-        hasUpvote: hasUpvote,
-        hasDownvote: hasDownvote,
+        hasUpvote,
+        hasDownvote,
         hasImage: discussion.image.contentType ? true : false,
       };
     }),
   );
+
   res.json(discussionsWithAuthor);
 }
 
