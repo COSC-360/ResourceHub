@@ -1,13 +1,14 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { apiClient } from "../../lib/api-client";
 import "./UpdateCourseInfo.css";
 
 const trim = (v) => (typeof v === "string" ? v.trim() : "");
 
-export default function UpdateCourseInfo() {
+export default function UpdateCourseInfo({ asModal = false, onClose, onUpdated, courseId: courseIdProp, initialCourse }) {
   const navigate = useNavigate();
-  const { courseId } = useParams();
+  const { courseId: routeCourseId } = useParams();
+  const courseId = courseIdProp || routeCourseId;
   const fileInputRef = useRef(null);
 
   const [loading, setLoading] = useState(true);
@@ -40,25 +41,16 @@ export default function UpdateCourseInfo() {
       }
 
       try {
-        setLoading(true);
-        setError("");
+        const course = initialCourse
+          ? initialCourse
+          : (await apiClient(`/api/courses/${courseId}`, { method: "GET" }))?.data;
 
-        const payload = await apiClient(`/api/courses/${courseId}`, {
-          method: "GET",
-        });
-
-        const course = payload?.data;
-
-        const next = {
+        if (!active) return;
+        setForm({
           name: course?.name ?? "",
           code: course?.code ?? "",
           description: course?.description ?? "",
-          image: course?.image ?? "",
-        };
-
-        if (!active) return;
-        setInitial(next);
-        setForm(next);
+        });
       } catch (err) {
         if (!active) return;
         setError(err.message || "Failed to load course.");
@@ -68,10 +60,8 @@ export default function UpdateCourseInfo() {
     }
 
     loadCourse();
-    return () => {
-      active = false;
-    };
-  }, [courseId]);
+    return () => { active = false; };
+  }, [courseId, initialCourse]);
 
   const hasChanges = useMemo(() => {
     return (
@@ -121,6 +111,18 @@ export default function UpdateCourseInfo() {
     await uploadImage(file);
   }
 
+  function handleCancel() {
+    if (asModal) {
+      onClose?.();
+      return;
+    }
+    if (courseId) {
+      navigate(`/courses/${courseId}`, { replace: true });
+    } else {
+      navigate(-1);
+    }
+  }
+
   async function onSubmit(e) {
     e.preventDefault();
     setError("");
@@ -152,14 +154,19 @@ export default function UpdateCourseInfo() {
     }
 
     try {
-      setSaving(true);
-
-      await apiClient(`/api/courses/${courseId}/update`, {
+      setSaving(true); // FIX: was missing
+      const token = localStorage.getItem("access_token");
+      const payload = await apiClient(`/api/courses/${courseId}/update`, {
         method: "PATCH",
         body: updates,
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
 
-      navigate(`/courses/${courseId}`, { replace: true });
+      const updatedCourse = payload?.data ?? null;
+      onUpdated?.(updatedCourse);
+
+      if (asModal) onClose?.();
+      else navigate(`/courses/${courseId}`, { replace: true });
     } catch (err) {
       setError(err.message || "Failed to update course.");
     } finally {
@@ -172,7 +179,7 @@ export default function UpdateCourseInfo() {
   }
 
   return (
-    <div className="update-course-page">
+    <div className={asModal ? "update-course update-course--modal" : "update-course"}>
       <div className="update-course-card">
         <h1 className="update-course-title">Update Course Info</h1>
 
@@ -248,7 +255,7 @@ export default function UpdateCourseInfo() {
             <button
               type="button"
               className="update-course-btn update-course-btn-secondary"
-              onClick={() => navigate(-1)}
+              onClick={handleCancel}
               disabled={saving || uploadingImage}
             >
               Cancel

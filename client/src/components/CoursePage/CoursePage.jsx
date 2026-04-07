@@ -60,6 +60,11 @@ export default function CoursePage() {
     });
   }, []);
 
+  const handleCourseUpdated = useCallback((updated) => {
+    if (!updated) return;
+    setCourse((prev) => ({ ...prev, ...updated }));
+  }, []);
+
   if (isLoading) {
     return (
       <div className="course-page">
@@ -82,7 +87,11 @@ export default function CoursePage() {
 
   return (
     <div className="course-page">
-      <CourseHeader course={course} onMembershipChanged={handleMembershipChanged} />
+      <CourseHeader
+        course={course}
+        onMembershipChanged={handleMembershipChanged}
+        onCourseUpdated={handleCourseUpdated}
+      />
       <CreateDiscussion
         courseId={courseId}
         buttonLabel="New Discussion"

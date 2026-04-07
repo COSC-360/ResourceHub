@@ -49,13 +49,12 @@ export default function CreateCourse({ asModal = false, onClose, onCreated }) {
             });
 
             onCreated?.(createdCourse.data);
+            onClose?.();
 
-            // keep existing behavior for non-modal usage
-            if (!asModal) {
-                navigate(`/courses/${newCourseId}`, {
-                    state: { course: createdCourse.data },
-                });
-            }
+            // FIX: always redirect
+            navigate(`/courses/${newCourseId}`, {
+                state: { course: createdCourse.data },
+            });
         } catch (error) {
             console.error('Error creating course:', error);
         }

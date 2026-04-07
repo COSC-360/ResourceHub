@@ -24,3 +24,14 @@ export async function findCourseIdsByUser(userId) {
   const rows = await Membership.find({ userId }).select("courseId -_id").lean();
   return rows.map((r) => String(r.courseId));
 }
+
+export async function upsertMembershipRole(userId, courseId, role) {
+  return Membership.findOneAndUpdate(
+    { userId, courseId },
+    {
+      $set: { role },
+      $setOnInsert: { joinedAt: new Date() },
+    },
+    { new: true, upsert: true }
+  );
+}

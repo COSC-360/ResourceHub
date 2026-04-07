@@ -1,4 +1,5 @@
 import courseRepository from "../repositories/courseRepository.js";
+import * as membershipRepository from "../repositories/membershipRepository.js";
 import { CourseCodeAlreadyExistsError } from "../errors/courseErrors.js";
 
 export async function checkCourseCodeUnique(id, code) {
@@ -21,9 +22,29 @@ export function getAll() {
   return courseRepository.findAll();
 }
 
-export async function create(course) {
-  await checkCourseCodeUnique(null, course.code);
-  return courseRepository.save(course);
+export async function create(course, creatorUserId) {
+  const existing = await courseRepository.findByCode(course.code);
+  if (existing) {
+    throw new CourseCodeAlreadyExistsError(course.code);
+  }
+
+  const created = await courseRepository.save(course);
+
+  try {
+    if (!creatorUserId) {
+      throw new Error("Missing creator user id");
+    }
+
+    await membershipRepository.createMembership(creatorUserId, created._id, "instructor");
+
+    const memberCount = await membershipRepository.countByCourse(created._id);
+    await courseRepository.setMemberCount(created._id, memberCount);
+
+    return await courseRepository.findById(created._id);
+  } catch (err) {
+    await courseRepository.deleteCourse(created._id); // rollback
+    throw err;
+  }
 }
 
 export async function update(id, updatedData) {

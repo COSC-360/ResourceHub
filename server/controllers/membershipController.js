@@ -4,8 +4,12 @@ export async function getMyStatus(req, res) {
   try {
     const { courseId } = req.params;
     const userId = req.user.id;
+
     const result = await membershipService.getMyMembershipStatus(userId, courseId);
-    return res.status(200).json({ isMember: result.isMember });
+    return res.status(200).json({
+      isMember: result.isMember,
+      role: result.membership?.role ?? null,
+    });
   } catch (error) {
     if (error.message.startsWith("Invalid")) {
       return res.status(400).json({ error: error.message });

@@ -51,3 +51,13 @@ export async function getMyCourses(userId) {
   if (!courseIds.length) return [];
   return courseRepository.findByIds(courseIds);
 }
+
+export async function makeInstructorForCourse(userId, courseId) {
+  assertValidObjectId(courseId, "courseId");
+  return membershipRepository.upsertMembershipRole(userId, courseId, "instructor");
+}
+
+export async function makeStudentForCourse(userId, courseId) {
+  assertValidObjectId(courseId, "courseId");
+  return membershipRepository.upsertMembershipRole(userId, courseId, "student");
+}

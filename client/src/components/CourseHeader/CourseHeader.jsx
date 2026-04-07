@@ -1,7 +1,9 @@
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiClient } from "../../lib/api-client";
 import CourseMembershipButton from "../CourseMembershipButton/CourseMembershipButton.jsx";
 import MemberCount from "../MemberCount/MemberCount.jsx";
+import UpdateCourseInfo from "../UpdateCourseInfo/UpdateCourseInfo.jsx";
 import "./CourseHeader.css";
 
 function PeopleIcon() {
@@ -19,9 +21,35 @@ function PeopleIcon() {
     );
 }
 
-export function CourseHeader({ course, onMembershipChanged }) {
+export function CourseHeader({ course, onMembershipChanged, onCourseUpdated }) {
     const navigate = useNavigate();
     const courseId = course._id || course.id;
+
+    const [isInstructor, setIsInstructor] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+
+    useEffect(() => {
+        let active = true;
+
+        async function loadRole() {
+            const token = localStorage.getItem("access_token");
+            if (!token || !courseId) return;
+
+            try {
+                const res = await apiClient(`/api/memberships/me/${courseId}`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                if (active) setIsInstructor(res?.role === "instructor");
+            } catch {
+                if (active) setIsInstructor(false);
+            }
+        }
+
+        loadRole();
+        return () => {
+            active = false;
+        };
+    }, [courseId]);
 
     const memberCount = Number(
         course.memberCount ?? course.numberOfStudents ?? 0
@@ -44,19 +72,16 @@ export function CourseHeader({ course, onMembershipChanged }) {
                         courseId={courseId}
                         onMembershipChanged={onMembershipChanged}
                     />
-                    <a
-                        href={`/courses/${course._id}/update`} // TODO: implement update course page
-                        className="course-header__edit-link"
-                    >
-                        Edit
-                    </a>
-                    {/* <button // TODO: implement delete course functionality
-                        type="button"
-                        className="course-header__delete-link"
-                        onClick={handleDelete}
-                    >
-                        Delete
-                    </button> */}
+
+                    {isInstructor && (
+                        <button
+                            type="button"
+                            className="course-header__edit-link"
+                            onClick={() => setShowEditModal(true)}
+                        >
+                            Edit
+                        </button>
+                    )}
 
                     <div
                         className="course-header__members"
@@ -69,6 +94,26 @@ export function CourseHeader({ course, onMembershipChanged }) {
                         />
                     </div>
                 </div>
+
+                {showEditModal && (
+                    <div
+                        className="course-header__modal-backdrop"
+                        onClick={() => setShowEditModal(false)}
+                    >
+                        <div
+                            className="course-header__modal-panel"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <UpdateCourseInfo
+                                asModal
+                                courseId={courseId}
+                                initialCourse={course}
+                                onClose={() => setShowEditModal(false)}
+                                onUpdated={(updated) => onCourseUpdated?.(updated)}
+                            />
+                        </div>
+                    </div>
+                )}
             </div>
         </section>
     );
