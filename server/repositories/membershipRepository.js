@@ -15,3 +15,12 @@ export async function deleteByUserAndCourse(userId, courseId) {
 export async function countByCourse(courseId) {
   return Membership.countDocuments({ courseId });
 }
+
+export async function findByUser(userId) {
+  return Membership.find({ userId }).lean();
+}
+
+export async function findCourseIdsByUser(userId) {
+  const rows = await Membership.find({ userId }).select("courseId -_id").lean();
+  return rows.map((r) => String(r.courseId));
+}

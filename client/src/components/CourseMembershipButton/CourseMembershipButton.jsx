@@ -44,27 +44,35 @@ export default function CourseMembershipButton({ courseId, onMembershipChanged }
 
     const nextIsMember = !isMember;
 
-    // optimistic UI
+    // optional optimistic UI
     setIsMember(nextIsMember);
-    onMembershipChanged?.(nextIsMember);
-    setLoading(true);
+    onMembershipChanged?.({ isMember: nextIsMember });
 
+    setLoading(true);
     try {
+      let res;
       if (nextIsMember) {
-        await apiClient(`/api/memberships/${courseId}/join`, {
+        res = await apiClient(`/api/memberships/${courseId}/join`, {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
         });
       } else {
-        await apiClient(`/api/memberships/${courseId}/leave`, {
+        res = await apiClient(`/api/memberships/${courseId}/leave`, {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },
         });
       }
-    } catch (e) {
-      // rollback on failure
+
+      // authoritative server state
+      setIsMember(Boolean(res?.isMember));
+      onMembershipChanged?.({
+        isMember: Boolean(res?.isMember),
+        memberCount: typeof res?.memberCount === "number" ? res.memberCount : undefined,
+      });
+    } catch {
+      // rollback optimistic
       setIsMember(!nextIsMember);
-      onMembershipChanged?.(!nextIsMember);
+      onMembershipChanged?.({ isMember: !nextIsMember });
     } finally {
       setLoading(false);
     }

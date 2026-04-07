@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import * as membershipRepository from "../repositories/membershipRepository.js";
+import courseRepository from "../repositories/courseRepository.js";
 import * as courseService from "./courseService.js";
 
 function assertValidObjectId(id, fieldName) {
@@ -15,23 +16,38 @@ export async function getMyMembershipStatus(userId, courseId) {
 }
 
 export async function joinCourse(userId, courseId) {
+  assertValidObjectId(courseId, "courseId");
+
   const existing = await membershipRepository.findByUserAndCourse(userId, courseId);
   if (existing) {
-    return { alreadyMember: true, membership: existing };
+    const memberCount = await membershipRepository.countByCourse(courseId);
+    await courseService.setMemberCount(courseId, memberCount);
+    return { alreadyMember: true, membership: existing, memberCount };
   }
 
   const membership = await membershipRepository.createMembership(userId, courseId, "student");
-  await courseService.incrementMemberCount(courseId);
+  const memberCount = await membershipRepository.countByCourse(courseId);
+  await courseService.setMemberCount(courseId, memberCount);
 
-  return { alreadyMember: false, membership };
+  return { alreadyMember: false, membership, memberCount };
 }
 
 export async function leaveCourse(userId, courseId) {
+  assertValidObjectId(courseId, "courseId");
+
   const removed = await membershipRepository.deleteByUserAndCourse(userId, courseId);
+  const memberCount = await membershipRepository.countByCourse(courseId);
+  await courseService.setMemberCount(courseId, memberCount);
 
-  if (removed) {
-    await courseService.decrementMemberCount(courseId);
-  }
+  return { removed: !!removed, memberCount };
+}
 
-  return { removed: !!removed };
+export async function getMyCourseIds(userId) {
+  return membershipRepository.findCourseIdsByUser(userId);
+}
+
+export async function getMyCourses(userId) {
+  const courseIds = await membershipRepository.findCourseIdsByUser(userId);
+  if (!courseIds.length) return [];
+  return courseRepository.findByIds(courseIds);
 }

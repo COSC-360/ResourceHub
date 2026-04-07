@@ -50,3 +50,7 @@ export async function incrementMemberCount(courseId) {
 export async function decrementMemberCount(courseId) {
   return await courseRepository.decrementMemberCount(courseId);
 }
+
+export async function setMemberCount(courseId, count) {
+  return await courseRepository.setMemberCount(courseId, count);
+}

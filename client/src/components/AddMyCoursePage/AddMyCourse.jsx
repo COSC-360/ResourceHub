@@ -1,65 +1,86 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiClient } from "../../lib/api-client";
+import CourseCard from "../Cards/CourseCard.jsx";
+import CreateCourse from "../CreateCourse/CreateCourse.jsx";
 import "./AddMyCourse.css";
 
-function CourseOptionCard({ course, onAdd }) {
-  return (
-    <button className="course-option-square" onClick={() => onAdd(course)}>
-      <h3>{course.code}</h3>
-      <p>{course.name}</p>
-    </button>
-  );
-}
-
 export default function AddMyCoursePage() {
-  const [allCourses, setAllCourses] = useState([]);
+  const [availableCourses, setAvailableCourses] = useState([]);
   const [error, setError] = useState("");
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    async function loadAllCourses() {
-      try {
-        const response = await apiClient("/api/courses");
-        setAllCourses(response.data || []);
-      } catch (err) {
-        setError(err.message || "Failed to load courses.");
-      }
-    }
-
-    loadAllCourses();
-  }, []);
-
-  async function handleAddCourse(course) {
+  async function loadAvailableCourses() {
     try {
-      const courseId = course._id ?? course.id;
-      await apiClient("/api/user/save", {
-        method: "POST",
-        body: { courseId },
+      const token = localStorage.getItem("access_token");
+      if (!token) return navigate("/login");
+
+      const [allCoursesRes, myIdsRes] = await Promise.all([
+        apiClient("/api/courses"),
+        apiClient("/api/memberships/me/course-ids", {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+      ]);
+
+      const allCourses = allCoursesRes.data || [];
+      const myIds = new Set((myIdsRes.data || []).map(String));
+
+      const filtered = allCourses.filter((course) => {
+        const id = String(course._id ?? course.id);
+        return !myIds.has(id);
       });
 
-      navigate("/my-courses");
+      setAvailableCourses(filtered);
     } catch (err) {
-      setError(err.message || "Failed to add course.");
+      setError(err.message || "Failed to load courses.");
     }
   }
 
+  useEffect(() => {
+    loadAvailableCourses();
+  }, [navigate]);
+
+  function openCreateModal() {
+    setShowCreateModal(true);
+  }
+
+  function closeCreateModal() {
+    setShowCreateModal(false);
+  }
+
+  async function handleCourseCreated() {
+    setShowCreateModal(false);
+    await loadAvailableCourses();
+  }
+
   return (
-    <div className="add-my-course-page">
-      <h1>Add My Course</h1>
-      <p>Select a course to add to your My Courses page.</p>
+    <div className={`add-my-course-page ${showCreateModal ? "is-blurred" : ""}`}>
+      <div className="add-my-course-page__header">
+        <div>
+          <h1>All Courses</h1>
+          <p>Select a course to open it, then join from the course page.</p>
+        </div>
+        <button className="add-my-course-page__create-btn" onClick={openCreateModal}>
+          + Create Course
+        </button>
+      </div>
 
       {error && <p className="mycourses-error">{error}</p>}
 
       <div className="all-courses-grid">
-        {allCourses.map((course) => (
-          <CourseOptionCard
-            key={course._id ?? course.id}
-            course={course}
-            onAdd={handleAddCourse}
-          />
+        {availableCourses.map((course) => (
+          <CourseCard key={course._id ?? course.id} data={course} />
         ))}
       </div>
+
+      {showCreateModal && (
+        <div className="modal-backdrop" onClick={closeCreateModal}>
+          <div className="modal-panel" onClick={(e) => e.stopPropagation()}>
+            <CreateCourse asModal onClose={closeCreateModal} onCreated={handleCourseCreated} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

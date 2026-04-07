@@ -1,25 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiClient } from "../../lib/api-client";
+import CourseCard from "../Cards/CourseCard.jsx";
 import "./MyCoursesPage.css";
-
-function MyCourseCard({ course, onClick }) {
-  return (
-    <button type="button" className="mycourse-square mycourse-nav-button" onClick={onClick}>
-      <h3>{course.code}</h3>
-      <p>{course.name}</p>
-    </button>
-  );
-}
-
-function AddCourseCard({ onClick }) {
-  return (
-    <button className="mycourse-square add-course-square" onClick={onClick}>
-      <span className="plus-sign">+</span>
-      <span>Add Courses to My Courses</span>
-    </button>
-  );
-}
 
 export default function MyCoursesPage() {
   const [myCourses, setMyCourses] = useState([]);
@@ -29,7 +12,13 @@ export default function MyCoursesPage() {
   useEffect(() => {
     async function loadMyCourses() {
       try {
-        const response = await apiClient("/api/user/courses");
+        const token = localStorage.getItem("access_token");
+        if (!token) return navigate("/login");
+
+        const response = await apiClient("/api/memberships/me/courses", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
         setMyCourses(response.data || []);
       } catch (err) {
         setError(err.message || "Failed to load My Courses.");
@@ -37,21 +26,19 @@ export default function MyCoursesPage() {
     }
 
     loadMyCourses();
-  }, []);
+  }, [navigate]);
 
   return (
     <div className="my-courses-page">
       <h1>My Courses</h1>
-      <p>Your saved courses.</p>
+      <p>Courses you are a member of.</p>
 
       {error && <p className="mycourses-error">{error}</p>}
 
       <div className="mycourses-grid">
         {myCourses.map((course) => (
-          <MyCourseCard key={course._id} course={course} onClick={() => navigate(`/courses/${course._id}`)} />
+          <CourseCard key={course._id ?? course.id} data={course} />
         ))}
-
-        <AddCourseCard onClick={() => navigate("/my-courses/add")} />
       </div>
     </div>
   );
