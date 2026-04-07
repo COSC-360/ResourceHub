@@ -1,6 +1,7 @@
 import * as courseService from '../services/courseService.js';
 import mongoose from 'mongoose';
 import { CourseCodeAlreadyExistsError } from '../errors/courseErrors.js';
+import * as discussionService from '../services/discussionService.js';
 
 export async function getById(req, res) {
     try {
@@ -175,7 +176,18 @@ export async function deleteCourse(req, res) {
 }
 
 export async function getDiscussions(req, res) {
-    //empty
+    /**
+     * takes the course id from the request parameters, validates it, and retrieves all discussions for that course from the database.
+     * it uses discussionService to get the discussions, and returns them in the response.
+     */
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ error: "Invalid course id" });
+    }
+
+    const discussions = await discussionService.getAllDiscussionsByCourse(id);
+    return res.status(200).json({ data: discussions });
 }
 
 export async function getResources(req, res) {
