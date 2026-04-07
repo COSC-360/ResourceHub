@@ -3,6 +3,7 @@ import { useLocation, useParams, Link } from 'react-router-dom';
 import { apiClient } from '../../lib/api-client'; 
 
 import { CourseHeader } from '../CourseHeader/CourseHeader.jsx';
+import HybridFeed from '../HybridFeed/HybridFeed.jsx';
 
 export default function CoursePage() {
     const location = useLocation();
@@ -61,6 +62,15 @@ export default function CoursePage() {
         <div>
             <CourseHeader
                 course={course}
+            />
+            <HybridFeed 
+                courseId={courseId}
+                courseIds={[courseId]}
+                showDiscussions={true}
+                showResources={true}
+                showCourses={false}
+                sort="newest"
+                limit={20}
             />
         </div>
     );
