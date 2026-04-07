@@ -44,10 +44,12 @@
     font: inherit;
     cursor: pointer;
     color: #222;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .profileMenuItem:hover {
-    background: #f0f0f0;
+    background: var(--rh-redirect-hover-bg);
+    color: var(--rh-redirect-hover-color);
 }
 
 .icon {
@@ -62,6 +64,12 @@
     border-radius: 8px;
     padding: 8px 12px;
     cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.adminPanel:hover {
+    background: var(--rh-redirect-hover-bg);
+    color: var(--rh-redirect-hover-color);
 }
 
 .signIn {
@@ -70,6 +78,12 @@
     border-radius: 8px;
     padding: 8px 12px;
     cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.signIn:hover {
+    background: var(--rh-redirect-hover-bg);
+    color: var(--rh-redirect-hover-color);
 }
 
 .register {
@@ -78,4 +92,10 @@
     border-radius: 8px;
     padding: 8px 12px;
     cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.register:hover {
+    background: var(--rh-redirect-hover-bg);
+    color: var(--rh-redirect-hover-color);
 }

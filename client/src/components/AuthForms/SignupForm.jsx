@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import "./AuthForms.css";
 import AuthContext from "../../AuthContext.jsx";
 
-export function SignupForm(){
+export function SignupForm() {
   const { signup } = useContext(AuthContext);
 
   const [username, setUsername] = useState("");
@@ -11,30 +11,45 @@ export function SignupForm(){
   const [password, setPassword] = useState("");
   const [repeatedPassword, setRepeatedPassword] = useState("");
 
-  const [weakPassword, setWeakPassword] = useState(false);
-  const [invalidEmail, setInvalidEmail] = useState(false);
+  const [error, setError] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validate = () => {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+[a-zA-Z]{2,}$/;
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*).{8,}$/;
     if (!passwordRegex.test(password)) {
-      setWeakPassword(true);
-      void(weakPassword);
+      setError(
+        "Password must be at least 8 characters and include upper and lower case letters.",
+      );
       return false;
     }
     if (!emailRegex.test(email)) {
-      setInvalidEmail(true);
-      void(invalidEmail);
+      setError("Please enter a valid email address.");
       return false;
     }
-    if (password !== repeatedPassword) return false;
+    if (password !== repeatedPassword) {
+      setError("Passwords do not match.");
+      return false;
+    }
     return true;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    validate();
-    signup(username, email, password);
+    setError(null);
+    if (!validate()) return;
+    setIsSubmitting(true);
+    try {
+      await signup(username, email, password);
+    } catch (err) {
+      const message =
+        err instanceof Error && err.message
+          ? err.message
+          : "Sign up failed. Please try again.";
+      setError(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -42,6 +57,11 @@ export function SignupForm(){
       <form className="auth-form-card" onSubmit={handleSubmit}>
         <legend>Welcome to ResourceHub</legend>
         <p className="auth-form-subtitle">Create a new account</p>
+        {error ? (
+          <p className="auth-form-error" role="alert">
+            {error}
+          </p>
+        ) : null}
         <fieldset>
           <label htmlFor="username">Username:</label>
           <input
@@ -87,8 +107,10 @@ export function SignupForm(){
           />
         </fieldset>
         <div className="button_container">
-          <button type="submit">Sign Up</button>
-          <Link to="/auth/login">
+          <button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Signing up…" : "Sign Up"}
+          </button>
+          <Link to="/login">
             <button type="button" className="redirect_button">
               Go to Login
             </button>
@@ -97,6 +119,6 @@ export function SignupForm(){
       </form>
     </div>
   );
-};
+}
 
 export default SignupForm;

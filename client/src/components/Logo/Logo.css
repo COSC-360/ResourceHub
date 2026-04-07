@@ -5,7 +5,16 @@
     text-decoration: none;
     display: inline-flex;
     justify-content: center;
-    padding: 0;
+    align-items: center;
+    padding: 4px 8px;
+    margin: -4px -8px;
+    border-radius: 10px;
     white-space: nowrap;
     line-height: 1;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.logo:hover {
+    background: var(--rh-redirect-hover-bg);
+    color: var(--rh-redirect-hover-color);
 }
