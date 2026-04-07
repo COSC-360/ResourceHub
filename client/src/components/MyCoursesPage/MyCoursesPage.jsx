@@ -3,12 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { apiClient } from "../../lib/api-client";
 import "./MyCoursesPage.css";
 
-function MyCourseCard({ course }) {
+function MyCourseCard({ course, onClick }) {
   return (
-    <div className="mycourse-square">
+    <button type="button" className="mycourse-square mycourse-nav-button" onClick={onClick}>
       <h3>{course.code}</h3>
       <p>{course.name}</p>
-    </div>
+    </button>
   );
 }
 
@@ -48,7 +48,7 @@ export default function MyCoursesPage() {
 
       <div className="mycourses-grid">
         {myCourses.map((course) => (
-          <MyCourseCard key={course.id} course={course} />
+          <MyCourseCard key={course._id} course={course} onClick={() => navigate(`/courses/${course._id}`)} />
         ))}
 
         <AddCourseCard onClick={() => navigate("/my-courses/add")} />

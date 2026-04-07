@@ -1,5 +1,5 @@
 import { User } from "../models/user.js";
-import * as courseRepository from "./courseRepository.js";
+import courseRepository from "./courseRepository.js";
 
 const savedCourseIdsByUser = {};
 
@@ -51,36 +51,39 @@ export async function updateProfile(userid, data) {
   return User.findById(userid).select("-password").lean();
 }
 
-export function getUserCourses(userId) {
+export async function getUserCourses(userId) {
   const savedIds = savedCourseIdsByUser[userId] || [];
-  const allCourses = courseRepository.findAll();
-  return allCourses.filter((course) => savedIds.includes(course.id));
+  const allCourses = await courseRepository.findAll();
+  return allCourses.filter((course) => {
+    const courseId = String(course._id ?? course.id);
+    return savedIds.some((savedId) => String(savedId) === courseId);
+  });
 }
 
-export function saveUserCourses(userId, courseId) {
+export async function saveUserCourses(userId, courseId) {
   const existingIds = savedCourseIdsByUser[userId] || [];
 
   if (!existingIds.includes(courseId)) {
     savedCourseIdsByUser[userId] = [...existingIds, courseId];
   }
 
-  return getUserCourses(userId);
+  return await getUserCourses(userId);
 }
 
-export function updateUserCourses(userId, courseIds) {
+export async function updateUserCourses(userId, courseIds) {
   savedCourseIdsByUser[userId] = Array.isArray(courseIds)
     ? [...new Set(courseIds)]
     : [];
 
-  return getUserCourses(userId);
+  return await getUserCourses(userId);
 }
 
-export function hideUserCourses(userId, courseId) {
+export async function hideUserCourses(userId, courseId) {
   const existingIds = savedCourseIdsByUser[userId] || [];
 
   savedCourseIdsByUser[userId] = existingIds.filter(
     (id) => String(id) !== String(courseId),
   );
 
-  return getUserCourses(userId);
+  return await getUserCourses(userId);
 }

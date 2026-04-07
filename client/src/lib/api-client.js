@@ -12,7 +12,12 @@ export async function apiClient(url, options = {}) {
     headers["Content-Type"] = "application/json";
   }
 
-  const userId = localStorage.getItem("userId");
+  const token = localStorage.getItem("access_token");
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  const userId = localStorage.getItem("userId") || localStorage.getItem("userid");
   if (userId) {
     headers["X-User-Id"] = userId;
   }

@@ -10,7 +10,7 @@ export async function verifyAccessToken(req, res, next) {
 
   if (!token) {
     res.status(401).json({ error: "No access token found" });
-    return next();
+    return;
   }
 
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET_KEY, (err, user) => {
