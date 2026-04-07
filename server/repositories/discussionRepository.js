@@ -9,8 +9,29 @@ export const DiscussionRepository = {
     return await Discussion.findById(id);
   },
 
-  async findAll() {
-    return await Discussion.find({ parentId: null }).sort({ timestamp: -1 });
+  async findAll(filters = {}) {
+    const {
+      courseId,
+      authorId,
+      parentId = null,
+      limit = 100,
+      page = 1,
+      sort = { createdAt: -1 },
+    } = filters;
+
+    const queryList = {};
+
+    if (courseId) queryList.courseId = courseId;
+    if (authorId) queryList.authorId = authorId;
+    if (parentId !== undefined) queryList.parentId = parentId;
+
+    let query = Discussion.find(queryList).sort(sort);
+
+    if (limit && page) {
+      query = query.skip((page - 1) * limit).limit(limit);
+    }
+    
+    return query;
   },
 
   async findByAuthor(authorid) {

@@ -5,6 +5,10 @@ export function getLatest() {
   return DiscussionRepository.findAll();
 }
 
+export function getAllDiscussionsByCourse(courseId) {
+  return DiscussionRepository.findAll({ courseId });
+}
+
 export async function create(data) {
   if (data._id) delete data._id;
   const discussion = new Discussion(data);
