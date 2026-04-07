@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useParams, Link } from 'react-router-dom';
-import { apiClient } from '../../lib/api-client';
-import './CoursePage.css';
+import { apiClient } from '../../lib/api-client'; 
+import { CourseHeader } from '../CourseHeader/CourseHeader.jsx';
+import HybridFeed from '../HybridFeed/HybridFeed.jsx';
 
 export default function CoursePage() {
     const location = useLocation();
@@ -21,7 +22,9 @@ export default function CoursePage() {
                 setIsLoading(true);
                 setError('');
 
-                const payload = await apiClient(`/api/courses/${courseId}`, {});
+                const payload = await apiClient(`/api/courses/${courseId}`, {
+                    method: 'GET',
+                });
 
                 setCourse(payload.data);
             } catch (fetchError) {
@@ -55,11 +58,19 @@ export default function CoursePage() {
     }
 
     return (
-        <div className="course-page">
-            <h2>{course.name}</h2>
-            <p><strong>Course Code:</strong> {course.code}</p>
-            <p><strong>Description:</strong> {course.description}</p>
-            <Link to="/">Create another course</Link>
+        <div>
+            <CourseHeader
+                course={course}
+            />
+            <HybridFeed 
+                courseId={courseId}
+                courseIds={[courseId]}
+                showDiscussions={true}
+                showResources={true}
+                showCourses={false}
+                sort="newest"
+                limit={20}
+            />
         </div>
     );
 }

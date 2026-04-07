@@ -109,31 +109,31 @@ export async function updateProfile(req, res) {
   }
 }
 
-export function getUserCourses(req, res) {
-  const savedCourses = userService.getUserCourses(req.userId);
+export async function getUserCourses(req, res) {
+  const savedCourses = await userService.getUserCourses(req.userId);
   res.status(200).json({ data: savedCourses });
 }
 
-export function saveUserCourses(req, res) {
+export async function saveUserCourses(req, res) {
   const { courseId } = req.body;
 
-  if (getUserById(req.userId) === null) {
+  if ((await userService.getUserById(req.userId)) === null) {
     throw new Error("User not authenticated");
   }
-  const result = userService.saveUserCourses(req.userId, courseId);
+  const result = await userService.saveUserCourses(req.userId, courseId);
   res.json({ data: result });
 }
 
-export function updateUserCourses(req, res) {
+export async function updateUserCourses(req, res) {
   const { courseIDs } = req.body;
-  const result = userService.updateUserCourses(req.userId, courseIDs);
+  const result = await userService.updateUserCourses(req.userId, courseIDs);
   res.json({ data: result });
 }
 
-export function hideUserCourses(req, res) {
+export async function hideUserCourses(req, res) {
   const { courseId } = req.body;
 
-  if (getUserById(req.userId) === null) {
+  if ((await userService.getUserById(req.userId)) === null) {
     throw new Error("User not authenticated");
   }
   if (!courseId) {
@@ -141,7 +141,7 @@ export function hideUserCourses(req, res) {
     return;
   }
 
-  const result = userService.hideUserCourses(req.userId, courseId);
+  const result = await userService.hideUserCourses(req.userId, courseId);
   res.json({ data: result });
 }
 

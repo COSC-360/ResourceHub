@@ -32,9 +32,10 @@ export default function AddMyCoursePage() {
 
   async function handleAddCourse(course) {
     try {
+      const courseId = course._id ?? course.id;
       await apiClient("/api/user/save", {
         method: "POST",
-        body: { courseId: course.id },
+        body: { courseId },
       });
 
       navigate("/my-courses");
@@ -53,7 +54,7 @@ export default function AddMyCoursePage() {
       <div className="all-courses-grid">
         {allCourses.map((course) => (
           <CourseOptionCard
-            key={course.id}
+            key={course._id ?? course.id}
             course={course}
             onAdd={handleAddCourse}
           />

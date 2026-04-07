@@ -57,22 +57,22 @@ export async function updateProfile(id, body) {
 }
 
 
-export function getUserCourses(userId) {
-  return userRepository.getUserCourses(userId);
+export async function getUserCourses(userId) {
+  return await userRepository.getUserCourses(userId);
 }
 
 
-export function saveUserCourses(userId, courses) {
+export async function saveUserCourses(userId, courses) {
 
-  return userRepository.saveUserCourses(userId, courses);
+  return await userRepository.saveUserCourses(userId, courses);
 }
 
-export function updateUserCourses(userId, courses) {
+export async function updateUserCourses(userId, courses) {
 
-  return userRepository.updateUserCourses(userId, courses);
+  return await userRepository.updateUserCourses(userId, courses);
 }
 
-export function hideUserCourses(userId, courseId) {
+export async function hideUserCourses(userId, courseId) {
 
-  return userRepository.hideUserCourses(userId, courseId);
+  return await userRepository.hideUserCourses(userId, courseId);
 }

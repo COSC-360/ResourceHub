@@ -305,7 +305,13 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
               <div className="post-header">
                 <div>
                   {!post_props.parentid ? (
-                    <h2 className="course">c/{post_props.coursename}</h2>
+                    <h2 className="course">c/</h2>
+                    // please dont put coursename, coursecode in the discussion model, courseId is there for a reason. 
+                    // use course route GET /api/courses/:courseId (see CoursePage.jsx)
+                    // to fetch course details when needed instead of storing redundant data in the discussion model.
+                    // Consider the fact that course details can be changed. then the discussions would have outdated 
+                    // coursename and coursecode.
+                    // <h2 className="course">c/{post_props.coursename}</h2> 
                   ) : null}
                   <h2 className="username">{username}</h2>
                 </div>

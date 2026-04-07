@@ -1,4 +1,4 @@
-import { Routes, Route, Outlet } from "react-router-dom";
+import { Routes, Route, Outlet, Navigate } from "react-router-dom";
 import "./components/Feed/FeedPost.jsx";
 import "./App.css";
 import Header from "./components/Header/Header.jsx";
@@ -14,6 +14,9 @@ import MyCoursesPage from "./components/MyCoursesPage/MyCoursesPage.jsx";
 import AddMyCoursePage from "./components/AddMyCoursePage/AddMyCourse.jsx";
 import CreatePost from "./pages/CreatePost.jsx";
 import ProfilePage from "./components/ProfilePage/ProfilePage.jsx";
+
+import CreateCourse from "./components/CreateCourse/CreateCourse.jsx";
+import UpdateCourseInfo from "./components/UpdateCourseInfo/UpdateCourseInfo.jsx";
 
 // Main layout component that includes the header and sidebar,
 // and an Outlet for rendering the main content based on the route
@@ -47,8 +50,13 @@ function App() {
         <Route path="/register" element={<SignupForm />} />
         <Route path="/information" element={<InformationForm />} />
         <Route path="/profile" element={<ProfilePage />} />
+
+        {/* redirect /courses to home */}
+        <Route path="/courses" element={<Navigate to="/" replace />} />
       </Route>
-      {/* not found page renders differently */}
+
+      <Route path="/courses/create" element={<CreateCourse />} />
+      <Route path="/courses/:courseId/update" element={<UpdateCourseInfo />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
