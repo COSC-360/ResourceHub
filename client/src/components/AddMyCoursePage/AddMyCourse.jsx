@@ -41,7 +41,11 @@ export default function AddMyCoursePage() {
   }, [navigate]);
 
   useEffect(() => {
-    loadAvailableCourses();
+    const id = setTimeout(() => {
+      void loadAvailableCourses();
+    }, 0);
+
+    return () => clearTimeout(id);
   }, [loadAvailableCourses]);
 
   function openCreateModal() {

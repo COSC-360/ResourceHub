@@ -21,7 +21,7 @@ async function fetchCourse(courseId) {
 
 export default function DiscussionCard({ data, isReply = false, depth = 0 }) {
   const [user, setUser] = useState(null);
-  const [courseCode, setCourseCode] = useState(data?.coursecode || "");
+  const courseCode = data?.coursecode || data?.courseCode || "";
 
   const discussionId = data?._id || data?.id;
   const hasImage = Boolean(data?.hasImage || data?.image?.contentType);
@@ -38,15 +38,11 @@ export default function DiscussionCard({ data, isReply = false, depth = 0 }) {
   }, [data?.authorId]);
 
   useEffect(() => {
-    if (data?.coursecode) {
-      setCourseCode(data.coursecode);
-      return;
-    }
     if (!data?.courseId) return;
     fetchCourse(data.courseId)
       .then((course) => setCourseCode(course?.code || ""))
       .catch(() => setCourseCode(""));
-  }, [data?.courseId, data?.coursecode]);
+  }, [data?.courseId]);
 
   const username = user?.username || "Unknown User";
   const faculty = user?.faculty || "";
