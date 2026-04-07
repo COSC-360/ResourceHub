@@ -24,6 +24,11 @@
 
 .searchButton {
   flex-shrink: 0;
+  flex: 0 0 auto;
+  width: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   height: 40px;
   padding: 0 16px;
   border: none;

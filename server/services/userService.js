@@ -38,6 +38,7 @@ export async function userSignin(email, password) {
         id: found._id,
         username: found.username,
         faculty: found.faculty,
+        admin: found.isAdmin,
       },
       process.env.ACCESS_TOKEN_SECRET_KEY,
       {
