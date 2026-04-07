@@ -1,6 +1,7 @@
 import * as courseService from '../services/courseService.js';
 import mongoose from 'mongoose';
 import { CourseCodeAlreadyExistsError } from '../errors/courseErrors.js';
+import * as discussionService from '../services/discussionService.js';
 
 export async function getById(req, res) {
     try {
