@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiClient } from "../../lib/api-client";
 import CourseCard from "../Cards/CourseCard.jsx";
@@ -11,10 +11,13 @@ export default function AddMyCoursePage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const navigate = useNavigate();
 
-  async function loadAvailableCourses() {
+  const loadAvailableCourses = useCallback(async () => {
     try {
       const token = localStorage.getItem("access_token");
-      if (!token) return navigate("/login");
+      if (!token) {
+        navigate("/login");
+        return;
+      }
 
       const [allCoursesRes, myIdsRes] = await Promise.all([
         apiClient("/api/courses"),
@@ -35,11 +38,11 @@ export default function AddMyCoursePage() {
     } catch (err) {
       setError(err.message || "Failed to load courses.");
     }
-  }
+  }, [navigate]);
 
   useEffect(() => {
     loadAvailableCourses();
-  }, [navigate]);
+  }, [loadAvailableCourses]);
 
   function openCreateModal() {
     setShowCreateModal(true);

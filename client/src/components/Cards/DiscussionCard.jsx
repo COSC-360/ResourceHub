@@ -26,9 +26,10 @@ export default function DiscussionCard({ data, isReply = false, depth = 0 }) {
   const discussionId = data?._id || data?.id;
   const hasImage = Boolean(data?.hasImage || data?.image?.contentType);
 
+  const createdAt = data?.createdAt || data?.updatedAt;
   const timeStr = useMemo(
-    () => timeAgo(new Date(data?.createdAt || data?.updatedAt || Date.now())),
-    [data?.createdAt, data?.updatedAt]
+    () => (createdAt ? timeAgo(new Date(createdAt)) : ""),
+    [createdAt]
   );
 
   useEffect(() => {

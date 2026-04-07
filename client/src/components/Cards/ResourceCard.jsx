@@ -43,9 +43,10 @@ export default function ResourceCard({ data }) {
     getCourse(data?.courseId).then(setCourse).catch(() => setCourse(null));
   }, [data?.authorId, data?.courseId]);
 
+  const createdAt = data?.createdAt || data?.updatedAt;
   const created = useMemo(
-    () => timeAgo(new Date(data?.createdAt || data?.updatedAt || Date.now())),
-    [data?.createdAt, data?.updatedAt],
+    () => (createdAt ? timeAgo(new Date(createdAt)) : ""),
+    [createdAt],
   );
 
   if (!data) return null;
@@ -63,18 +64,6 @@ export default function ResourceCard({ data }) {
     // TODO(server): add endpoint to increment download count, e.g. PATCH /api/resources/:id/download
     // await fetch(`/api/resources/${id}/download`, { method: "PATCH" });
     setDownloadCount((n) => n + 1);
-  }
-
-  async function onUpvote() {
-    // TODO(server): confirm vote routes support targetType="Resource"
-    // await fetch("/api/vote/up", { method: "POST", ... })
-    setLikes((n) => n + 1);
-  }
-
-  async function onDownvote() {
-    // TODO(server): confirm vote routes support targetType="Resource"
-    // await fetch("/api/vote/down", { method: "POST", ... })
-    setDislikes((n) => n + 1);
   }
 
   return (
