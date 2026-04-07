@@ -6,12 +6,12 @@ import request from "supertest";
 const feedMock = jest.fn();
 const searchMock = jest.fn();
 
-await jest.unstable_mockModule("../services/commonService.js", () => ({
+await jest.unstable_mockModule("../../services/commonService.js", () => ({
   feed: feedMock,
   search: searchMock,
 }));
 
-const { commonRoutes } = await import("../routes/commonRoutes.js");
+const { commonRoutes } = await import("../../routes/commonRoutes.js");
 
 function buildTestApp() {
   const app = express();
