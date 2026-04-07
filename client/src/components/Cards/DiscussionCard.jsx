@@ -1,12 +1,27 @@
 import { useState, useEffect, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { fetchUserById } from "../../lib/userUtils";
+import { apiClient } from "../../lib/api-client";
 import { timeAgo } from "../../lib/dateUtils";
 import VoteControls from "../VoteControls/VoteControls.jsx";
 import defaultProfile from "../../assets/profile.svg";
 import "./DiscussionCard.css";
 
+const courseCache = new Map();
+
+async function fetchCourse(courseId) {
+  if (!courseId) return null;
+  if (courseCache.has(courseId)) return courseCache.get(courseId);
+
+  const res = await apiClient(`/api/courses/${courseId}`);
+  const course = res?.data ?? res;
+  courseCache.set(courseId, course);
+  return course;
+}
+
 export default function DiscussionCard({ data, isReply = false, depth = 0 }) {
   const [user, setUser] = useState(null);
+  const [courseCode, setCourseCode] = useState(data?.coursecode || "");
 
   const discussionId = data?._id || data?.id;
   const hasImage = Boolean(data?.hasImage || data?.image?.contentType);
@@ -21,8 +36,19 @@ export default function DiscussionCard({ data, isReply = false, depth = 0 }) {
     fetchUserById(data.authorId).then(setUser).catch(() => setUser(null));
   }, [data?.authorId]);
 
+  useEffect(() => {
+    if (data?.coursecode) {
+      setCourseCode(data.coursecode);
+      return;
+    }
+    if (!data?.courseId) return;
+    fetchCourse(data.courseId)
+      .then((course) => setCourseCode(course?.code || ""))
+      .catch(() => setCourseCode(""));
+  }, [data?.courseId, data?.coursecode]);
+
   const username = user?.username || "Unknown User";
-  const faculty = user?.faculty || "None";
+  const faculty = user?.faculty || "";
 
   if (!data || !user) return null;
 
@@ -41,7 +67,11 @@ export default function DiscussionCard({ data, isReply = false, depth = 0 }) {
 
         <div className="discussion-card__meta">
           <div className="discussion-card__user-info">
-            {!isReply && <span className="discussion-card__forum">c/</span>}
+            {!isReply && data?.courseId && (
+              <Link to={`/courses/${data.courseId}`} className="discussion-card__forum">
+                c/{courseCode || "course"}
+              </Link>
+            )}
             <span className="discussion-card__username">{username}</span>
             {faculty && <span className="discussion-card__faculty">{faculty}</span>}
             <span className="discussion-card__time">{timeStr}</span>
@@ -72,7 +102,6 @@ export default function DiscussionCard({ data, isReply = false, depth = 0 }) {
           buttonClassName="discussion-card__vote"
           activeClassName="active"
         />
-
         <button className="discussion-card__reply" title="Reply">
           <i className="bi bi-chat"></i>
           <span>{data.replies ?? 0}</span>

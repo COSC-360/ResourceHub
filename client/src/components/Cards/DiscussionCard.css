@@ -59,8 +59,13 @@
 }
 
 .discussion-card__forum {
-    color: #007bff;
+    color: #0b66d1;
+    text-decoration: none;
     font-weight: 600;
+}
+
+.discussion-card__forum:hover {
+    text-decoration: underline;
 }
 
 .discussion-card__username {
