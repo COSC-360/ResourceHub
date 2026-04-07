@@ -32,16 +32,24 @@ describe("courseService", () => {
         it("does nothing when code is unique", async () => {
             mockFindByCode.mockResolvedValue(null);
 
-            await expect(courseService.checkCourseCodeUnique("CS101")).resolves.toBeUndefined();
+            await expect(courseService.checkCourseCodeUnique(null, "CS101")).resolves.toBeUndefined();
             expect(mockFindByCode).toHaveBeenCalledWith("CS101");
         });
 
         it("throws CourseCodeAlreadyExistsError when code already exists", async () => {
             mockFindByCode.mockResolvedValue({ _id: "1", code: "CS101" });
 
-            await expect(courseService.checkCourseCodeUnique("CS101"))
+            await expect(courseService.checkCourseCodeUnique(null, "CS101"))
                 .rejects.toBeInstanceOf(CourseCodeAlreadyExistsError);
 
+            expect(mockFindByCode).toHaveBeenCalledWith("CS101");
+        });
+
+        it("does not throw when existing course has same id (updating same course)", async () => {
+            const existingCourse = { _id: "1", code: "CS101" };
+            mockFindByCode.mockResolvedValue(existingCourse);
+
+            await expect(courseService.checkCourseCodeUnique("1", "CS101")).resolves.toBeUndefined();
             expect(mockFindByCode).toHaveBeenCalledWith("CS101");
         });
     });

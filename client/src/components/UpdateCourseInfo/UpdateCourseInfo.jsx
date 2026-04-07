@@ -97,16 +97,10 @@ export default function UpdateCourseInfo() {
     setError("");
 
     try {
-      const res = await fetch(`/api/courses/${courseId}/updateimage`, {
+      const payload = await apiClient(`/api/courses/${courseId}/updateimage`, {
         method: "PATCH",
         body: fd,
       });
-
-      const payload = await res.json().catch(() => null);
-
-      if (!res.ok) {
-        throw new Error(payload?.error || "Failed to upload image.");
-      }
 
       const updatedCourse = payload?.data;
       const nextImage = updatedCourse?.image ?? "";

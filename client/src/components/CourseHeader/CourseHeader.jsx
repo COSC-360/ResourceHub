@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+import { apiClient } from "../../lib/api-client";
 import "./CourseHeader.css";
 
 function PeopleIcon() {
@@ -16,6 +18,29 @@ function PeopleIcon() {
 }
 
 export function CourseHeader({ course }) {
+    const navigate = useNavigate();
+
+    const handleDelete = async () => {
+        const shouldDelete = window.confirm(
+            "Are you sure you want to delete this course? This action cannot be undone.",
+        );
+
+        if (!shouldDelete) {
+            return;
+        }
+
+        try {
+            await apiClient(`/api/courses/${course._id}`, {
+                method: "DELETE",
+            });
+            alert("Course deleted successfully.");
+            navigate("/");
+        } catch (error) {
+            console.error("Error deleting course:", error);
+            alert(error.message || "An error occurred while deleting the course.");
+        }
+    };
+
     return (
         <section className="course-header">
             <div className="course-header__image-wrap">
@@ -44,26 +69,7 @@ export function CourseHeader({ course }) {
                     <button // TODO: implement delete course functionality
                         type="button"
                         className="course-header__delete-link"
-                        onClick={() => {
-                            if (window.confirm("Are you sure you want to delete this course? This action cannot be undone.")) {
-                                // hit /courses/:id DELETE endpoint, then redirect to homepage
-                                fetch(`/api/courses/${course._id}`, {
-                                    method: 'DELETE',
-                                })
-                                    .then(response => {
-                                        if (response.ok) {
-                                            alert("Course deleted successfully.");
-                                            window.location.href = "/"; // redirect to homepage
-                                        } else {
-                                            alert("Failed to delete course.");
-                                        }
-                                    })
-                                    .catch(error => {
-                                        console.error("Error deleting course:", error);
-                                        alert("An error occurred while deleting the course.");
-                                    });
-                            }
-                        }}
+                        onClick={handleDelete}
                     >
                         Delete
                     </button>

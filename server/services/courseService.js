@@ -3,7 +3,7 @@ import { CourseCodeAlreadyExistsError } from '../errors/courseErrors.js';
 
 export async function checkCourseCodeUnique(id, code) {
     const existingCourse = await courseRepository.findByCode(code);
-    if (existingCourse && existingCourse._id !== id) {
+    if (existingCourse && !id.equals(existingCourse._id)) {
         throw new CourseCodeAlreadyExistsError(code);
     }
 }
