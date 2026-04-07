@@ -35,7 +35,7 @@ export function CourseHeader({ course }) {
                     >
                         Join
                     </button>
-                    <a 
+                    <a
                         href={`/courses/${course._id}/update`} // TODO: implement update course page
                         className="course-header__edit-link"
                     >
@@ -50,18 +50,18 @@ export function CourseHeader({ course }) {
                                 fetch(`/api/courses/${course._id}`, {
                                     method: 'DELETE',
                                 })
-                                .then(response => {
-                                    if (response.ok) {
-                                        alert("Course deleted successfully.");
-                                        window.location.href = "/"; // redirect to homepage
-                                    } else {
-                                        alert("Failed to delete course.");
-                                    }
-                                })
-                                .catch(error => {
-                                    console.error("Error deleting course:", error);
-                                    alert("An error occurred while deleting the course.");
-                                });
+                                    .then(response => {
+                                        if (response.ok) {
+                                            alert("Course deleted successfully.");
+                                            window.location.href = "/"; // redirect to homepage
+                                        } else {
+                                            alert("Failed to delete course.");
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error("Error deleting course:", error);
+                                        alert("An error occurred while deleting the course.");
+                                    });
                             }
                         }}
                     >

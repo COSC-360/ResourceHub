@@ -10,7 +10,7 @@ export async function getById(req, res) {
 
         // 2. validate the course id (must be a valid MongoDB ObjectId)
         if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({ error: "Invalid course id" });
+            return res.status(400).json({ error: "Invalid course id" });
         }
 
         // 3. call the course service to get the course by id
@@ -108,7 +108,7 @@ export async function update(req, res) {
             }
             updates.code = updates.code.trim();
         }
-        
+
         if ("description" in updates) {
             if (typeof updates.description !== 'string') {
                 return res.status(400).json({ error: 'Invalid course description' });
