@@ -10,6 +10,7 @@ const Comment = ({ onSubmit, parentid, parentUsername }) => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef(null);
+  const userid = localStorage.getItem("userid");
 
   const router = useNavigate();
 
@@ -65,7 +66,13 @@ const Comment = ({ onSubmit, parentid, parentUsername }) => {
   return (
     <form className="container" onSubmit={handleSubmit}>
       <div className="form_body">
-        <img src={defaultProfile} className="pfp" />
+        <img
+          src={`http://localhost:3000/api/user/getProfilePhoto/${userid}`}
+          className="pfp"
+          onError={(e) => {
+            e.target.src = defaultProfile;
+          }}
+        />
         <textarea
           className="text"
           onChange={handleChange}

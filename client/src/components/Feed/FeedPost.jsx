@@ -275,7 +275,7 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
         console.log(err);
       }
     })();
-  }, []);
+  }, [post_props.authorid]);
 
   return (
     <div

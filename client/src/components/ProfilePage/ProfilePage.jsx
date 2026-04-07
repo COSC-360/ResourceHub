@@ -56,7 +56,7 @@ export function ProfilePage() {
     return () => {
       cancelled = true;
     };
-  }, [t]);
+  }, [t, userid]);
 
   const loading = Boolean(t) && fetchedForToken !== t;
   if (!t) {

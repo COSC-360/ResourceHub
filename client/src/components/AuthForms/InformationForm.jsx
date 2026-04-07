@@ -7,7 +7,7 @@ import { apiClient } from "../../lib/api-client";
 const InformationForm = () => {
   const [file, setFile] = useState(null);
   const [formData, setFormData] = useState({ bio: "" });
-  const [present, setPresent] = useState(false);
+  const present = file || formData.bio;
   const fileCurrentRef = useRef(null);
 
   const router = useNavigate();
@@ -57,9 +57,8 @@ const InformationForm = () => {
 
   useEffect(() => {
     const status = localStorage.getItem("first_time");
-    if (status) router("/");
-    setPresent(file || formData.bio);
-  }, [formData, file]);
+    if (!status) router("/");
+  }, [formData, file, router]);
 
   return (
     <div className="auth-form-page">
