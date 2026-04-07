@@ -30,6 +30,13 @@
   cursor: pointer;
   border: 2px dashed #b646eb;
   background: #faf5ff;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.add-course-square:hover {
+  background: var(--rh-redirect-hover-bg);
+  color: var(--rh-redirect-hover-color);
+  border-color: var(--rh-redirect-hover-color);
 }
 
 .plus-sign {

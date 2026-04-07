@@ -43,9 +43,9 @@ function App() {
         <Route path="/create" element={<CreatePost />} />
         <Route path="/my-courses" element={<MyCoursesPage />} />
         <Route path="/my-courses/add" element={<AddMyCoursePage />} />
-        <Route path="/auth/login" element={<LoginForm />} />
-        <Route path="/auth/register" element={<SignupForm />} />
-        <Route path="/auth/information" element={<InformationForm />} />
+        <Route path="/login" element={<LoginForm />} />
+        <Route path="/register" element={<SignupForm />} />
+        <Route path="/information" element={<InformationForm />} />
         <Route path="/profile" element={<ProfilePage />} />
       </Route>
       {/* not found page renders differently */}

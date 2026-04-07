@@ -51,7 +51,6 @@ export function ProfileHeader({ userType }) {
               aria-controls="profile-dropdown-menu"
               onClick={() => setMenuOpen((o) => !o)}
             >
-              {console.log(userid)}
               <img
                 src={`http://localhost:3000/api/user/getProfilePhoto/${userid}`}
                 alt="profile"
@@ -86,10 +85,10 @@ export function ProfileHeader({ userType }) {
       </div>
       {!userType && (
         <div className="authButtons">
-          <Link to="/auth/login">
+          <Link to="/login">
             <button className="signIn">Log In</button>
           </Link>
-          <Link to="/auth/register">
+          <Link to="/register">
             <button className="register">Register</button>
           </Link>
         </div>

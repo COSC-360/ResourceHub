@@ -2,6 +2,7 @@
   position: relative;
   display: flex;
   align-items: center;
+  gap: 8px;
   width: 100%;
   min-width: 0;
   height: 40px;
@@ -14,11 +15,33 @@
   border: none;
   border-radius: 8px;
   box-sizing: border-box;
-  width: 100%;
+  flex: 1;
   min-width: 0;
   height: 40px;
   padding-left: 40px;
-  margin:0px;
+  margin: 0;
+}
+
+.searchButton {
+  flex-shrink: 0;
+  height: 40px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 8px;
+  background: #2563eb;
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.searchButton:hover {
+  background: #1d4ed8;
+}
+
+.searchButton:focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: 2px;
 }
 
 .searchIcon {

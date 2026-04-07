@@ -10,3 +10,16 @@ button {
   flex-direction: column;
   gap: 10px;
 }
+
+.body .create_post {
+  cursor: pointer;
+  align-self: flex-start;
+  border-radius: 10px;
+  padding: 10px 14px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.body .create_post:hover {
+  background: var(--rh-redirect-hover-bg);
+  color: var(--rh-redirect-hover-color);
+}

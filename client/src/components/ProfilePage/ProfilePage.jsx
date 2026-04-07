@@ -63,7 +63,7 @@ export function ProfilePage() {
     return (
       <div className="profile-page">
         <p>Sign in to view your profile.</p>
-        <Link to="/auth/login">Log in</Link>
+        <Link to="/login">Log in</Link>
       </div>
     );
   }

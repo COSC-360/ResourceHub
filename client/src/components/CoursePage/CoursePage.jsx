@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useParams, Link } from 'react-router-dom';
 import { apiClient } from '../../lib/api-client';
+import './CoursePage.css';
 
 export default function CoursePage() {
     const location = useLocation();
@@ -35,7 +36,7 @@ export default function CoursePage() {
 
     if (isLoading) {
         return (
-            <div>
+            <div className="course-page">
                 <h2>Course Page</h2>
                 <p>Loading course details...</p>
             </div>
@@ -44,7 +45,7 @@ export default function CoursePage() {
 
     if (!course) {
         return (
-            <div>
+            <div className="course-page">
                 <h2>Course Page</h2>
                 <p>{error || 'No details found for this course.'}</p>
                 <p><strong>Course ID:</strong> {courseId}</p>
@@ -54,7 +55,7 @@ export default function CoursePage() {
     }
 
     return (
-        <div>
+        <div className="course-page">
             <h2>{course.name}</h2>
             <p><strong>Course Code:</strong> {course.code}</p>
             <p><strong>Description:</strong> {course.description}</p>
