@@ -1,9 +1,10 @@
-import { Router } from 'express';
-import * as resourceController from './resource.controller.js';
+import { Router } from "express";
+import * as resourceController from "../controllers/resource.controller.js";
 
 export const resourceRoutes = Router();
 
-resourceRoutes.get('/:id', resourceController.get);
-resourceRoutes.post('/', resourceController.create);
-resourceRoutes.put('/:id', resourceController.update);
-resourceRoutes.delete('/:id', resourceController.remove);
+resourceRoutes.get("/", resourceController.getAll);          // all resources OR ?courseIds=id1,id2
+resourceRoutes.get("/:id", resourceController.get);
+resourceRoutes.post("/", resourceController.create);
+resourceRoutes.put("/:id", resourceController.update);
+resourceRoutes.delete("/:id", resourceController.remove);

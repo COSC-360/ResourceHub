@@ -1,25 +1,35 @@
 import { Resource } from '../models/resource.js';
-import * as resourceRepository from './resource.repository.js';
+import * as resourceRepository from '../repositories/resource.repository.js';
 
-export function get(id) {
-    const data = resourceRepository.get(id);
-    return new Resource(data);
+export async function get(id) {
+    return await resourceRepository.get(id);
 }
 
-export function create(data) {
-    const newResource = new Resource(data);
-    return resourceRepository.create(newResource);
+export async function findAll() {
+    return await resourceRepository.findAll();
 }
 
-export function update(id, data) {
-    const existingData = resourceRepository.get(id);
+// ids = courseIds
+export async function findByIds(ids) {
+    return await resourceRepository.findByIds(ids);
+}
+
+export async function create(data) {
+    return await resourceRepository.create(data);
+}
+
+export async function update(id, data) {
+    const existingData = await resourceRepository.get(id);
     if (!existingData) {
-        throw new Error('Resource not found');
+        throw new Error("Resource not found");
     }
-    const updatedResource = new Resource({ ...existingData, ...data });
-    return resourceRepository.update(id, updatedResource);
+    return await resourceRepository.update(id, data);
 }
 
-export function remove(id) {
-    resourceRepository.remove(id);
+export async function remove(id) {
+    const existingData = await resourceRepository.get(id);
+    if (!existingData) {
+        throw new Error("Resource not found");
+    }
+    return await resourceRepository.remove(id);
 }
