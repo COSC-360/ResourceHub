@@ -1,48 +1,46 @@
-import { useState, useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { fetchUserById } from "../../lib/userUtils";
-import { apiClient } from "../../lib/api-client";
 import { timeAgo } from "../../lib/dateUtils";
 import VoteControls from "../VoteControls/VoteControls.jsx";
 import defaultProfile from "../../assets/profile.svg";
 import "./DiscussionCard.css";
 
-const courseCache = new Map();
-
-async function fetchCourse(courseId) {
-  if (!courseId) return null;
-  if (courseCache.has(courseId)) return courseCache.get(courseId);
-
-  const res = await apiClient(`/api/courses/${courseId}`);
-  const course = res?.data ?? res;
-  courseCache.set(courseId, course);
-  return course;
-}
-
 export default function DiscussionCard({ data, isReply = false, depth = 0 }) {
   const [user, setUser] = useState(null);
-  const courseCode = data?.coursecode || data?.courseCode || "";
 
   const discussionId = data?._id || data?.id;
+  const courseCode = data?.courseCode || data?.coursecode || data?.course?.code || "";
   const hasImage = Boolean(data?.hasImage || data?.image?.contentType);
 
   const createdAt = data?.createdAt || data?.updatedAt;
-  const timeStr = useMemo(
-    () => (createdAt ? timeAgo(new Date(createdAt)) : ""),
-    [createdAt]
-  );
+  const timeStr = useMemo(() => {
+    return createdAt ? timeAgo(new Date(createdAt)) : "";
+  }, [createdAt]);
 
   useEffect(() => {
-    if (!data?.authorId) return;
-    fetchUserById(data.authorId).then(setUser).catch(() => setUser(null));
+    let cancelled = false;
+
+    async function loadUser() {
+      if (!data?.authorId) {
+        setUser(null);
+        return;
+      }
+
+      try {
+        const fetchedUser = await fetchUserById(data.authorId);
+        if (!cancelled) setUser(fetchedUser);
+      } catch {
+        if (!cancelled) setUser(null);
+      }
+    }
+
+    loadUser();
+
+    return () => {
+      cancelled = true;
+    };
   }, [data?.authorId]);
-
-  useEffect(() => {
-    if (!data?.courseId) return;
-    fetchCourse(data.courseId)
-      .then((course) => setCourseCode(course?.code || ""))
-      .catch(() => setCourseCode(""));
-  }, [data?.courseId]);
 
   const username = user?.username || "Unknown User";
   const faculty = user?.faculty || "";
@@ -59,7 +57,9 @@ export default function DiscussionCard({ data, isReply = false, depth = 0 }) {
           src={data?.authorId ? `/api/user/getProfilePhoto/${data.authorId}` : defaultProfile}
           alt={username}
           className="discussion-card__avatar"
-          onError={(e) => (e.currentTarget.src = defaultProfile)}
+          onError={(e) => {
+            e.currentTarget.src = defaultProfile;
+          }}
         />
 
         <div className="discussion-card__meta">
