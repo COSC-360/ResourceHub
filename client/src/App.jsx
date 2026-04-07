@@ -20,6 +20,7 @@ import CreateCourse from "./components/CreateCourse/CreateCourse.jsx";
 import UpdateCourseInfo from "./components/UpdateCourseInfo/UpdateCourseInfo.jsx";
 import NotAuthorized from "./components/NotAuthorized/NotAuthorized.jsx";
 import AuthContext from "./AuthContext.jsx";
+import GlobalApiError from "./components/GlobalApiError/GlobalApiError";
 
 // Main layout component that includes the header and sidebar,
 // and an Outlet for rendering the main content based on the route
@@ -47,43 +48,46 @@ function AdminRoute({ children }) {
 
 function App() {
   return (
-    <Routes>
-      {/* Main layout route, routes inside get rendered within the Outlet in MainLayout */}
-      <Route element={<MainLayout />}>
-        <Route path="/" element={<Feed />} />
-        <Route path="/search" element={<SearchResults />} />
-        <Route path="/courses/:courseId" element={<CoursePage />} />
-        <Route path="/create" element={<CreatePost />} />
-        <Route path="/my-courses" element={<MyCoursesPage />} />
-        <Route path="/my-courses/add" element={<AddMyCoursePage />} />
-        <Route path="/login" element={<LoginForm />} />
-        <Route path="/register" element={<SignupForm />} />
-        <Route path="/information" element={<InformationForm />} />
-        <Route path="/profile" element={<ProfilePage />} />
+    <>
+      <GlobalApiError />
+      <Routes>
+        {/* Main layout route, routes inside get rendered within the Outlet in MainLayout */}
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<Feed />} />
+          <Route path="/search" element={<SearchResults />} />
+          <Route path="/courses/:courseId" element={<CoursePage />} />
+          <Route path="/create" element={<CreatePost />} />
+          <Route path="/my-courses" element={<MyCoursesPage />} />
+          <Route path="/my-courses/add" element={<AddMyCoursePage />} />
+          <Route path="/login" element={<LoginForm />} />
+          <Route path="/register" element={<SignupForm />} />
+          <Route path="/information" element={<InformationForm />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <AdminPanel />
+              </AdminRoute>
+            }
+          />
+
+          {/* redirect /courses to home */}
+          <Route path="/courses" element={<Navigate to="/" replace />} />
+        </Route>
+
+        <Route path="/courses/create" element={<CreateCourse />} />
         <Route
-          path="/admin"
+          path="/courses/:courseId/update"
           element={
             <AdminRoute>
-              <AdminPanel />
+              <UpdateCourseInfo />
             </AdminRoute>
           }
         />
-
-        {/* redirect /courses to home */}
-        <Route path="/courses" element={<Navigate to="/" replace />} />
-      </Route>
-
-      <Route path="/courses/create" element={<CreateCourse />} />
-      <Route
-        path="/courses/:courseId/update"
-        element={
-          <AdminRoute>
-            <UpdateCourseInfo />
-          </AdminRoute>
-        }
-      />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </>
   );
 }
 

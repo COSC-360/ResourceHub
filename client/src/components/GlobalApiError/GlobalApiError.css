@@ -1,0 +1,22 @@
+.global-api-error {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 2000;
+  min-width: 280px;
+  max-width: 420px;
+  background: #ffe8e8;
+  border: 1px solid #ffb3b3;
+  color: #7a1010;
+  padding: 10px 12px;
+  border-radius: 10px;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+.global-api-error button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+}
