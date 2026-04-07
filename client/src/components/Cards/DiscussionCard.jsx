@@ -50,7 +50,7 @@ export default function DiscussionCard({ data, isReply = false, depth = 0 }) {
   const username = user?.username || "Unknown User";
   const faculty = user?.faculty || "";
 
-  if (!data || !user) return null;
+  if (!data) return null;
 
   const classPrefix = isReply ? "discussion-card--reply" : "discussion-card";
   const depthClass = depth > 0 ? `discussion-card--depth-${Math.min(depth, 4)}` : "";
@@ -59,7 +59,7 @@ export default function DiscussionCard({ data, isReply = false, depth = 0 }) {
     <article className={`${classPrefix} ${depthClass}`}>
       <div className="discussion-card__header">
         <img
-          src={`/api/user/getProfilePhoto/${data.authorId}`}
+          src={data?.authorId ? `/api/user/getProfilePhoto/${data.authorId}` : defaultProfile}
           alt={username}
           className="discussion-card__avatar"
           onError={(e) => (e.currentTarget.src = defaultProfile)}

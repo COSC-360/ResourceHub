@@ -22,27 +22,23 @@ export function getAll() {
   return courseRepository.findAll();
 }
 
-export async function create(course, creatorUserId) {
+export async function create(course, creatorUserId = null) {
   const existing = await courseRepository.findByCode(course.code);
-  if (existing) {
-    throw new CourseCodeAlreadyExistsError(course.code);
-  }
+  if (existing) throw new CourseCodeAlreadyExistsError(course.code);
 
   const created = await courseRepository.save(course);
 
+  if (!creatorUserId) {
+    return created;
+  }
+
   try {
-    if (!creatorUserId) {
-      throw new Error("Missing creator user id");
-    }
-
     await membershipRepository.createMembership(creatorUserId, created._id, "instructor");
-
     const memberCount = await membershipRepository.countByCourse(created._id);
     await courseRepository.setMemberCount(created._id, memberCount);
-
     return await courseRepository.findById(created._id);
   } catch (err) {
-    await courseRepository.deleteCourse(created._id); // rollback
+    await courseRepository.deleteCourse(created._id);
     throw err;
   }
 }

@@ -41,16 +41,23 @@ export default function UpdateCourseInfo({ asModal = false, onClose, onUpdated, 
       }
 
       try {
+        setLoading(true);
+        setError("");
+
         const course = initialCourse
           ? initialCourse
           : (await apiClient(`/api/courses/${courseId}`, { method: "GET" }))?.data;
 
-        if (!active) return;
-        setForm({
+        const next = {
           name: course?.name ?? "",
           code: course?.code ?? "",
           description: course?.description ?? "",
-        });
+          image: course?.image ?? "",
+        };
+
+        if (!active) return;
+        setInitial(next);
+        setForm(next);
       } catch (err) {
         if (!active) return;
         setError(err.message || "Failed to load course.");
@@ -60,7 +67,9 @@ export default function UpdateCourseInfo({ asModal = false, onClose, onUpdated, 
     }
 
     loadCourse();
-    return () => { active = false; };
+    return () => {
+      active = false;
+    };
   }, [courseId, initialCourse]);
 
   const hasChanges = useMemo(() => {

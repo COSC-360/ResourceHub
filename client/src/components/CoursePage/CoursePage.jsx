@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import { apiClient } from "../../lib/api-client";
 import { CourseHeader } from "../CourseHeader/CourseHeader.jsx";
 import HybridFeed from "../HybridFeed/HybridFeed.jsx";

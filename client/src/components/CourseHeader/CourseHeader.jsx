@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { apiClient } from "../../lib/api-client";
 import CourseMembershipButton from "../CourseMembershipButton/CourseMembershipButton.jsx";
 import MemberCount from "../MemberCount/MemberCount.jsx";
@@ -22,7 +21,6 @@ function PeopleIcon() {
 }
 
 export function CourseHeader({ course, onMembershipChanged, onCourseUpdated }) {
-    const navigate = useNavigate();
     const courseId = course._id || course.id;
 
     const [isInstructor, setIsInstructor] = useState(false);

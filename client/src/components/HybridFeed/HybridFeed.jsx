@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import './HybridFeed.css';
 import CourseCard from '../Cards/CourseCard.jsx';
 import DiscussionCard from '../Cards/DiscussionCard.jsx';
@@ -17,6 +17,8 @@ function HybridFeed({
     const [items, setItems] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
+
+    const courseIdsKey = useMemo(() => courseIds.join(','), [courseIds]);
 
     async function fetchFeedItems() {
         const types = [
@@ -57,7 +59,7 @@ function HybridFeed({
 
     useEffect(() => {
         fetchFeedItems();
-    }, [courseId, courseIds, showDiscussions, showResources, showCourses, sort, limit]);
+    }, [courseId, courseIdsKey, showDiscussions, showResources, showCourses, sort, limit]);
 
     if (isLoading) return <div className="hybrid-feed__loading">Loading...</div>;
     if (error) return <div className="hybrid-feed__error">Error: {error}</div>;

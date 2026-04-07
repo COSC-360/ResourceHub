@@ -97,9 +97,21 @@ export const DiscussionRepository = {
     }).sort({ timestamp: -1 });
   },
 
-  // ids = courseIds
+  async findRecent({ scopedCourseIds = null, limit = 20 } = {}) {
+    const query =
+      Array.isArray(scopedCourseIds) && scopedCourseIds.length
+        ? { courseId: { $in: scopedCourseIds }, parentId: null }
+        : { parentId: null };
+
+    return Discussion.find(query).sort({ createdAt: -1, _id: -1 }).limit(limit);
+  },
+
   async findByIds(ids) {
-    return await this.findAll({ courseIds: ids, parentId: null, sort: { createdAt: -1 } });
+    return await this.findAll({
+      courseIds: ids,
+      parentId: null,
+      sort: { createdAt: -1 },
+    });
   },
 };
 

@@ -29,36 +29,32 @@ export async function feed({ types, courseId, courseIds, sort, limit }) {
     const hasScope = scopedCourseIds.length > 0;
 
     if (types.includes("discussion")) {
-        const discussionPromise = hasScope
-            ? DiscussionRepository.findByIds(scopedCourseIds)
-            : DiscussionRepository.findAll();
-
         tasks.push(
-            discussionPromise.then((rows) =>
-                rows.slice(0, limit).map((d) => toFeedItem("discussion", d)),
-        ));
+            DiscussionRepository.findRecent({
+                scopedCourseIds: hasScope ? scopedCourseIds : null,
+                limit,
+            }).then((rows) => rows.map((d) => toFeedItem("discussion", d))),
+        );
     }
 
     if (types.includes("resource")) {
-        const resourcePromise = hasScope
-            ? ResourceRepository.findByIds(scopedCourseIds)
-            : ResourceRepository.findAll();
-
         tasks.push(
-            resourcePromise.then((rows) =>
-                rows.slice(0, limit).map((r) => toFeedItem("resource", r)),
-        ));
+            ResourceRepository.findRecent({
+                scopedCourseIds: hasScope ? scopedCourseIds : null,
+                limit,
+            }).then((rows) => rows.map((r) => toFeedItem("resource", r))),
+        );
     }
 
     if (types.includes("course")) {
-        const coursePromise = hasScope
-            ? courseRepository.findByIds(scopedCourseIds)
-            : courseRepository.findAll();
-
         tasks.push(
-            coursePromise.then((rows) =>
-                rows.slice(0, limit).map((c) => toFeedItem("course", c)),
-        ));
+            courseRepository
+                .findRecent({
+                    scopedCourseIds: hasScope ? scopedCourseIds : null,
+                    limit,
+                })
+                .then((rows) => rows.map((c) => toFeedItem("course", c))),
+        );
     }
 
     const grouped = await Promise.all(tasks);

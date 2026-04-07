@@ -48,15 +48,26 @@ export async function feed(req, res) {
 
         const enriched = await Promise.all(
             data.map(async (item) => {
-                const raw = item?.data?.toObject ? item.data.toObject() : item.data;
-                const id = raw?._id?.toString?.() || item.id;
+                const doc = item?.data;
+
+                // read image from the original mongoose doc first
+                const hasImage = Boolean(doc?.image?.contentType || doc?.hasImage);
+
+                const base =
+                    doc?.toJSON?.() ??
+                    doc?.toObject?.() ??
+                    doc ??
+                    {};
+
+                const { image, ...raw } = base;
+                const id = (raw?._id && String(raw._id)) || raw?.id;
 
                 if (item.type === "discussion") {
                     return {
                         ...item,
                         data: {
                             ...raw,
-                            hasImage: Boolean(raw?.image?.contentType || raw?.hasImage),
+                            hasImage,
                             hasUpvote: userId ? await voteService.hasUpvote(id, userId, "Discussion") : false,
                             hasDownvote: userId ? await voteService.hasDownvote(id, userId, "Discussion") : false,
                         },

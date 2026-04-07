@@ -85,6 +85,15 @@ export const courseRepository = {
             { new: true, runValidators: true },
         );
     },
+
+    async findRecent({ scopedCourseIds = null, limit = 20 } = {}) {
+        const query =
+            Array.isArray(scopedCourseIds) && scopedCourseIds.length
+                ? { _id: { $in: scopedCourseIds } }
+                : {};
+
+        return Course.find(query).sort({ createdAt: -1, _id: -1 }).limit(limit);
+    },
 };
 
 export default courseRepository;

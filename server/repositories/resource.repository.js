@@ -24,3 +24,12 @@ export async function update(id, updatedData) {
 export async function remove(id) {
     return await Resource.findByIdAndDelete(id);
 }
+
+export async function findRecent({ scopedCourseIds = null, limit = 20 } = {}) {
+    const query =
+        Array.isArray(scopedCourseIds) && scopedCourseIds.length
+            ? { courseId: { $in: scopedCourseIds } }
+            : {};
+
+    return await Resource.find(query).sort({ createdAt: -1, _id: -1 }).limit(limit);
+}
