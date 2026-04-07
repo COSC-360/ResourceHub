@@ -1,90 +1,148 @@
 import { jest, describe, it, expect, beforeEach } from "@jest/globals";
+import { CourseCodeAlreadyExistsError } from "../../../errors/courseErrors.js";
 
-const mockGetById = jest.fn();
-const mockIsValid = jest.fn();
+const mockFindByCode = jest.fn();
+const mockFindById = jest.fn();
+const mockFindAll = jest.fn();
+const mockSave = jest.fn();
+const mockUpdate = jest.fn();
+const mockUpdateImage = jest.fn();
+const mockDeleteCourse = jest.fn();
 
-await jest.unstable_mockModule("../../../services/courseService.js", () => ({
-    getById: mockGetById,
-}));
-
-await jest.unstable_mockModule("mongoose", () => ({
-    default: {
-        Types: {
-            ObjectId: {
-                isValid: mockIsValid,
-            },
-        },
+await jest.unstable_mockModule("../../../repositories/courseRepository.js", () => ({
+    courseRepository: {
+        findByCode: mockFindByCode,
+        findById: mockFindById,
+        findAll: mockFindAll,
+        save: mockSave,
+        update: mockUpdate,
+        updateImage: mockUpdateImage,
+        deleteCourse: mockDeleteCourse,
     },
 }));
 
-const { getById } = await import("../../../controllers/courseController.js");
+const courseService = await import("../../../services/courseService.js");
 
-function createRes() {
-    return {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn().mockReturnThis(),
-    };
-}
-
-describe("courseController.getById", () => {
+describe("courseService", () => {
     beforeEach(() => {
         jest.clearAllMocks();
     });
 
-    it("returns 400 when id is invalid", async () => {
-        mockIsValid.mockReturnValue(false);
+    describe("checkCourseCodeUnique", () => {
+        it("does nothing when code is unique", async () => {
+            mockFindByCode.mockResolvedValue(null);
 
-        const req = { params: { id: "bad-id" } };
-        const res = createRes();
+            await expect(courseService.checkCourseCodeUnique("CS101")).resolves.toBeUndefined();
+            expect(mockFindByCode).toHaveBeenCalledWith("CS101");
+        });
 
-        await getById(req, res);
+        it("throws CourseCodeAlreadyExistsError when code already exists", async () => {
+            mockFindByCode.mockResolvedValue({ _id: "1", code: "CS101" });
 
-        expect(mockIsValid).toHaveBeenCalledWith("bad-id");
-        expect(mockGetById).not.toHaveBeenCalled();
-        expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.json).toHaveBeenCalledWith({ error: "Invalid course id" });
+            await expect(courseService.checkCourseCodeUnique("CS101"))
+                .rejects.toBeInstanceOf(CourseCodeAlreadyExistsError);
+
+            expect(mockFindByCode).toHaveBeenCalledWith("CS101");
+        });
     });
 
-    it("returns 404 when id is valid but course is not found", async () => {
-        mockIsValid.mockReturnValue(true);
-        mockGetById.mockResolvedValue(null);
+    describe("getById", () => {
+        it("delegates to repository.findById", async () => {
+            const course = { _id: "abc", code: "CS101" };
+            mockFindById.mockResolvedValue(course);
 
-        const req = { params: { id: "507f1f77bcf86cd799439011" } };
-        const res = createRes();
-
-        await getById(req, res);
-
-        expect(mockIsValid).toHaveBeenCalledWith("507f1f77bcf86cd799439011");
-        expect(mockGetById).toHaveBeenCalledWith("507f1f77bcf86cd799439011");
-        expect(res.status).toHaveBeenCalledWith(404);
-        expect(res.json).toHaveBeenCalledWith({ error: "Course not found" });
+            await expect(courseService.getById("abc")).resolves.toEqual(course);
+            expect(mockFindById).toHaveBeenCalledWith("abc");
+        });
     });
 
-    it("returns 200 with course when found", async () => {
-        const course = { id: "507f1f77bcf86cd799439011", name: "Algorithms" };
-        mockIsValid.mockReturnValue(true);
-        mockGetById.mockResolvedValue(course);
+    describe("getAll", () => {
+        it("delegates to repository.findAll", async () => {
+            const courses = [{ code: "CS101" }, { code: "MATH200" }];
+            mockFindAll.mockResolvedValue(courses);
 
-        const req = { params: { id: "507f1f77bcf86cd799439011" } };
-        const res = createRes();
-
-        await getById(req, res);
-
-        expect(mockGetById).toHaveBeenCalledWith("507f1f77bcf86cd799439011");
-        expect(res.status).toHaveBeenCalledWith(200);
-        expect(res.json).toHaveBeenCalledWith({ data: course });
+            await expect(courseService.getAll()).resolves.toEqual(courses);
+            expect(mockFindAll).toHaveBeenCalledTimes(1);
+        });
     });
 
-    it("returns 500 when service throws", async () => {
-        mockIsValid.mockReturnValue(true);
-        mockGetById.mockRejectedValue(new Error("DB failure"));
+    describe("create", () => {
+        it("checks uniqueness then saves course", async () => {
+            const input = { code: "CS101", title: "Algorithms" };
+            const saved = { _id: "1", ...input };
 
-        const req = { params: { id: "507f1f77bcf86cd799439011" } };
-        const res = createRes();
+            mockFindByCode.mockResolvedValue(null);
+            mockSave.mockResolvedValue(saved);
 
-        await getById(req, res);
+            await expect(courseService.create(input)).resolves.toEqual(saved);
+            expect(mockFindByCode).toHaveBeenCalledWith("CS101");
+            expect(mockSave).toHaveBeenCalledWith(input);
+        });
 
-        expect(res.status).toHaveBeenCalledWith(500);
-        expect(res.json).toHaveBeenCalledWith({ error: "DB failure" });
+        it("throws and does not save when code already exists", async () => {
+            const input = { code: "CS101", title: "Algorithms" };
+            mockFindByCode.mockResolvedValue({ _id: "existing", code: "CS101" });
+
+            await expect(courseService.create(input))
+                .rejects.toBeInstanceOf(CourseCodeAlreadyExistsError);
+
+            expect(mockSave).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("update", () => {
+        it("checks uniqueness when code is present, then updates", async () => {
+            const updatedData = { code: "CS102", title: "Advanced Algorithms" };
+            const updated = { _id: "1", ...updatedData };
+
+            mockFindByCode.mockResolvedValue(null);
+            mockUpdate.mockResolvedValue(updated);
+
+            await expect(courseService.update("1", updatedData)).resolves.toEqual(updated);
+            expect(mockFindByCode).toHaveBeenCalledWith("CS102");
+            expect(mockUpdate).toHaveBeenCalledWith("1", updatedData);
+        });
+
+        it("throws and does not update when new code already exists", async () => {
+            const updatedData = { code: "CS102" };
+
+            mockFindByCode.mockResolvedValue({ _id: "2", code: "CS102" });
+
+            await expect(courseService.update("1", updatedData))
+                .rejects.toBeInstanceOf(CourseCodeAlreadyExistsError);
+
+            expect(mockUpdate).not.toHaveBeenCalled();
+        });
+
+        it("skips uniqueness check when code is not present", async () => {
+            const updatedData = { title: "Only title change" };
+            const updated = { _id: "1", code: "CS101", ...updatedData };
+
+            mockUpdate.mockResolvedValue(updated);
+
+            await expect(courseService.update("1", updatedData)).resolves.toEqual(updated);
+            expect(mockFindByCode).not.toHaveBeenCalled();
+            expect(mockUpdate).toHaveBeenCalledWith("1", updatedData);
+        });
+    });
+
+    describe("updateImage", () => {
+        it("delegates to repository.updateImage", async () => {
+            const result = { _id: "1", imageUrl: "https://img.test/a.png" };
+            mockUpdateImage.mockResolvedValue(result);
+
+            await expect(courseService.updateImage("1", "https://img.test/a.png")).resolves.toEqual(result);
+            expect(mockUpdateImage).toHaveBeenCalledWith("1", "https://img.test/a.png");
+        });
+    });
+
+    describe("deleteCourse", () => {
+        it("delegates to repository.deleteCourse", async () => {
+            const result = { deletedCount: 1 };
+            mockDeleteCourse.mockResolvedValue(result);
+
+            await expect(courseService.deleteCourse("1")).resolves.toEqual(result);
+            expect(mockDeleteCourse).toHaveBeenCalledWith("1");
+        });
     });
 });
