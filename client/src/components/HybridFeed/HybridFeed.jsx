@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './HybridFeed.css';
 
 function HybridFeed({
@@ -19,8 +19,36 @@ function HybridFeed({
     const [items, setItems] = useState([]);
 
     async function fetchFeedItems() {
+        const types = [
+            showDiscussions && 'discussion',
+            showResources && 'resource',
+            showCourses && 'course',
+        ].filter(Boolean);
+
+        // nothing selected
+        if (types.length === 0) {
+            setItems([]);
+            return;
+        }
+
+        const params = new URLSearchParams();
+        params.set('types', types.join(','));
+        params.set('sort', sort);
+        params.set('limit', String(limit));
+
+        if (courseId) params.set('courseId', courseId);
+        else if (courseIds.length) params.set('courseIds', courseIds.join(','));
+
+        const res = await fetch(`/api/feed?${params.toString()}`);
+        if (!res.ok) throw new Error('Failed to fetch feed');
+        const json = await res.json();
+        setItems(json.data ?? []);
     }
-    // fetch
+
+    useEffect(() => {
+        fetchFeedItems().catch(console.error);
+    }, [courseId, courseIds, showDiscussions, showResources, showCourses, sort, limit]);
+
     return (
         <div>
             {items.map(item => {
