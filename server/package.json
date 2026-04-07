@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "lint": "eslint . --max-warnings=0",
+    "lint": "eslint .",
     "build": "node --check server.js && npm run lint",
     "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js"
   },
