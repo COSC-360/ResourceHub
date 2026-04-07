@@ -79,8 +79,8 @@ export function ProfileHeader({ userType }) {
             </div>
             {!userType && (
                 <div className="authButtons">
-                    <Link to="/auth/login"><button className="signIn">Log In</button></Link>
-                    <Link to="/auth/register"><button className="register">Register</button></Link>
+                    <Link to="/login"><button className="signIn">Log In</button></Link>
+                    <Link to="/register"><button className="register">Register</button></Link>
                 </div>
             )}
         </>

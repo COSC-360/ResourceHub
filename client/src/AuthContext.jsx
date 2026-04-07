@@ -58,8 +58,8 @@ export const AuthProvider = ({ children }) => {
 
       router("/"); //change this if homepage route changes
     } catch (error) {
-      console.log("Login failed:", error);
-      throw new Error("Login failed");
+      console.error("Login failed:", error);
+      throw error;
     }
   };
 

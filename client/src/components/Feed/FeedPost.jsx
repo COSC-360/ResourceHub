@@ -110,7 +110,7 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
       (async () => {
         const token = localStorage.getItem("access_token");
         if (!token) {
-          router("/auth/login");
+          router("login");
           return;
         }
         let result = null;
@@ -149,7 +149,7 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
       (async () => {
         const token = localStorage.getItem("access_token");
         if (!token) {
-          router("/auth/login");
+          router("/login");
           return;
         }
         let result = null;

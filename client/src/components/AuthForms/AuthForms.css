@@ -25,6 +25,16 @@
   color: #555;
 }
 
+.auth-form-error {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #b00020;
+  background: #fde8ea;
+  border: 1px solid #f5c2c7;
+}
+
 .auth-form-card fieldset {
   border: none;
   margin: 0;
@@ -74,10 +84,17 @@
   transition: background-color 0.2s ease;
 }
 
+.button_container button[type="submit"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.75;
+  background: #5a9cff;
+}
+
 .button_container .redirect_button {
   background: #f5f7fb;
   color: #1f4fa3;
   border: 1px solid #b8c9ea;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 .button_container button:hover {
@@ -85,7 +102,9 @@
 }
 
 .button_container .redirect_button:hover {
-  background: #e9f0ff;
+  background: var(--rh-redirect-hover-bg);
+  color: var(--rh-redirect-hover-color);
+  border-color: #c4b5dc;
 }
 
 .button_container a {

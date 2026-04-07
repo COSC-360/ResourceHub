@@ -27,7 +27,7 @@ const Comment = ({ onSubmit, parentid, parentUsername }) => {
         const token = localStorage.getItem("access_token");
         const data = new FormData();
         if (!token) {
-          router("/auth/login");
+          router("/login");
           return;
         }
         data.append("content", `@${parentUsername} ${formData.content}`);

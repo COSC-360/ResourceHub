@@ -12,3 +12,26 @@
     font-size: 18px;
     color: #666;
 }
+
+.not-found-link {
+    display: inline-block;
+    margin-top: 28px;
+    padding: 10px 22px;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    color: #fff;
+    background: #007bff;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.not-found-link:hover {
+    background: #0056b3;
+    color: #fff;
+}
+
+.not-found-link:focus-visible {
+    outline: 2px solid #007bff;
+    outline-offset: 3px;
+}
