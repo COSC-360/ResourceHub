@@ -29,11 +29,20 @@
   border-radius: 10px;
   font-size: 16px;
   color: #333;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-.nav li:hover {
-  background: #ece4f8;
+.nav li a {
+  display: block;
+}
+
+.nav li:not(.active):hover {
+  background: var(--rh-redirect-hover-bg);
+  color: var(--rh-redirect-hover-color);
+}
+
+.nav li.active:hover {
+  background: #9d3ed4;
 }
 
 .nav li.active {

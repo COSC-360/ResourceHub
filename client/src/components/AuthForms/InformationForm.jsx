@@ -34,7 +34,7 @@ const InformationForm = () => {
     (async () => {
       try {
         const token = localStorage.getItem("access_token");
-        if (!token) router("/auth/register");
+        if (!token) router("/register");
         const data = new FormData();
         data.append("bio", formData.bio);
         data.append("file", file);

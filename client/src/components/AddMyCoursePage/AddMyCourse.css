@@ -24,4 +24,11 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.course-option-square:hover {
+  background: var(--rh-redirect-hover-bg);
+  color: var(--rh-redirect-hover-color);
+  border-color: #c4b5dc;
 }

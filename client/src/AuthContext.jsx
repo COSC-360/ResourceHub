@@ -59,8 +59,8 @@ export const AuthProvider = ({ children }) => {
 
       router("/"); //change this if homepage route changes
     } catch (error) {
-      console.log("Login failed:", error);
-      throw new Error("Login failed");
+      console.error("Login failed:", error);
+      throw error;
     }
   };
 
@@ -88,7 +88,7 @@ export const AuthProvider = ({ children }) => {
         access_token: token,
       });
       localStorage.setItem("first_time", true);
-      router("/auth/information");
+      router("/information");
 
       return true;
     } catch (error) {

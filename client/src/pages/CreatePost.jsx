@@ -7,7 +7,7 @@ const CreatePost = () => {
 
   useEffect(() => {
     const accessToken = localStorage.getItem("access_token");
-    if (!accessToken) router("/auth/login");
+    if (!accessToken) router("/login");
   }, [router]);
   return (
     <div>
