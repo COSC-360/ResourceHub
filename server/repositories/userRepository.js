@@ -37,6 +37,12 @@ export async function updateProfile(userid, data) {
   if (data.bio != null) {
     $set.bio = String(data.bio);
   }
+  if (data.file != null) {
+    $set.pfp = { data: data.file.buffer, contentType: data.file.mimetype };
+  }
+  if (data.faculty != null && String(data.faculty).trim()) {
+    $set.faculty = String(data.faculty);
+  }
 
   if (Object.keys($set).length > 0) {
     await User.updateOne({ _id: userid }, { $set });
@@ -73,9 +79,8 @@ export function hideUserCourses(userId, courseId) {
   const existingIds = savedCourseIdsByUser[userId] || [];
 
   savedCourseIdsByUser[userId] = existingIds.filter(
-    (id) => String(id) !== String(courseId)
+    (id) => String(id) !== String(courseId),
   );
 
   return getUserCourses(userId);
 }
-

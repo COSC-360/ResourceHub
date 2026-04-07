@@ -23,9 +23,8 @@ const DiscussionSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    username: { type: String, ref: "User" },
-    pfp: { type: Buffer, ref: "User" },
-    faculty: { type: String, ref: "User", default: "None" },
+    coursename: { type: String, ref: "Course" },
+    coursecode: { type: String, ref: "Course" },
     image: {
       data: { type: Buffer, default: null },
       contentType: { type: String, default: null },
