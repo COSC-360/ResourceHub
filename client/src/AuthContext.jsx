@@ -44,10 +44,11 @@ export const AuthProvider = ({ children }) => {
         body: { email, password },
       });
       localStorage.setItem("access_token", response.access_token);
-      localStorage.setItem("user", JSON.stringify(response));
 
       const token = response.access_token;
       const payload = JSON.parse(atob(token.split(".")[1]));
+
+      localStorage.setItem("userid", payload.id);
 
       setUser({
         ...payload,
@@ -77,16 +78,17 @@ export const AuthProvider = ({ children }) => {
       }
 
       localStorage.setItem("access_token", token);
-      localStorage.setItem("user", JSON.stringify(response));
 
       const payload = JSON.parse(atob(token.split(".")[1]));
+
+      localStorage.setItem("userid", payload.id);
 
       setUser({
         ...payload,
         access_token: token,
       });
-
-      router("/"); //change this if homepage route changes
+      localStorage.setItem("first_time", true);
+      router("/auth/information");
 
       return true;
     } catch (error) {

@@ -8,6 +8,7 @@ import Feed from "./pages/Feed.jsx";
 import Sidebar from "./components/Sidebar/Sidebar.jsx";
 import LoginForm from "./components/AuthForms/LoginForm.jsx";
 import SignupForm from "./components/AuthForms/SignupForm.jsx";
+import InformationForm from "./components/AuthForms/InformationForm.jsx";
 import NotFound from "./components/NotFoundPage/NotFound.jsx";
 import MyCoursesPage from "./components/MyCoursesPage/MyCoursesPage.jsx";
 import AddMyCoursePage from "./components/AddMyCoursePage/AddMyCourse.jsx";
@@ -44,6 +45,7 @@ function App() {
         <Route path="/my-courses/add" element={<AddMyCoursePage />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<SignupForm />} />
+        <Route path="/auth/information" element={<InformationForm />} />
         <Route path="/profile" element={<ProfilePage />} />
       </Route>
       {/* not found page renders differently */}

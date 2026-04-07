@@ -1,4 +1,10 @@
-import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  useMemo,
+} from "react";
 import { apiClient } from "../../lib/api-client";
 import "./Feed.css";
 import defaultProfile from "../../assets/profile.svg";
@@ -19,6 +25,8 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
   const [downvotes, setDownvotes] = useState(post_props.down_votes);
   const [hasDownvote, setHasDownvote] = useState(post_props.hasDownvote);
   const [replies, setReplies] = useState(post_props.replies);
+  const [username, setUsername] = useState("Unknown User");
+  const [faculty, setFaculty] = useState("None");
 
   const [comments, setComments] = useState([]);
   const [showComments, setShowComments] = useState(false);
@@ -53,6 +61,7 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
         hasUpvote: discussion.hasUpvote,
         hasDownvote: discussion.hasDownvote,
         deleted: discussion.deleted,
+        authorid: discussion.authorId,
       }));
       setComments(transformedData);
     } catch (err) {
@@ -254,6 +263,20 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
     return () => clearTimeout(id);
   }, [expandDown, post_props.replies, loadReplies]);
 
+  useEffect(() => {
+    (async () => {
+      try {
+        const response = await apiClient(
+          `http://localhost:3000/api/user/getUserById/${post_props.authorid}`,
+        );
+        setUsername(response.data.username);
+        setFaculty(response.data.faculty);
+      } catch (err) {
+        console.log(err);
+      }
+    })();
+  }, [post_props.authorid]);
+
   return (
     <div
       className={
@@ -266,9 +289,12 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
     >
       <div className="post">
         <img
-          src={post_props.pfp ? post_props.post_image : defaultProfile}
+          src={`http://localhost:3000/api/user/getProfilePhoto/${post_props.authorid}`}
           alt="profile photo"
           className="pfp"
+          onError={(e) => {
+            e.target.src = defaultProfile;
+          }}
         />
 
         <div className="post-container">
@@ -281,10 +307,10 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
                   {!post_props.parentid ? (
                     <h2 className="course">c/{post_props.coursename}</h2>
                   ) : null}
-                  <h2 className="username">{post_props.username}</h2>
+                  <h2 className="username">{username}</h2>
                 </div>
                 <p className="details">• {date}</p>
-                <p className="details">• {post_props.faculty}</p>
+                <p className="details">• {faculty}</p>
                 {post_props.edited && <p className="details faded"> edited</p>}
                 {post_props.isAuthor ? (
                   <button

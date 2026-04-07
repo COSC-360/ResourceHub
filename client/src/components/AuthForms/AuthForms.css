@@ -14,6 +14,55 @@
   padding: 24px;
 }
 
+.remove_photo {
+  margin: 0 auto;
+  padding: 2px;
+}
+
+.avatar_wrapper {
+  position: relative;
+  width: 50%;
+  height: 50%;
+  margin: 0 auto;
+}
+
+.avatar_preview {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 2px solid #b646eb;
+  display: block;
+  object-fit: contain;
+}
+
+.file_upload {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.file_label {
+  font-size: medium;
+  text-align: center;
+  width: 100%;
+}
+
+.text {
+  width: 100%;
+  resize: none;
+  field-sizing: content;
+  max-height: 100px;
+}
+
+.submit:hover {
+  cursor: pointer;
+}
+
 .auth-form-card legend {
   font-size: 24px;
   font-weight: 700;
@@ -49,7 +98,7 @@
   color: #333;
 }
 
-.auth-form-card input {
+.auth-form-card input:not([type="file"]) {
   width: 100%;
   box-sizing: border-box;
   padding: 10px 12px;
