@@ -5,6 +5,10 @@ export const courseRepository = {
         return Course.findById(id);
     },
 
+    async findByIds(ids) {
+        return Course.find({ _id: { $in: ids } });
+    },
+
     async findAll() {
         /**
          * Retreives all courses from the database, sorted by creation date (newest first).

@@ -52,9 +52,8 @@ export async function updateProfile(userid, data) {
 }
 
 export function getUserCourses(userId) {
-  const savedIds = savedCourseIdsByUser[userId] || [];
-  const allCourses = courseRepository.findAll();
-  return allCourses.filter((course) => savedIds.includes(course.id));
+  const courseIds = savedCourseIdsByUser[userId] || [];
+  return courseRepository.findByIds(courseIds);
 }
 
 export function saveUserCourses(userId, courseId) {
