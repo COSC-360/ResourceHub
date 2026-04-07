@@ -26,6 +26,24 @@
   text-align: center;
 }
 
+.mycourse-nav-button {
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  appearance: none;
+}
+
+.mycourse-nav-button:hover {
+  border-color: #b646eb;
+  box-shadow: 0 6px 16px rgba(182, 70, 235, 0.25);
+  transform: translateY(-1px);
+}
+
+.mycourse-nav-button:focus-visible {
+  outline: 3px solid #b646eb;
+  outline-offset: 2px;
+}
+
 .add-course-square {
   cursor: pointer;
   border: 2px dashed #b646eb;
