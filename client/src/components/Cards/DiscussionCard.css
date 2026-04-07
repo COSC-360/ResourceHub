@@ -1,0 +1,142 @@
+.discussion-card {
+    border: 1px solid #d9d9d9;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 12px;
+    background: #fff;
+}
+
+.discussion-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.discussion-card--reply {
+    margin-left: 12px;
+    margin-bottom: 8px;
+    background: #f9f9f9;
+}
+
+.discussion-card--depth-1 {
+    margin-left: 24px;
+}
+
+.discussion-card--depth-2 {
+    margin-left: 36px;
+}
+
+.discussion-card--depth-3 {
+    margin-left: 48px;
+}
+
+.discussion-card--depth-4 {
+    margin-left: 60px;
+}
+
+.discussion-card__header {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.discussion-card__avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.discussion-card__meta {
+    flex: 1;
+}
+
+.discussion-card__user-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    flex-wrap: wrap;
+}
+
+.discussion-card__forum {
+    color: #007bff;
+    font-weight: 600;
+}
+
+.discussion-card__username {
+    font-weight: 600;
+}
+
+.discussion-card__time,
+.discussion-card__faculty {
+    color: #666;
+    font-size: 0.85rem;
+}
+
+.discussion-card__time::before {
+    content: "• ";
+}
+
+.discussion-card__faculty::before {
+    content: "• ";
+}
+
+.discussion-card__edited {
+    color: #999;
+    font-size: 0.85rem;
+    font-style: italic;
+}
+
+.discussion-card__title {
+    margin: 8px 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+}
+
+.discussion-card__content {
+    margin: 8px 0;
+    line-height: 1.5;
+}
+
+.discussion-card__image {
+    max-width: 100%;
+    max-height: 400px;
+    border-radius: 6px;
+    margin-top: 8px;
+}
+
+.discussion-card__footer {
+    display: flex;
+    gap: 4px;
+    margin-top: 8px;
+}
+
+.discussion-card__vote,
+.discussion-card__reply {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border: none;
+    background: #f0f0f0;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #666;
+    transition: all 0.2s;
+}
+
+.discussion-card__vote:hover {
+    background: #e0e0e0;
+}
+
+.discussion-card__vote.active {
+    background: #007bff;
+    color: white;
+}
+
+.discussion-card__error {
+    color: #d32f2f;
+    font-size: 0.85rem;
+    margin-top: 8px;
+}
