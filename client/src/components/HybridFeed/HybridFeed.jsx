@@ -3,6 +3,7 @@ import './HybridFeed.css';
 import CourseCard from '../Cards/CourseCard.jsx';
 import DiscussionCard from '../Cards/DiscussionCard.jsx';
 import ResourceCard from '../Cards/ResourceCard.jsx';
+import { apiClient } from "../../lib/api-client";
 
 function HybridFeed({
     courseId,
@@ -41,13 +42,14 @@ function HybridFeed({
             if (courseId) params.set('courseId', courseId);
             else if (courseIds.length) params.set('courseIds', courseIds.join(','));
 
-            const res = await fetch(`/api/common/feed?${params.toString()}`);
-            if (!res.ok) throw new Error('Failed to fetch feed');
-            const json = await res.json();
+            const token = localStorage.getItem("access_token");
+            const json = await apiClient(`/api/common/feed?${params.toString()}`, {
+                headers: token ? { Authorization: `Bearer ${token}` } : {},
+            });
+
             setItems(json.data ?? []);
         } catch (err) {
-            setError(err.message);
-            console.error('Feed fetch error:', err);
+            setError(err.message || "Failed to fetch feed");
         } finally {
             setIsLoading(false);
         }

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { timeAgo } from "../../lib/dateUtils";
+import VoteControls from "../VoteControls/VoteControls.jsx";
 import "./ResourceCard.css";
 
 const userCache = new Map();
@@ -114,8 +115,16 @@ export default function ResourceCard({ data }) {
       </a>
 
       <footer className="resource-card__footer">
-        <button className="resource-card__btn" onClick={onUpvote}>↑ {likes}</button>
-        <button className="resource-card__btn" onClick={onDownvote}>↓ {dislikes}</button>
+        <VoteControls
+          targetId={id}
+          targetType="Resource"
+          initialUpvotes={likes}
+          initialDownvotes={dislikes}
+          initialHasUpvote={Boolean(data?.hasUpvote)}
+          initialHasDownvote={Boolean(data?.hasDownvote)}
+          buttonClassName="resource-card__btn"
+          activeClassName="active"
+        />
         <span className="resource-card__stat">Files: {fileCount}</span>
         <span className="resource-card__stat">Downloads: {downloadCount}</span>
       </footer>

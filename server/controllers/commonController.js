@@ -1,4 +1,5 @@
 import * as commonService from "../services/commonService.js";
+import * as voteService from "../services/voteService.js";
 
 export async function search(req, res) {
     console.log("request received");
@@ -35,6 +36,8 @@ export async function feed(req, res) {
         const sort = (req.query.sort ?? "newest").toLowerCase() === "oldest" ? "oldest" : "newest";
         const limit = Math.max(1, Math.min(Number(req.query.limit ?? 20), 100));
 
+        const userId = req.user?.id ?? null;
+
         const data = await commonService.feed({
             types,
             courseId,
@@ -43,7 +46,39 @@ export async function feed(req, res) {
             limit,
         });
 
-        return res.status(200).json({ data });
+        const enriched = await Promise.all(
+            data.map(async (item) => {
+                const raw = item?.data?.toObject ? item.data.toObject() : item.data;
+                const id = raw?._id?.toString?.() || item.id;
+
+                if (item.type === "discussion") {
+                    return {
+                        ...item,
+                        data: {
+                            ...raw,
+                            hasImage: Boolean(raw?.image?.contentType || raw?.hasImage),
+                            hasUpvote: userId ? await voteService.hasUpvote(id, userId, "Discussion") : false,
+                            hasDownvote: userId ? await voteService.hasDownvote(id, userId, "Discussion") : false,
+                        },
+                    };
+                }
+
+                if (item.type === "resource") {
+                    return {
+                        ...item,
+                        data: {
+                            ...raw,
+                            hasUpvote: userId ? await voteService.hasUpvote(id, userId, "Resource") : false,
+                            hasDownvote: userId ? await voteService.hasDownvote(id, userId, "Resource") : false,
+                        },
+                    };
+                }
+
+                return { ...item, data: raw };
+            })
+        );
+
+        return res.status(200).json({ data: enriched });
     } catch (error) {
         return res.status(500).json({ error: error.message });
     }
