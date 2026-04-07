@@ -1,3 +1,4 @@
+import { useContext } from "react";
 import { Routes, Route, Outlet, Navigate } from "react-router-dom";
 import "./components/Feed/FeedPost.jsx";
 import "./App.css";
@@ -14,9 +15,11 @@ import MyCoursesPage from "./components/MyCoursesPage/MyCoursesPage.jsx";
 import AddMyCoursePage from "./components/AddMyCoursePage/AddMyCourse.jsx";
 import CreatePost from "./pages/CreatePost.jsx";
 import ProfilePage from "./components/ProfilePage/ProfilePage.jsx";
-
+import AdminPanel from "./components/AdminPanel/AdminPanel.jsx";
 import CreateCourse from "./components/CreateCourse/CreateCourse.jsx";
 import UpdateCourseInfo from "./components/UpdateCourseInfo/UpdateCourseInfo.jsx";
+import NotAuthorized from "./components/NotAuthorized/NotAuthorized.jsx";
+import AuthContext from "./AuthContext.jsx";
 
 // Main layout component that includes the header and sidebar,
 // and an Outlet for rendering the main content based on the route
@@ -35,6 +38,13 @@ function MainLayout() {
   );
 }
 
+function AdminRoute({ children }) {
+  const { user } = useContext(AuthContext);
+  const admin = user?.admin;
+
+  return admin ? children : <NotAuthorized />;
+}
+
 function App() {
   return (
     <Routes>
@@ -50,13 +60,28 @@ function App() {
         <Route path="/register" element={<SignupForm />} />
         <Route path="/information" element={<InformationForm />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminPanel />
+            </AdminRoute>
+          }
+        />
 
         {/* redirect /courses to home */}
         <Route path="/courses" element={<Navigate to="/" replace />} />
       </Route>
 
       <Route path="/courses/create" element={<CreateCourse />} />
-      <Route path="/courses/:courseId/update" element={<UpdateCourseInfo />} />
+      <Route
+        path="/courses/:courseId/update"
+        element={
+          <AdminRoute>
+            <UpdateCourseInfo />
+          </AdminRoute>
+        }
+      />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

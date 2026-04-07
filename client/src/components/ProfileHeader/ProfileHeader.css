@@ -59,7 +59,8 @@
 }
 
 .adminPanel {
-    background-color: white;
+    background-color: #2563eb;
+    color: #fff;
     border: none;
     border-radius: 8px;
     padding: 8px 12px;
@@ -68,8 +69,8 @@
 }
 
 .adminPanel:hover {
-    background: var(--rh-redirect-hover-bg);
-    color: var(--rh-redirect-hover-color);
+    background: #1d4ed8;
+    color: #fff;
 }
 
 .signIn {

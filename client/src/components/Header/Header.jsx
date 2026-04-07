@@ -11,6 +11,7 @@ userType "user" = registered
 userType "admin" = registered */
 export function Header(){
     const { user } = useContext(AuthContext);
+    const admin = user?.admin;
 
     return (
         <>
@@ -25,7 +26,7 @@ export function Header(){
                     <SearchBar />
                 </div>
                 <div className="buttonDiv">
-                    <ProfileHeader userType={user ? "user" : undefined}/>
+                    <ProfileHeader userType={admin ? "admin" : user ? "user" : undefined}/>
                 </div>
             </div>
         </>
