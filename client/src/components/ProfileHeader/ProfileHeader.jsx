@@ -33,71 +33,62 @@ export function ProfileHeader({ userType }) {
     };
   }, [menuOpen]);
 
-    return (
-        <>
-            <div className="profileContainer">
-                {userType === "admin" && (
-                    <Link to="/admin">
-                        <button className="adminPanel">Admin Panel</button>
-                    </Link>
-                )}
-                {(userType === "admin" || userType === "user") && (
-                    <div className="profileMenuWrapper" ref={menuRef}>
-                        <button
-                            type="button"
-                            className="profile"
-                            aria-haspopup="menu"
-                            aria-expanded={menuOpen}
-                            aria-controls="profile-dropdown-menu"
-                            onClick={() => setMenuOpen((o) => !o)}
-                        >
-                            <img
-                                src={`http://localhost:3000/api/user/getProfilePhoto/${userid}`}
-                                alt="profile"
-                                className="icon"
-                                onError={(e) => (e.target.src = "/src/assets/profile.svg")}
-                            />
-                        </button>
-                        {menuOpen && (
-                            <div
-                                id="profile-dropdown-menu"
-                                className="profileMenu"
-                                role="menu"
-                            >
-                                {menuItems.map((item) => (
-                                    <button
-                                        key={item.id}
-                                        type="button"
-                                        className="profileMenuItem"
-                                        role="menuitem"
-                                        onClick={() => {
-                                            setMenuOpen(false);
-                                            item.onSelect();
-                                        }}
-                                    >
-                                        {item.label}
-                                    </button>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                )}
-            </div>
-            {!userType && (
-                <div className="authButtons">
-                    <Link to="/login"><button className="signIn">Log In</button></Link>
-                    <Link to="/register"><button className="register">Register</button></Link>
-                </div>
+  return (
+    <>
+      <div className="profileContainer">
+        {userType === "admin" && (
+          <Link to="/admin">
+            <button className="adminPanel">Admin Panel</button>
+          </Link>
+        )}
+        {(userType === "admin" || userType === "user") && (
+          <div className="profileMenuWrapper" ref={menuRef}>
+            <button
+              type="button"
+              className="profile"
+              aria-haspopup="menu"
+              aria-expanded={menuOpen}
+              aria-controls="profile-dropdown-menu"
+              onClick={() => setMenuOpen((o) => !o)}
+            >
+              <img
+                src={`http://localhost:3000/api/user/getProfilePhoto/${userid}`}
+                alt="profile"
+                className="icon"
+                onError={(e) => (e.target.src = "/src/assets/profile.svg")}
+              />
+            </button>
+            {menuOpen && (
+              <div
+                id="profile-dropdown-menu"
+                className="profileMenu"
+                role="menu"
+              >
+                {menuItems.map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    className="profileMenuItem"
+                    role="menuitem"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      item.onSelect();
+                    }}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
             )}
           </div>
         )}
       </div>
       {!userType && (
         <div className="authButtons">
-          <Link to="/auth/login">
+          <Link to="/login">
             <button className="signIn">Log In</button>
           </Link>
-          <Link to="/auth/register">
+          <Link to="/register">
             <button className="register">Register</button>
           </Link>
         </div>

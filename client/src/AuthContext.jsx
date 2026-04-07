@@ -88,7 +88,7 @@ export const AuthProvider = ({ children }) => {
         access_token: token,
       });
       localStorage.setItem("first_time", true);
-      router("/auth/information");
+      router("/information");
 
       return true;
     } catch (error) {

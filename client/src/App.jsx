@@ -45,7 +45,7 @@ function App() {
         <Route path="/my-courses/add" element={<AddMyCoursePage />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<SignupForm />} />
-        <Route path="/auth/information" element={<InformationForm />} />
+        <Route path="/information" element={<InformationForm />} />
         <Route path="/profile" element={<ProfilePage />} />
       </Route>
       {/* not found page renders differently */}
