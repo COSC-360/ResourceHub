@@ -1,9 +1,9 @@
 import { courseRepository } from '../repositories/courseRepository.js';
 import { CourseCodeAlreadyExistsError } from '../errors/courseErrors.js';
 
-export async function checkCourseCodeUnique(code) {
+export async function checkCourseCodeUnique(id, code) {
     const existingCourse = await courseRepository.findByCode(code);
-    if (existingCourse) {
+    if (existingCourse && existingCourse._id !== id) {
         throw new CourseCodeAlreadyExistsError(code);
     }
 }
@@ -17,14 +17,14 @@ export function getAll() {
 }
 
 export async function create(course) {
-    await checkCourseCodeUnique(course.code);
+    await checkCourseCodeUnique(null, course.code);
     return courseRepository.save(course);
 }
 
 export async function update(id, updatedData) {
     // check uniqueness of course code if it's being updated
     if ("code" in updatedData) {
-        await checkCourseCodeUnique(updatedData.code);
+        await checkCourseCodeUnique(id, updatedData.code);
     }
     return courseRepository.update(id, updatedData);
 }
