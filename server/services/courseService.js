@@ -24,7 +24,7 @@ export async function create(course) {
 export async function update(id, updatedData) {
     // check uniqueness of course code if it's being updated
     if ("code" in updatedData) {
-        await courseService.checkCourseCodeUnique(updatedData.code);
+        await checkCourseCodeUnique(updatedData.code);
     }
     return courseRepository.update(id, updatedData);
 }
