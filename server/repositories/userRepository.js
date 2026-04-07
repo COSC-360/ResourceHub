@@ -53,7 +53,7 @@ export async function updateProfile(userid, data) {
 
 export async function getUserCourses(userId) {
   const savedIds = savedCourseIdsByUser[userId] || [];
-  const allCourses = await courseRepository.findByIds(courseIds);
+  const allCourses = await courseRepository.findByIds(savedIds);
   return allCourses.filter((course) => {
     const courseId = String(course._id ?? course.id);
     return savedIds.some((savedId) => String(savedId) === courseId);
