@@ -20,6 +20,7 @@ export function issueAccessToken(userDoc) {
       username: u.username,
       faculty: u.faculty,
       pfp: u.pfp,
+      admin: u.isAdmin,
     },
     process.env.ACCESS_TOKEN_SECRET_KEY,
     { expiresIn: "60m" },
