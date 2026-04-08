@@ -42,3 +42,40 @@ To run tests on the backend, make sure your current directory is `.../server`, t
 ~~~
 npm run test
 ~~~
+
+## Running with Docker (Recommended)
+
+This project can be run using Docker, which starts the frontend, backend, and MongoDB together.
+
+### Prerequisites
+- Docker installed
+- Docker Compose installed
+
+### Setup
+
+1. Create a `.env` file for the backend by copying the example:
+
+cp server/.env.example server/.env
+
+2. Add the required environment variables inside `server/.env`:
+
+# Database
+MONGO_URI=your_mongodb_connection_string
+
+# JWT
+ACCESS_TOKEN_SECRET_KEY=your_access_token_secret
+
+### Run the application
+
+From the project root directory, run:
+
+docker compose up --build
+
+### Access the application
+
+- Frontend: http://localhost:5173  
+- Backend: http://localhost:3000  
+
+### Stop the application
+
+docker compose down
