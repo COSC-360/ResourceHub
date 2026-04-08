@@ -26,7 +26,19 @@ const CreateDiscussion = ({
   };
 
   const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
+    const selectedFile = e.target.files?.[0];
+    if (!selectedFile) {
+      setFile(null);
+      return;
+    }
+    if (!selectedFile.type?.startsWith("image/")) {
+      e.target.value = "";
+      setError("Only image files are allowed.");
+      setFile(null);
+      return;
+    }
+    setError(null);
+    setFile(selectedFile);
   };
 
   const handleSubmit = async (e) => {

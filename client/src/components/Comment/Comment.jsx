@@ -53,7 +53,19 @@ const Comment = ({ onSubmit, parentid, parentUsername }) => {
   };
 
   const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
+    const selectedFile = e.target.files?.[0];
+    if (!selectedFile) {
+      setFile(null);
+      return;
+    }
+    if (!selectedFile.type?.startsWith("image/")) {
+      e.target.value = "";
+      setError("Only image files are allowed.");
+      setFile(null);
+      return;
+    }
+    setError("");
+    setFile(selectedFile);
   };
 
   const resetFile = () => {
@@ -89,6 +101,7 @@ const Comment = ({ onSubmit, parentid, parentUsername }) => {
           <input
             type="file"
             name="file"
+            accept="image/*"
             onChange={handleFileChange}
             ref={fileInputRef}
           />

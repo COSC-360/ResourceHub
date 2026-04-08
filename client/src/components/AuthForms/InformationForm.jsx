@@ -13,7 +13,18 @@ const InformationForm = () => {
   const router = useNavigate();
 
   const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
+    const selectedFile = e.target.files?.[0];
+    if (!selectedFile) {
+      setFile(null);
+      return;
+    }
+    if (!selectedFile.type?.startsWith("image/")) {
+      e.target.value = "";
+      alert("Only image files are allowed.");
+      setFile(null);
+      return;
+    }
+    setFile(selectedFile);
   };
 
   const handleChange = (e) => {
@@ -72,6 +83,7 @@ const InformationForm = () => {
             type="file"
             className="file_upload"
             name="file"
+            accept="image/*"
             onChange={handleFileChange}
           />
         </div>

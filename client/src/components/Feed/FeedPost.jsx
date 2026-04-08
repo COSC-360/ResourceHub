@@ -86,7 +86,19 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
   };
 
   const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
+    const selectedFile = e.target.files?.[0];
+    if (!selectedFile) {
+      setFile(null);
+      return;
+    }
+    if (!selectedFile.type?.startsWith("image/")) {
+      e.target.value = "";
+      setError("Only image files are allowed.");
+      setFile(null);
+      return;
+    }
+    setError("");
+    setFile(selectedFile);
     if (removeImage) setRemoveImage(false);
   };
 
