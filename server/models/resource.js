@@ -25,4 +25,4 @@ const ResourceSchema = new mongoose.Schema({
     downloadCount: { type: Number, default: 0 },
 }, { timestamps: true }); // Automatically adds createdAt and updatedAt fields
 
-export const ResourceModel = mongoose.model("Resource", ResourceSchema);
+export const Resource = mongoose.model("Resource", ResourceSchema);

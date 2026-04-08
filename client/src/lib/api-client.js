@@ -1,38 +1,45 @@
-export async function apiClient(url, options = {}) {
-  const { method = "GET", body, headers: customHeaders = {} } = options;
+import { publishApiError } from "./api-error-bus";
 
-  const isFormData = body instanceof FormData;
+export async function apiClient(url, options = {}) {
+  const isFormData = options.body instanceof FormData;
 
   const headers = {
-    //"Content-Type": "application/json",
-    ...customHeaders,
+    ...(options.headers || {}),
   };
 
-  if (!isFormData) {
-    headers["Content-Type"] = "application/json";
+  let body = options.body;
+  if (body && !isFormData) {
+    headers["Content-Type"] = headers["Content-Type"] || "application/json";
+    body = JSON.stringify(body);
   }
 
-  const token = localStorage.getItem("access_token");
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
-
-  const userId = localStorage.getItem("userId") || localStorage.getItem("userid");
-  if (userId) {
-    headers["X-User-Id"] = userId;
-  }
-
-  const response = await fetch(url, {
-    method,
+  const res = await fetch(url, {
+    ...options,
     headers,
-    body: body ? (isFormData ? body : JSON.stringify(body)) : undefined,
+    body,
   });
 
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.error || "Something went wrong");
+  let json = null;
+  try {
+    json = await res.json();
+  } catch {
+    json = null;
   }
 
-  return data;
+  if (!res.ok) {
+    const err = new Error(json?.error || res.statusText || "Request failed");
+    err.status = res.status;
+    err.payload = json ?? null;
+
+    publishApiError({
+      status: err.status,
+      message: err.message,
+      payload: err.payload,
+      path: url,
+    });
+
+    throw err;
+  }
+
+  return json;
 }

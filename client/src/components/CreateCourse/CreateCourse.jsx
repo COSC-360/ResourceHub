@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './CreateCourse.css';
 import { apiClient } from '../../lib/api-client';
 
-export default function CreateCourse() {
+export default function CreateCourse({ asModal = false, onClose, onCreated }) {
     const navigate = useNavigate();
 
     const [courseData, setCourseData] = useState({
@@ -30,9 +30,11 @@ export default function CreateCourse() {
         };
 
         try {
+            const token = localStorage.getItem("access_token");
             const createdCourse = await apiClient('/api/courses/create', {
                 method: 'POST',
                 body: course,
+                headers: token ? { Authorization: `Bearer ${token}` } : {},
             });
 
             const newCourseId = createdCourse?.data?._id || createdCourse?.data?.id;
@@ -40,14 +42,18 @@ export default function CreateCourse() {
                 throw new Error("Created course ID missing from response");
             }
 
-            navigate(`/courses/${newCourseId}`, {
-                state: { course: createdCourse.data },
-            });
-
             setCourseData({
                 name: '',
                 code: '',
                 description: '',
+            });
+
+            onCreated?.(createdCourse.data);
+            onClose?.();
+
+            // FIX: always redirect
+            navigate(`/courses/${newCourseId}`, {
+                state: { course: createdCourse.data },
             });
         } catch (error) {
             console.error('Error creating course:', error);
@@ -55,9 +61,16 @@ export default function CreateCourse() {
     }
 
     return (
-        <div>
+        <div className={asModal ? "create-course create-course--modal" : "create-course"}>
             <form onSubmit={handleSubmit}>
-                <legend>What is your course?</legend>
+                <div className="create-course__top">
+                    <legend>What is your course?</legend>
+                    {asModal && (
+                        <button type="button" className="create-course__close" onClick={onClose}>
+                            ✕
+                        </button>
+                    )}
+                </div>
                 <p>Describe your course to help people find it.</p>
                 <fieldset>
                     <label htmlFor="name">Course Name:</label>
@@ -91,7 +104,14 @@ export default function CreateCourse() {
                         required 
                     />
                 </fieldset>
-                <button type="submit">Create Course</button>
+                <div className="create-course__actions">
+                    {asModal && (
+                        <button type="button" onClick={onClose} className="create-course__secondary">
+                            Cancel
+                        </button>
+                    )}
+                    <button type="submit">Create Course</button>
+                </div>
             </form>
         </div>
     );

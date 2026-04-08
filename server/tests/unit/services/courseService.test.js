@@ -9,16 +9,19 @@ const mockUpdate = jest.fn();
 const mockUpdateImage = jest.fn();
 const mockDeleteCourse = jest.fn();
 
+const courseRepositoryMock = {
+    findByCode: mockFindByCode,
+    findById: mockFindById,
+    findAll: mockFindAll,
+    save: mockSave,
+    update: mockUpdate,
+    updateImage: mockUpdateImage,
+    deleteCourse: mockDeleteCourse,
+};
+
 await jest.unstable_mockModule("../../../repositories/courseRepository.js", () => ({
-    courseRepository: {
-        findByCode: mockFindByCode,
-        findById: mockFindById,
-        findAll: mockFindAll,
-        save: mockSave,
-        update: mockUpdate,
-        updateImage: mockUpdateImage,
-        deleteCourse: mockDeleteCourse,
-    },
+    default: courseRepositoryMock,
+    courseRepository: courseRepositoryMock,
 }));
 
 const courseService = await import("../../../services/courseService.js");

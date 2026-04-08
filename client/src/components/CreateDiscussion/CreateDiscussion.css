@@ -102,3 +102,18 @@
   background-color: #ccc;
   cursor: not-allowed;
 }
+
+.create-discussion-toggle {
+  max-width: 600px;
+  margin: 12px auto;
+  display: block;
+}
+
+.create-discussion-cancel {
+  margin-top: 8px;
+  background-color: #6c757d;
+}
+
+.create-discussion-cancel:hover:not(:disabled) {
+  background-color: #565e64;
+}

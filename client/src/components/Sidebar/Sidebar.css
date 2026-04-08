@@ -19,13 +19,13 @@
 
 .nav {
   list-style: none;
-  padding: 0;
   margin: 0;
+  padding: 0;
 }
 
 .nav li {
+  margin: 10px 0;
   padding: 12px 14px;
-  margin-bottom: 8px;
   border-radius: 10px;
   font-size: 16px;
   color: #333;
@@ -34,6 +34,17 @@
 
 .nav li a {
   display: block;
+  text-decoration: none;
+  color: #333;
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-size: 1.05rem;
+}
+
+.nav a.active-link {
+  color: #fff;
+  background: linear-gradient(90deg, #b54cff, #9b3df0);
+  font-weight: 600;
 }
 
 .nav li:not(.active):hover {

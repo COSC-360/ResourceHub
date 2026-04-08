@@ -12,6 +12,7 @@ export const DiscussionRepository = {
   async findAll(filters = {}) {
     const {
       courseId,
+      courseIds,
       authorId,
       parentId = null,
       limit = 100,
@@ -22,6 +23,7 @@ export const DiscussionRepository = {
     const queryList = {};
 
     if (courseId) queryList.courseId = courseId;
+    if (courseIds?.length) queryList.courseId = { $in: courseIds };
     if (authorId) queryList.authorId = authorId;
     if (parentId !== undefined) queryList.parentId = parentId;
 
@@ -30,7 +32,7 @@ export const DiscussionRepository = {
     if (limit && page) {
       query = query.skip((page - 1) * limit).limit(limit);
     }
-    
+
     return query;
   },
 
@@ -93,6 +95,23 @@ export const DiscussionRepository = {
     return await Discussion.find({
       title: { $regex: searchTerm, $options: "i" },
     }).sort({ timestamp: -1 });
+  },
+
+  async findRecent({ scopedCourseIds = null, limit = 20 } = {}) {
+    const query =
+      Array.isArray(scopedCourseIds) && scopedCourseIds.length
+        ? { courseId: { $in: scopedCourseIds }, parentId: null }
+        : { parentId: null };
+
+    return Discussion.find(query).sort({ createdAt: -1, _id: -1 }).limit(limit);
+  },
+
+  async findByIds(ids) {
+    return await this.findAll({
+      courseIds: ids,
+      parentId: null,
+      sort: { createdAt: -1 },
+    });
   },
 };
 

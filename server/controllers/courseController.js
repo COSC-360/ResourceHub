@@ -27,40 +27,47 @@ export async function getById(req, res) {
 }
 
 export async function create(req, res) {
-    try {
-        // 1. extract course data from the request body
-        const { name, code, description } = req.body;
-        console.log('Received course data:', { name, code, description });
+  try {
+    const { name, code, description } = req.body;
 
-        // 2. validate the course data (basic validation)
-        if (!name || typeof name !== 'string') {
-            return res.status(400).json({ error: 'Course name is required and must be a string' });
-        }
-
-        if (!code || typeof code !== 'string') {
-            return res.status(400).json({ error: 'Course code is required and must be a string' });
-        }
-
-        const course = {
-            name: name.trim(),
-            code: code.trim(),
-            description: typeof description === "string" ? description.trim() : "",
-        };
-
-        const createdCourse = await courseService.create(course);
-        return res.status(201).json({ data: createdCourse });
-    } catch (error) {
-        if (error instanceof CourseCodeAlreadyExistsError) {
-            return res.status(409).json({ error: error.message });
-        }
-
-        // Handles unique-index collisions even if two requests pass pre-check simultaneously
-        if (error?.code === 11000 && error?.keyPattern?.code) {
-            return res.status(409).json({ error: "Course with this code already exists" });
-        }
-
-        return res.status(500).json({ error: error.message });
+    if (!name || typeof name !== "string") {
+      return res.status(400).json({ error: "Course name is required and must be a string" });
     }
+    if (!code || typeof code !== "string") {
+      return res.status(400).json({ error: "Course code is required and must be a string" });
+    }
+
+    // get logged-in user id from token middleware
+    const creatorUserId = req.user?.id || req.user?._id || req.user?.userId;
+    if (!creatorUserId) {
+      return res.status(401).json({ error: "Unauthorized: missing user id in token" });
+    }
+
+    const course = {
+      name: name.trim(),
+      code: code.trim(),
+      description: typeof description === "string" ? description.trim() : "",
+    };
+
+    // IMPORTANT: pass creatorUserId
+    const createdCourse = await courseService.create(course, creatorUserId);
+
+    return res.status(201).json({ data: createdCourse });
+  } catch (error) {
+    if (error instanceof CourseCodeAlreadyExistsError) {
+      return res.status(409).json({ error: error.message });
+    }
+
+    if (error?.code === 11000 && error?.keyPattern?.code) {
+      return res.status(409).json({ error: "Course with this code already exists" });
+    }
+
+    if (error instanceof mongoose.Error.ValidationError) {
+      return res.status(400).json({ error: error.message });
+    }
+
+    return res.status(500).json({ error: error.message });
+  }
 }
 
 export async function getAll(req, res) {

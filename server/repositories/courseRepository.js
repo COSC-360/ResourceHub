@@ -45,6 +45,55 @@ export const courseRepository = {
     async deleteCourse(id) {
         return Course.findByIdAndDelete(id);
     },
+
+    async adjustMemberCount(id, delta) {
+        return await Course.findByIdAndUpdate(
+            id,
+            [
+                {
+                    $set: {
+                        memberCount: {
+                            $max: [0, { $add: [{ $ifNull: ["$memberCount", 0] }, delta] }],
+                        },
+                    },
+                },
+            ],
+            { new: true },
+        );
+    },
+
+    async setMemberCount(id, count) {
+        return await Course.findByIdAndUpdate(
+            id,
+            { $set: { memberCount: Math.max(0, Number(count) || 0) } },
+            { new: true, runValidators: true },
+        );
+    },
+
+    async incrementMemberCount(id) {
+        return await Course.findByIdAndUpdate(
+            id,
+            { $inc: { memberCount: 1 } },
+            { new: true, runValidators: true },
+        );
+    },
+
+    async decrementMemberCount(id) {
+        return await Course.findByIdAndUpdate(
+            id,
+            { $inc: { memberCount: -1 } },
+            { new: true, runValidators: true },
+        );
+    },
+
+    async findRecent({ scopedCourseIds = null, limit = 20 } = {}) {
+        const query =
+            Array.isArray(scopedCourseIds) && scopedCourseIds.length
+                ? { _id: { $in: scopedCourseIds } }
+                : {};
+
+        return Course.find(query).sort({ createdAt: -1, _id: -1 }).limit(limit);
+    },
 };
 
 export default courseRepository;

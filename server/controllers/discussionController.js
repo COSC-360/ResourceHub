@@ -2,7 +2,15 @@ import * as discussionService from "../services/discussionService.js";
 import * as voteService from "../services/voteService.js";
 
 export async function getLatest(req, res) {
-  const discussions = await discussionService.getLatest();
+  const courseIds = (req.query.courseIds ?? "")
+    .split(",")
+    .map((id) => id.trim())
+    .filter(Boolean);
+
+  const discussions = courseIds.length
+    ? await discussionService.findByIds(courseIds)
+    : await discussionService.findAll();
+
   const discussionsWithAuthor = await Promise.all(
     discussions.map(async (discussion) => {
       const obj = discussion.toJSON();
@@ -19,12 +27,13 @@ export async function getLatest(req, res) {
       return {
         ...obj,
         isAuthor: discussion.authorId?.toString() === req.user?.id,
-        hasUpvote: hasUpvote,
-        hasDownvote: hasDownvote,
+        hasUpvote,
+        hasDownvote,
         hasImage: discussion.image.contentType ? true : false,
       };
     }),
   );
+
   res.json(discussionsWithAuthor);
 }
 
@@ -37,30 +46,37 @@ export async function getImage(req, res) {
 
 export async function create(req, res) {
   const { content, title, parentid } = req.body;
+  const courseId = req.courseId; // set by middleware
 
   if (!content || typeof content !== "string" || !content.trim()) {
-    res.status(400).json({ error: "Content is required" });
-    return;
+    return res.status(400).json({ error: "Content is required" });
   }
 
   if (!parentid && (!title || typeof title !== "string" || !title.trim())) {
-    res.status(400).json({ error: "Title is required" });
-    return;
+    return res.status(400).json({ error: "Title is required" });
   }
-  const discussion = await discussionService.create({
-    content: content,
-    title: title,
-    image: req.file
-      ? {
-          data: req.file.buffer,
-          contentType: req.file.mimetype,
-        }
-      : null,
-    username: req.user.username,
-    authorId: req.user.id,
-    parentId: parentid,
-  });
-  res.status(201).json({ data: discussion });
+
+  try {
+    const discussion = await discussionService.create({
+      courseId,
+      content,
+      title,
+      image: req.file
+        ? { data: req.file.buffer, contentType: req.file.mimetype }
+        : null,
+      authorId: req.user.id,
+      parentId: parentid || null,
+    });
+
+    return res.status(201).json({ data: discussion });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    const status =
+      message.includes("not found") ? 404 :
+      message.includes("course") ? 400 : 500;
+
+    return res.status(status).json({ error: message });
+  }
 }
 
 export async function update(req, res) {

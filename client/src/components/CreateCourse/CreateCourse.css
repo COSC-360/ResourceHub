@@ -71,3 +71,34 @@ button {
 button:hover {
     background-color: #0056b3;
 }
+
+.create-course--modal {
+  background: #fff;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.2);
+}
+
+.create-course__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.create-course__close {
+  border: none;
+  background: transparent;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.create-course__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.create-course__secondary {
+  background: #eee;
+  color: #333;
+}

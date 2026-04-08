@@ -7,6 +7,7 @@ import { courseRoutes } from "./routes/courseRoutes.js";
 import { discussionRoutes } from "./routes/discussionRoutes.js";
 import { commonRoutes } from "./routes/commonRoutes.js";
 import { voteRoutes } from "./routes/voteRoutes.js";
+import { membershipRoutes } from "./routes/membershipRoutes.js";
 
 const app = express();
 
@@ -21,6 +22,9 @@ app.use((req, res, next) => {
     express.json({ limit: "10mb" })(req, res, next);
   }
 });
+
+app.use(express.json({ limit: "10mb" }));
+
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
 
 app.get("/api/health", (_req, res) => {
@@ -32,6 +36,7 @@ app.use("/api/courses", courseRoutes);
 app.use("/api/discussion", discussionRoutes);
 app.use("/api/common", commonRoutes);
 app.use("/api/vote", voteRoutes);
+app.use("/api/memberships", membershipRoutes);
 
 app.use("/uploads", express.static(path.resolve(__dirname, "uploads")));
 

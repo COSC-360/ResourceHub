@@ -1,5 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import './HybridFeed.css';
+import CourseCard from '../Cards/CourseCard.jsx';
+import DiscussionCard from '../Cards/DiscussionCard.jsx';
+import ResourceCard from '../Cards/ResourceCard.jsx';
+import { apiClient } from "../../lib/api-client";
 
 function HybridFeed({
     courseId,
@@ -10,50 +14,71 @@ function HybridFeed({
     sort = 'newest',
     limit = 20,
 }) {
-    const CARD_BY_TYPE = {
-        discussion: DiscussionCard,
-        resource: ResourceCard,
-        course: CourseCard,
-    };
-
     const [items, setItems] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+    const courseIdsKey = useMemo(() => courseIds.join(','), [courseIds]);
 
     async function fetchFeedItems() {
+        const types = [
+            showDiscussions && 'discussion',
+            showResources && 'resource',
+            showCourses && 'course',
+        ].filter(Boolean);
+
+        if (types.length === 0) {
+            setItems([]);
+            return;
+        }
+
+        setIsLoading(true);
+        setError(null);
+
+        try {
+            const params = new URLSearchParams();
+            params.set('types', types.join(','));
+            params.set('sort', sort);
+            params.set('limit', String(limit));
+
+            if (courseId) params.set('courseId', courseId);
+            else if (courseIds.length) params.set('courseIds', courseIds.join(','));
+
+            const token = localStorage.getItem("access_token");
+            const json = await apiClient(`/api/common/feed?${params.toString()}`, {
+                headers: token ? { Authorization: `Bearer ${token}` } : {},
+            });
+
+            setItems(json.data ?? []);
+        } catch (err) {
+            setError(err.message || "Failed to fetch feed");
+        } finally {
+            setIsLoading(false);
+        }
     }
-    // fetch
+
+    useEffect(() => {
+        fetchFeedItems();
+    }, [courseId, courseIdsKey, showDiscussions, showResources, showCourses, sort, limit]);
+
+    if (isLoading) return <div className="hybrid-feed__loading">Loading...</div>;
+    if (error) return <div className="hybrid-feed__error">Error: {error}</div>;
+    if (!items.length) return <div className="hybrid-feed__empty">No items found</div>;
+
     return (
-        <div>
-            {items.map(item => {
-                const CardComponent = CARD_BY_TYPE[item.type];
-                return <CardComponent key={item.id} data={item} />;
+        <div className="hybrid-feed">
+            {items.map((item) => {
+                switch (item.type) {
+                    case 'discussion':
+                        return <DiscussionCard key={`${item.type}-${item.id}`} data={item.data} />;
+                    case 'resource':
+                        return <ResourceCard key={`${item.type}-${item.id}`} data={item.data} />;
+                    case 'course':
+                        return <CourseCard key={`${item.type}-${item.id}`} data={item.data} />;
+                    default:
+                        return null;
+                }
             })}
-        </div>
-    );
-}
-
-function DiscussionCard({ data }) {
-    return (
-        <div className="discussion-card">
-            <h3>{data.title}</h3>
-            <p>{data.excerpt}</p>
-        </div>
-    );
-}
-
-function ResourceCard({ data }) {
-    return (
-        <div className="resource-card">
-            <h3>{data.title}</h3>
-            <p>{data.excerpt}</p>
-        </div>
-    );
-}
-
-function CourseCard({ data }) {
-    return (
-        <div className="course-card">
-            <h3>{data.name}</h3>
-            <p>{data.description}</p>
         </div>
     );
 }

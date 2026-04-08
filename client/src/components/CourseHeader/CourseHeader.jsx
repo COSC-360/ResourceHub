@@ -1,5 +1,8 @@
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { apiClient } from "../../lib/api-client";
+import CourseMembershipButton from "../CourseMembershipButton/CourseMembershipButton.jsx";
+import MemberCount from "../MemberCount/MemberCount.jsx";
+import UpdateCourseInfo from "../UpdateCourseInfo/UpdateCourseInfo.jsx";
 import "./CourseHeader.css";
 
 function PeopleIcon() {
@@ -17,29 +20,38 @@ function PeopleIcon() {
     );
 }
 
-export function CourseHeader({ course }) {
-    const navigate = useNavigate();
+export function CourseHeader({ course, onMembershipChanged, onCourseUpdated }) {
+    const courseId = course._id || course.id;
 
-    const handleDelete = async () => {
-        const shouldDelete = window.confirm(
-            "Are you sure you want to delete this course? This action cannot be undone.",
-        );
+    const [isInstructor, setIsInstructor] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
 
-        if (!shouldDelete) {
-            return;
+    useEffect(() => {
+        let active = true;
+
+        async function loadRole() {
+            const token = localStorage.getItem("access_token");
+            if (!token || !courseId) return;
+
+            try {
+                const res = await apiClient(`/api/memberships/me/${courseId}`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                if (active) setIsInstructor(res?.role === "instructor");
+            } catch {
+                if (active) setIsInstructor(false);
+            }
         }
 
-        try {
-            await apiClient(`/api/courses/${course._id}`, {
-                method: "DELETE",
-            });
-            alert("Course deleted successfully.");
-            navigate("/");
-        } catch (error) {
-            console.error("Error deleting course:", error);
-            alert(error.message || "An error occurred while deleting the course.");
-        }
-    };
+        loadRole();
+        return () => {
+            active = false;
+        };
+    }, [courseId]);
+
+    const memberCount = Number(
+        course.memberCount ?? course.numberOfStudents ?? 0
+    );
 
     return (
         <section className="course-header">
@@ -54,34 +66,52 @@ export function CourseHeader({ course }) {
                 </div>
 
                 <div className="course-header__side">
-                    <button // TODO: implement join/leave functionality
-                        type="button"
-                        className={`course-header__join`}
-                    >
-                        Join
-                    </button>
-                    <a
-                        href={`/courses/${course._id}/update`} // TODO: implement update course page
-                        className="course-header__edit-link"
-                    >
-                        Edit
-                    </a>
-                    <button // TODO: implement delete course functionality
-                        type="button"
-                        className="course-header__delete-link"
-                        onClick={handleDelete}
-                    >
-                        Delete
-                    </button>
+                    <CourseMembershipButton
+                        courseId={courseId}
+                        onMembershipChanged={onMembershipChanged}
+                    />
+
+                    {isInstructor && (
+                        <button
+                            type="button"
+                            className="course-header__edit-link"
+                            onClick={() => setShowEditModal(true)}
+                        >
+                            Edit
+                        </button>
+                    )}
 
                     <div
                         className="course-header__members"
-                        aria-label={`${course.memberCount} members`}
+                        aria-label={`${memberCount} members`}
                     >
                         <PeopleIcon />
-                        <span className="course-header__members-count">{course.memberCount}</span>
+                        <MemberCount
+                            count={memberCount}
+                            className="course-header__members-text"
+                        />
                     </div>
                 </div>
+
+                {showEditModal && (
+                    <div
+                        className="course-header__modal-backdrop"
+                        onClick={() => setShowEditModal(false)}
+                    >
+                        <div
+                            className="course-header__modal-panel"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <UpdateCourseInfo
+                                asModal
+                                courseId={courseId}
+                                initialCourse={course}
+                                onClose={() => setShowEditModal(false)}
+                                onUpdated={(updated) => onCourseUpdated?.(updated)}
+                            />
+                        </div>
+                    </div>
+                )}
             </div>
         </section>
     );

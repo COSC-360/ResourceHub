@@ -1,41 +1,35 @@
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'node:url';
+import { Resource } from "../models/resource.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const RESOURCES_FILE_PATH = path.resolve(__dirname, '../data/resources.json');
-
-export function get(id) {
-    const resources = JSON.parse(fs.readFileSync(RESOURCES_FILE_PATH, 'utf-8'));
-    return resources.find(resource => resource.id === id);
+export async function get(id) {
+    return await Resource.findById(id);
 }
 
-export function create(resource) {
-    const resources = JSON.parse(fs.readFileSync(RESOURCES_FILE_PATH, 'utf-8'));
-    resources.push(resource);
-    fs.writeFileSync(RESOURCES_FILE_PATH, JSON.stringify(resources, null, 2));
-    return resource;
+export async function findAll() {
+    return await Resource.find().sort({ createdAt: -1 });
 }
 
-export function update(id, updatedResource) {
-    const resources = JSON.parse(fs.readFileSync(RESOURCES_FILE_PATH, 'utf-8'));
-    const index = resources.findIndex(resource => resource.id === id);
-    if (index === -1) {
-        throw new Error('Resource not found');
-    }
-    resources[index] = updatedResource;
-    fs.writeFileSync(RESOURCES_FILE_PATH, JSON.stringify(resources, null, 2));
-    return updatedResource;
+// ids = courseIds
+export async function findByIds(ids) {
+    return await Resource.find({ courseId: { $in: ids } }).sort({ createdAt: -1 });
 }
 
-export function remove(id) {
-    const resources = JSON.parse(fs.readFileSync(RESOURCES_FILE_PATH, 'utf-8'));
-    const index = resources.findIndex(resource => resource.id === id);
-    if (index === -1) {
-        throw new Error('Resource not found');
-    }
-    resources.splice(index, 1);
-    fs.writeFileSync(RESOURCES_FILE_PATH, JSON.stringify(resources, null, 2));
+export async function create(resourceData) {
+    return await Resource.create(resourceData);
+}
+
+export async function update(id, updatedData) {
+    return await Resource.findByIdAndUpdate(id, updatedData, { new: true, runValidators: true });
+}
+
+export async function remove(id) {
+    return await Resource.findByIdAndDelete(id);
+}
+
+export async function findRecent({ scopedCourseIds = null, limit = 20 } = {}) {
+    const query =
+        Array.isArray(scopedCourseIds) && scopedCourseIds.length
+            ? { courseId: { $in: scopedCourseIds } }
+            : {};
+
+    return await Resource.find(query).sort({ createdAt: -1, _id: -1 }).limit(limit);
 }
