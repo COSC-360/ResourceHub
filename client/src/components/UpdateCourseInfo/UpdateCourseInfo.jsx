@@ -117,6 +117,10 @@ export default function UpdateCourseInfo({ asModal = false, onClose, onUpdated, 
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file) return;
+    if (!file.type?.startsWith("image/")) {
+      setError("Only image files are allowed.");
+      return;
+    }
     await uploadImage(file);
   }
 
