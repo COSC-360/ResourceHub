@@ -428,21 +428,22 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
               onClick={handleUpvote}
             >
               <i className="bi bi-arrow-up"></i>
-              <p>{upvotes}</p>
+              <p className="voteButton">{upvotes}</p>
             </button>
             <button
               className={hasDownvote ? "footer_button red" : "footer_button"}
               onClick={handleDownvote}
             >
               <i className="bi bi-arrow-down"></i>
-              <p>{downvotes}</p>
+              <p className="voteButton">{downvotes}</p>
             </button>
             <button
               className="footer_button"
               onClick={() => showCommentBox(!commentBox)}
             >
               <i className="bi bi-chat"></i>
-              <p>{replies}</p>
+              <br></br>
+              <p className="voteButton">{replies}</p>
             </button>
           </div>
         </div>

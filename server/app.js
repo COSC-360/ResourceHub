@@ -39,5 +39,6 @@ app.use("/api/vote", voteRoutes);
 app.use("/api/memberships", membershipRoutes);
 
 app.use("/uploads", express.static(path.resolve(__dirname, "uploads")));
+app.use("/assets", express.static(path.resolve(__dirname, "assets")));
 
 export default app;
