@@ -52,3 +52,15 @@
   gap: 8px;
   white-space: nowrap;
 }
+
+.headerRightSection {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.headerRightSection > * {
+  flex: 0 0 auto;
+}

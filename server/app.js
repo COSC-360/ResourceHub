@@ -8,6 +8,7 @@ import { discussionRoutes } from "./routes/discussionRoutes.js";
 import { commonRoutes } from "./routes/commonRoutes.js";
 import { voteRoutes } from "./routes/voteRoutes.js";
 import { membershipRoutes } from "./routes/membershipRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
 
 const app = express();
 
@@ -37,6 +38,7 @@ app.use("/api/discussion", discussionRoutes);
 app.use("/api/common", commonRoutes);
 app.use("/api/vote", voteRoutes);
 app.use("/api/memberships", membershipRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 app.use("/uploads", express.static(path.resolve(__dirname, "uploads")));
 app.use("/assets", express.static(path.resolve(__dirname, "assets")));
