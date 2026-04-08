@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { DEFAULT_COURSE_COVER, resolveCourseImageSrc } from '../../lib/course-cover.js';
 import MemberCount from '../MemberCount/MemberCount.jsx';
 import './CourseCard.css';
 
@@ -9,7 +10,7 @@ export default function CourseCard({ data }) {
     const name = data.name || data.coursename || 'Untitled Course';
     const code = data.code || data.coursecode || '';
     const description = data.description || 'No description yet.';
-    const image = data.image || '';
+    const imageSrc = resolveCourseImageSrc(data.image);
     const memberCount = Number(data.memberCount ?? data.numberOfStudents ?? 0);
 
     return (
@@ -19,12 +20,10 @@ export default function CourseCard({ data }) {
             className="course-card"
         >
             <div className="course-card__image-wrap">
-                {image ? (
-                    <img className="course-card__image" src={image} alt={`${name} cover`} />
+                {imageSrc ? (
+                    <img className="course-card__image" src={imageSrc} alt={`${name} cover`} />
                 ) : (
-                    <div className="course-card__image course-card__image--placeholder">
-                        No image
-                    </div>
+                    <img className="course-card__image" src={DEFAULT_COURSE_COVER} alt="" />
                 )}
             </div>
 

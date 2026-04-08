@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { apiClient } from "../../lib/api-client";
+import { DEFAULT_COURSE_COVER, resolveCourseImageSrc } from "../../lib/course-cover.js";
 import CourseMembershipButton from "../CourseMembershipButton/CourseMembershipButton.jsx";
 import MemberCount from "../MemberCount/MemberCount.jsx";
 import UpdateCourseInfo from "../UpdateCourseInfo/UpdateCourseInfo.jsx";
@@ -53,10 +54,14 @@ export function CourseHeader({ course, onMembershipChanged, onCourseUpdated }) {
         course.memberCount ?? course.numberOfStudents ?? 0
     );
 
+    const imageSrc = resolveCourseImageSrc(course.image);
+    const coverSrc = imageSrc || DEFAULT_COURSE_COVER;
+    const coverAlt = imageSrc ? course.name : "";
+
     return (
         <section className="course-header">
             <div className="course-header__image-wrap">
-                <img className="course-header__image" src={course.image} alt={course.name} />
+                <img className="course-header__image" src={coverSrc} alt={coverAlt} />
             </div>
 
             <div className="course-header__content">

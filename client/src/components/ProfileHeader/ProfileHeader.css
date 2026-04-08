@@ -80,6 +80,7 @@
     padding: 8px 12px;
     cursor: pointer;
     transition: background-color 0.2s ease, color 0.2s ease;
+    color: black;
 }
 
 .signIn:hover {
@@ -94,6 +95,7 @@
     padding: 8px 12px;
     cursor: pointer;
     transition: background-color 0.2s ease, color 0.2s ease;
+    color: black;
 }
 
 .register:hover {
