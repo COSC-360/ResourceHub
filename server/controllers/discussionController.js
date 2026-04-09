@@ -141,6 +141,15 @@ export async function create(req, res) {
   }
 }
 
+export async function createReply(req, res) {
+  const { parentId } = req.params;
+  req.body = {
+    ...req.body,
+    parentid: parentId,
+  };
+  return create(req, res);
+}
+
 export async function update(req, res) {
   const { id } = req.params;
   const { updatedImage, content, title } = req.body;
