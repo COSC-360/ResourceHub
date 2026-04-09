@@ -6,6 +6,21 @@ import upload from "../middleware/fileUploads.js";
 
 export const discussionRoutes = Router();
 
+/**
+ * @swagger
+ * tags:
+ *   name: Discussions
+ *   description: API endpoints for managing discussions
+ */
+
+/**
+ * @swagger
+ * /api/discussion:
+ *   get:
+ *     summary: Get latest discussions
+ *     tags: [Discussions]
+ *     security:
+ */
 discussionRoutes.get("/", decodeAccessToken, discussionController.getLatest);
 discussionRoutes.get("/:id/image", discussionController.getImage);
 discussionRoutes.get("/replies/:id", decodeAccessToken, discussionController.getReplies);
