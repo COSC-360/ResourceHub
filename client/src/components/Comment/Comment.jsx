@@ -24,34 +24,27 @@ const Comment = ({ onSubmit, parentid, parentUsername, courseId }) => {
     setLoading(true);
     setError("");
     try {
-      const token = localStorage.getItem("access_token");
-      const data = new FormData();
-
-      if (!token) {
-        router("/login");
-        return;
-      }
-
-      if (!courseId) {
-        throw new Error("Missing course id.");
-      }
-
-      if (!parentid) {
-        throw new Error("Cannot post comment without reference.");
-      }
-
-      data.append("content", `@${parentUsername} ${formData.content}`);
-      if (file) data.append("file", file);
-
-      await apiClient(`/api/courses/${courseId}/discussions/${parentid}/replies`, {
-        method: "POST",
-        body: data,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      onSubmit();
+      (async () => {
+        const token = localStorage.getItem("access_token");
+        const data = new FormData();
+        if (!token) {
+          router("/login");
+          return;
+        }
+        data.append("content", `@${parentUsername} ${formData.content}`);
+        if (!parentid)
+          throw new Error("Cannot post comment without reference.");
+        data.append("parentid", parentid);
+        if (file) data.append("file", file);
+        await apiClient(`/api/discussion`, {
+          method: "POST",
+          body: data,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        onSubmit();
+      })();
     } catch (err) {
       setError(err?.message || "Failed to post comment");
     } finally {
