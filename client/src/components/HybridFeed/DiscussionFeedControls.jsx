@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import "./DiscussionFeedControls.css";
 
 const SORT_OPTIONS = [
@@ -10,34 +10,16 @@ const SORT_OPTIONS = [
   { value: "score", label: "Best score" },
 ];
 
-function parseList(value) {
-  return String(value || "")
-    .split(",")
-    .map((item) => item.trim())
-    .filter(Boolean);
-}
-
-function joinList(values) {
-  return Array.isArray(values) ? values.join(", ") : "";
-}
-
 export default function DiscussionFeedControls({
   filters,
   onChange,
   onReset,
-  showCourseIds = true,
+  courseScope = "any",
+  onCourseScopeChange,
+  disableMyCourses = false,
+  hintMessage = "",
 }) {
   const [open, setOpen] = useState(false);
-
-  const courseIdsText = useMemo(() => joinList(filters.courseIds), [filters.courseIds]);
-  const authorIdsText = useMemo(() => joinList(filters.authorIds), [filters.authorIds]);
-  const populateText = useMemo(() => joinList(filters.populate), [filters.populate]);
-
-  function handleTextChange(name) {
-    return (event) => {
-      onChange({ [name]: parseList(event.target.value) });
-    };
-  }
 
   function handleCheckbox(name) {
     return (event) => {
@@ -82,6 +64,19 @@ export default function DiscussionFeedControls({
               <option value="asc">Ascending</option>
             </select>
           </label>
+
+          {onCourseScopeChange && (
+            <label>
+              Course scope
+              <select
+                value={courseScope}
+                onChange={(event) => onCourseScopeChange(event.target.value)}
+              >
+                <option value="any">Any course</option>
+                <option value="my" disabled={disableMyCourses}>My courses</option>
+              </select>
+            </label>
+          )}
         </div>
 
         <button
@@ -95,37 +90,7 @@ export default function DiscussionFeedControls({
 
       {open && (
         <div className="discussion-feed-controls__panel">
-          {showCourseIds && (
-            <label className="discussion-feed-controls__field">
-              Course IDs
-              <input
-                type="text"
-                value={courseIdsText}
-                onChange={handleTextChange("courseIds")}
-                placeholder="id1, id2, id3"
-              />
-            </label>
-          )}
-
-          <label className="discussion-feed-controls__field">
-            Author IDs
-            <input
-              type="text"
-              value={authorIdsText}
-              onChange={handleTextChange("authorIds")}
-              placeholder="author1, author2"
-            />
-          </label>
-
-          <label className="discussion-feed-controls__field">
-            Populate fields
-            <input
-              type="text"
-              value={populateText}
-              onChange={handleTextChange("populate")}
-              placeholder="courseId, authorId"
-            />
-          </label>
+          {hintMessage && <p className="discussion-feed-controls__hint">{hintMessage}</p>}
 
           <div className="discussion-feed-controls__toggles">
             <label>

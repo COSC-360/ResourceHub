@@ -14,11 +14,16 @@ function HybridFeed({
     maxItemsPerPage,
     initialFilters = {},
 }) {
+    const hasToken = Boolean(localStorage.getItem("access_token"));
     const [items, setItems] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(false);
+    const [courseScope, setCourseScope] = useState('any');
+    const [courseScopeHint, setCourseScopeHint] = useState('');
+    const [myCourseIds, setMyCourseIds] = useState([]);
+    const [myCourseIdsLoaded, setMyCourseIdsLoaded] = useState(false);
     const resolvedPageSize = Number(maxItemsPerPage ?? limit ?? 20);
     const pageSize = Number.isFinite(resolvedPageSize) && resolvedPageSize > 0
         ? Math.min(Math.floor(resolvedPageSize), 200)
@@ -29,31 +34,66 @@ function HybridFeed({
     );
 
     const baseFilters = useMemo(() => ({
-        courseIds: courseId ? [courseId] : normalizedCourseIds,
-        authorIds: [],
         deleted: undefined,
         edited: undefined,
         hasReplies: undefined,
         topLevelOnly: true,
         sortBy: 'createdAt',
         sortOrder: sort === 'oldest' ? 'asc' : 'desc',
-        populate: ['courseId'],
-    }), [courseId, normalizedCourseIds, sort]);
+    }), [sort]);
 
     const [filters, setFilters] = useState(() => ({
         ...baseFilters,
         ...initialFilters,
-        courseIds: initialFilters.courseIds ?? baseFilters.courseIds,
         sortBy: initialFilters.sortBy ?? baseFilters.sortBy,
         sortOrder: initialFilters.sortOrder ?? baseFilters.sortOrder,
-        populate: initialFilters.populate ?? baseFilters.populate,
     }));
+
+    useEffect(() => {
+        if (courseId || courseScope !== 'my') return;
+
+        let cancelled = false;
+
+        async function loadMyCourseIds() {
+            const token = localStorage.getItem("access_token");
+            if (!token) {
+                if (!cancelled) {
+                    setMyCourseIds([]);
+                    setMyCourseIdsLoaded(true);
+                }
+                return;
+            }
+
+            try {
+                const json = await apiClient('/api/memberships/me/course-ids', {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+
+                if (!cancelled) {
+                    const ids = Array.isArray(json?.data) ? json.data : [];
+                    setMyCourseIds(ids);
+                    setMyCourseIdsLoaded(true);
+                }
+            } catch {
+                if (!cancelled) {
+                    setMyCourseIds([]);
+                    setMyCourseIdsLoaded(true);
+                }
+            }
+        }
+
+        loadMyCourseIds();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [courseId, courseScope]);
 
     const resolvedCourseIds = useMemo(() => {
         if (courseId) return [courseId];
-        if (filters.courseIds?.length) return filters.courseIds;
+        if (courseScope === 'my') return myCourseIds;
         return normalizedCourseIds;
-    }, [courseId, normalizedCourseIds, filters.courseIds]);
+    }, [courseId, courseScope, myCourseIds, normalizedCourseIds]);
 
     function updateFilters(next) {
         setFilters((prev) => ({ ...prev, ...next }));
@@ -62,16 +102,25 @@ function HybridFeed({
 
     function resetFilters() {
         setFilters({
-            courseIds: courseId ? [courseId] : courseIds,
-            authorIds: [],
             deleted: undefined,
             edited: undefined,
             hasReplies: undefined,
             topLevelOnly: true,
             sortBy: 'createdAt',
             sortOrder: sort === 'oldest' ? 'asc' : 'desc',
-            populate: ['courseId'],
         });
+        setPage(1);
+    }
+
+    function handleCourseScopeChange(nextScope) {
+        if (nextScope === 'my' && !hasToken) {
+            setCourseScopeHint('Log in to use the My courses filter.');
+            setCourseScope('any');
+            return;
+        }
+
+        setCourseScopeHint('');
+        setCourseScope(nextScope);
         setPage(1);
     }
 
@@ -87,6 +136,12 @@ function HybridFeed({
 
     useEffect(() => {
         let cancelled = false;
+
+        if (!courseId && courseScope === 'my' && !myCourseIdsLoaded) {
+            return () => {
+                cancelled = true;
+            };
+        }
 
         setIsLoading(true);
         setError(null);
@@ -123,7 +178,7 @@ function HybridFeed({
         return () => {
             cancelled = true;
         };
-    }, [queryInput, pageSize]);
+    }, [queryInput, pageSize, courseId, courseScope, myCourseIdsLoaded]);
 
     return (
         <div className="hybrid-feed">
@@ -131,7 +186,10 @@ function HybridFeed({
                 filters={filters}
                 onChange={updateFilters}
                 onReset={resetFilters}
-                showCourseIds={!courseId}
+                courseScope={courseScope}
+                onCourseScopeChange={handleCourseScopeChange}
+                disableMyCourses={!hasToken}
+                hintMessage={courseScopeHint || (!hasToken ? 'Log in to enable My courses.' : '')}
             />
 
             <DiscussionFeedPagination

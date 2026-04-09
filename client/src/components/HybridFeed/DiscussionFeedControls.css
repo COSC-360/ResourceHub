@@ -63,6 +63,12 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.discussion-feed-controls__hint {
+  margin: 0;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
 .discussion-feed-controls__toggles {
   display: flex;
   gap: 1rem;
