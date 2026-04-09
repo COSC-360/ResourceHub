@@ -1,11 +1,40 @@
 import * as discussionService from "../services/discussionService.js";
 import * as voteService from "../services/voteService.js";
+import mongoose from "mongoose";
 
 function parseCsv(value) {
-  if (!value || typeof value !== "string") return [];
-  return value
-    .split(",")
+  if (!value) return [];
+
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => String(item).trim())
+      .map((item) => item.replace(/^['"]+|['"]+$/g, ""))
+      .filter(Boolean);
+  }
+
+  if (typeof value !== "string") return [];
+
+  const raw = value.trim();
+  if (!raw) return [];
+
+  if (raw.startsWith("[") && raw.endsWith("]")) {
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        return parsed
+          .map((item) => String(item).trim())
+          .map((item) => item.replace(/^['"]+|['"]+$/g, ""))
+          .filter(Boolean);
+      }
+    } catch {
+      // fall through to CSV-style parsing
+    }
+  }
+
+  return raw
+    .split(/[\n,]/)
     .map((item) => item.trim())
+    .map((item) => item.replace(/^['"]+|['"]+$/g, ""))
     .filter(Boolean);
 }
 
@@ -29,6 +58,10 @@ function parsePopulate(value) {
   return parseCsv(value).filter((entry) => allowed.has(entry));
 }
 
+function hasInvalidObjectId(ids = []) {
+  return ids.some((id) => !mongoose.Types.ObjectId.isValid(id));
+}
+
 export async function getAll(req, res) {
   const courseIds = parseCsv(req.query.courseIds);
   const authorIds = parseCsv(req.query.authorIds);
@@ -49,52 +82,73 @@ export async function getAll(req, res) {
     parentId = null;
   }
 
-  // get raw discussions based on filters
-  const discussions = await discussionService.findByFilters({
-    courseIds,
-    authorIds,
-    deleted,
-    edited,
-    hasReplies,
-    parentId,
-    populate,
-    sortBy,
-    sortOrder,
-    page,
-    limit,
-  });
+  if (courseIds.length && hasInvalidObjectId(courseIds)) {
+    return res.status(400).json({
+      error: "Invalid courseIds. Use comma-separated Mongo ObjectIds.",
+    });
+  }
 
-  const discussionsWithAuthor = await Promise.all(
-    discussions.map(async (discussion) => {
-      const obj = discussion.toJSON();
+  if (authorIds.length && hasInvalidObjectId(authorIds)) {
+    return res.status(400).json({
+      error: "Invalid authorIds. Use comma-separated Mongo ObjectIds.",
+    });
+  }
 
-      const authorId =
-        typeof discussion.authorId === "object" && discussion.authorId !== null
-          ? discussion.authorId._id?.toString()
-          : discussion.authorId?.toString();
+  if (
+    typeof parentId === "string" &&
+    parentId.trim() !== "" &&
+    !mongoose.Types.ObjectId.isValid(parentId)
+  ) {
+    return res.status(400).json({ error: "Invalid parentId." });
+  }
 
-      // only check votes if user is logged in, otherwise skip to save time
+  try {
+    const discussions = await discussionService.findByFilters({
+      courseIds,
+      authorIds,
+      deleted,
+      edited,
+      hasReplies,
+      parentId,
+      populate,
+      sortBy,
+      sortOrder,
+      page,
+      limit,
+    });
 
-      // if user is logged in, check if they have upvoted or downvoted this discussion
-      const hasUpvote = req.user?.id
-        ? await voteService.hasUpvote(discussion._id, req.user.id, "Discussion")
-        : false;
-      const hasDownvote = req.user?.id
-        ? await voteService.hasDownvote(discussion._id, req.user.id, "Discussion")
-        : false;
+    const discussionsWithAuthor = await Promise.all(
+      discussions.map(async (discussion) => {
+        const obj = discussion.toJSON();
 
-      return {
-        ...obj,
-        isAuthor: authorId === req.user?.id,
-        hasUpvote,
-        hasDownvote,
-        hasImage: Boolean(discussion.image?.contentType),
-        score: Number(discussion.upvotes || 0) - Number(discussion.downvotes || 0),
-      };
-    }),
-  );
+        const authorId =
+          typeof discussion.authorId === "object" && discussion.authorId !== null
+            ? discussion.authorId._id?.toString()
+            : discussion.authorId?.toString();
 
-  res.json(discussionsWithAuthor);
+        const hasUpvote = req.user?.id
+          ? await voteService.hasUpvote(discussion._id, req.user.id, "Discussion")
+          : false;
+        const hasDownvote = req.user?.id
+          ? await voteService.hasDownvote(discussion._id, req.user.id, "Discussion")
+          : false;
+
+        return {
+          ...obj,
+          isAuthor: authorId === req.user?.id,
+          hasUpvote,
+          hasDownvote,
+          hasImage: Boolean(discussion.image?.contentType),
+          score: Number(discussion.upvotes || 0) - Number(discussion.downvotes || 0),
+        };
+      }),
+    );
+
+    return res.json(discussionsWithAuthor);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return res.status(500).json({ error: message });
+  }
 }
 
 export const getLatest = getAll;
