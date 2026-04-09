@@ -1,0 +1,68 @@
+.notificationWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notificationButton {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  padding: 0;
+  font-size: 22px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notificationBadge {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  background: red;
+  color: white;
+  border-radius: 50%;
+  min-width: 18px;
+  height: 18px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 4px;
+}
+
+.notificationDropdown {
+  position: absolute;
+  top: 34px;
+  right: 0;
+  width: 280px;
+  max-height: 300px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px;
+  z-index: 2000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.notificationItem {
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.notificationItem:last-child {
+  border-bottom: none;
+}
+
+.notificationItem p {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+}
+
+.notificationItem small {
+  color: #666;
+}
