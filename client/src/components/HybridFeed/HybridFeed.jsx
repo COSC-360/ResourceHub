@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import './HybridFeed.css';
 import DiscussionCard from '../Cards/DiscussionCard.jsx';
 import DiscussionFeedControls from './DiscussionFeedControls.jsx';
+import DiscussionFeedPagination from './DiscussionFeedPagination.jsx';
 import { apiClient } from "../../lib/api-client";
 import { buildDiscussionFeedQuery } from "../../lib/discussion-feed.js";
 
@@ -10,11 +11,18 @@ function HybridFeed({
     courseIds,
     sort = 'newest',
     limit = 20,
+    maxItemsPerPage,
     initialFilters = {},
 }) {
     const [items, setItems] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(false);
+    const resolvedPageSize = Number(maxItemsPerPage ?? limit ?? 20);
+    const pageSize = Number.isFinite(resolvedPageSize) && resolvedPageSize > 0
+        ? Math.min(Math.floor(resolvedPageSize), 200)
+        : 20;
     const normalizedCourseIds = useMemo(
         () => (Array.isArray(courseIds) ? courseIds.filter(Boolean) : []),
         [courseIds],
@@ -47,18 +55,9 @@ function HybridFeed({
         return normalizedCourseIds;
     }, [courseId, normalizedCourseIds, filters.courseIds]);
 
-    const queryKey = useMemo(
-        () =>
-            JSON.stringify({
-                ...filters,
-                courseIds: resolvedCourseIds,
-                limit,
-            }),
-        [filters, resolvedCourseIds, limit],
-    );
-
     function updateFilters(next) {
         setFilters((prev) => ({ ...prev, ...next }));
+        setPage(1);
     }
 
     function resetFilters() {
@@ -73,7 +72,18 @@ function HybridFeed({
             sortOrder: sort === 'oldest' ? 'asc' : 'desc',
             populate: ['courseId'],
         });
+        setPage(1);
     }
+
+    const queryInput = useMemo(
+        () => ({
+            ...filters,
+            courseIds: resolvedCourseIds,
+            page,
+            limit: Math.min(pageSize + 1, 200),
+        }),
+        [filters, resolvedCourseIds, page, pageSize],
+    );
 
     useEffect(() => {
         let cancelled = false;
@@ -83,11 +93,7 @@ function HybridFeed({
 
         async function fetchFeedItems() {
             try {
-                const params = buildDiscussionFeedQuery({
-                    ...filters,
-                    courseIds: resolvedCourseIds,
-                    limit,
-                });
+                const params = buildDiscussionFeedQuery(queryInput);
 
                 const token = localStorage.getItem("access_token");
                 const json = await apiClient(`/api/discussion?${params.toString()}`, {
@@ -95,11 +101,15 @@ function HybridFeed({
                 });
 
                 if (!cancelled) {
-                    setItems(Array.isArray(json) ? json : (json.data ?? []));
+                    const rows = Array.isArray(json) ? json : (json.data ?? []);
+                    const more = rows.length > pageSize;
+                    setHasMore(more);
+                    setItems(more ? rows.slice(0, pageSize) : rows);
                 }
             } catch (err) {
                 if (!cancelled) {
                     setError(err.message || "Failed to fetch feed");
+                    setHasMore(false);
                 }
             } finally {
                 if (!cancelled) {
@@ -113,7 +123,7 @@ function HybridFeed({
         return () => {
             cancelled = true;
         };
-    }, [queryKey, filters, limit, resolvedCourseIds]);
+    }, [queryInput, pageSize]);
 
     return (
         <div className="hybrid-feed">
@@ -124,6 +134,14 @@ function HybridFeed({
                 showCourseIds={!courseId}
             />
 
+            <DiscussionFeedPagination
+                page={page}
+                canGoPrevious={page > 1}
+                canGoNext={hasMore}
+                onPrevious={() => setPage((prev) => Math.max(1, prev - 1))}
+                onNext={() => setPage((prev) => prev + 1)}
+            />
+
             {isLoading && <div className="hybrid-feed__loading">Loading...</div>}
             {error && <div className="hybrid-feed__error">Error: {error}</div>}
             {!isLoading && !error && !items.length && <div className="hybrid-feed__empty">No discussions found</div>}
@@ -132,6 +150,14 @@ function HybridFeed({
                 const discussionId = item._id || item.id;
                 return <DiscussionCard key={discussionId} data={item} />;
             })}
+
+            <DiscussionFeedPagination
+                page={page}
+                canGoPrevious={page > 1}
+                canGoNext={hasMore}
+                onPrevious={() => setPage((prev) => Math.max(1, prev - 1))}
+                onNext={() => setPage((prev) => prev + 1)}
+            />
         </div>
     );
 }
