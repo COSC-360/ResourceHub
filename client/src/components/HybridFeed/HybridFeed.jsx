@@ -40,6 +40,7 @@ function HybridFeed({
         topLevelOnly: true,
         sortBy: 'createdAt',
         sortOrder: sort === 'oldest' ? 'asc' : 'desc',
+        populate: ['courseId'],
     }), [sort]);
 
     const [filters, setFilters] = useState(() => ({
@@ -47,6 +48,7 @@ function HybridFeed({
         ...initialFilters,
         sortBy: initialFilters.sortBy ?? baseFilters.sortBy,
         sortOrder: initialFilters.sortOrder ?? baseFilters.sortOrder,
+        populate: ['courseId'],
     }));
 
     useEffect(() => {
@@ -108,6 +110,7 @@ function HybridFeed({
             topLevelOnly: true,
             sortBy: 'createdAt',
             sortOrder: sort === 'oldest' ? 'asc' : 'desc',
+            populate: ['courseId'],
         });
         setPage(1);
     }
