@@ -21,6 +21,7 @@ import UpdateCourseInfo from "./components/UpdateCourseInfo/UpdateCourseInfo.jsx
 import NotAuthorized from "./components/NotAuthorized/NotAuthorized.jsx";
 import AuthContext from "./AuthContext.jsx";
 import GlobalApiError from "./components/GlobalApiError/GlobalApiError";
+import HybridFeed from "./components/HybridFeed/HybridFeed.jsx";
 
 // Main layout component that includes the header and sidebar,
 // and an Outlet for rendering the main content based on the route
@@ -53,7 +54,7 @@ function App() {
       <Routes>
         {/* Main layout route, routes inside get rendered within the Outlet in MainLayout */}
         <Route element={<MainLayout />}>
-          <Route path="/" element={<Feed />} />
+          <Route path="/" element={<HybridFeed />} />
           <Route path="/search" element={<SearchResults />} />
           <Route path="/courses/:courseId" element={<CoursePage />} />
           <Route path="/create" element={<CreatePost />} />

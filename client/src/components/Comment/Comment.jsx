@@ -4,7 +4,7 @@ import "./Comment.css";
 import { apiClient } from "../../lib/api-client";
 import { useNavigate } from "react-router-dom";
 
-const Comment = ({ onSubmit, parentid, parentUsername }) => {
+const Comment = ({ onSubmit, parentid, parentUsername, courseId }) => {
   const [formData, setFormData] = useState({ content: "" });
   const [file, setFile] = useState(null);
   const [error, setError] = useState("");
@@ -19,34 +19,41 @@ const Comment = ({ onSubmit, parentid, parentUsername }) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     try {
-      (async () => {
-        const token = localStorage.getItem("access_token");
-        const data = new FormData();
-        if (!token) {
-          router("/login");
-          return;
-        }
-        data.append("content", `@${parentUsername} ${formData.content}`);
-        if (!parentid)
-          throw new Error("Cannot post comment without reference.");
-        data.append("parentid", parentid);
-        if (file) data.append("file", file);
-        await apiClient(`/api/discussion/course/${courseId}`, {
-          method: "POST",
-          body: data,
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        onSubmit();
-      })();
+      const token = localStorage.getItem("access_token");
+      const data = new FormData();
+
+      if (!token) {
+        router("/login");
+        return;
+      }
+
+      if (!courseId) {
+        throw new Error("Missing course id.");
+      }
+
+      if (!parentid) {
+        throw new Error("Cannot post comment without reference.");
+      }
+
+      data.append("content", `@${parentUsername} ${formData.content}`);
+      if (file) data.append("file", file);
+
+      await apiClient(`/api/courses/${courseId}/discussions/${parentid}/replies`, {
+        method: "POST",
+        body: data,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      onSubmit();
     } catch (err) {
-      setError(err);
+      setError(err?.message || "Failed to post comment");
     } finally {
       setLoading(false);
     }

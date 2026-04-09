@@ -463,6 +463,7 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
 
       {commentBox && (
         <Comment
+          courseId={post_props.courseId?._id || post_props.courseId}
           parentUsername={post_props.username}
           parentid={post_props._id}
           onSubmit={() => {

@@ -1,83 +1,136 @@
 import { useEffect, useMemo, useState } from 'react';
 import './HybridFeed.css';
-import CourseCard from '../Cards/CourseCard.jsx';
 import DiscussionCard from '../Cards/DiscussionCard.jsx';
-import ResourceCard from '../Cards/ResourceCard.jsx';
+import DiscussionFeedControls from './DiscussionFeedControls.jsx';
 import { apiClient } from "../../lib/api-client";
+import { buildDiscussionFeedQuery } from "../../lib/discussion-feed.js";
 
 function HybridFeed({
     courseId,
-    courseIds = [],
-    showDiscussions = true,
-    showResources = true,
-    showCourses = true,
+    courseIds,
     sort = 'newest',
     limit = 20,
+    initialFilters = {},
 }) {
     const [items, setItems] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
+    const normalizedCourseIds = useMemo(
+        () => (Array.isArray(courseIds) ? courseIds.filter(Boolean) : []),
+        [courseIds],
+    );
 
-    const courseIdsKey = useMemo(() => courseIds.join(','), [courseIds]);
+    const baseFilters = useMemo(() => ({
+        courseIds: courseId ? [courseId] : normalizedCourseIds,
+        authorIds: [],
+        deleted: undefined,
+        edited: undefined,
+        hasReplies: undefined,
+        topLevelOnly: true,
+        sortBy: 'createdAt',
+        sortOrder: sort === 'oldest' ? 'asc' : 'desc',
+        populate: ['courseId'],
+    }), [courseId, normalizedCourseIds, sort]);
 
-    async function fetchFeedItems() {
-        const types = [
-            showDiscussions && 'discussion',
-            showResources && 'resource',
-            showCourses && 'course',
-        ].filter(Boolean);
+    const [filters, setFilters] = useState(() => ({
+        ...baseFilters,
+        ...initialFilters,
+        courseIds: initialFilters.courseIds ?? baseFilters.courseIds,
+        sortBy: initialFilters.sortBy ?? baseFilters.sortBy,
+        sortOrder: initialFilters.sortOrder ?? baseFilters.sortOrder,
+        populate: initialFilters.populate ?? baseFilters.populate,
+    }));
 
-        if (types.length === 0) {
-            setItems([]);
-            return;
-        }
+    const resolvedCourseIds = useMemo(() => {
+        if (courseId) return [courseId];
+        if (filters.courseIds?.length) return filters.courseIds;
+        return normalizedCourseIds;
+    }, [courseId, normalizedCourseIds, filters.courseIds]);
+
+    const queryKey = useMemo(
+        () =>
+            JSON.stringify({
+                ...filters,
+                courseIds: resolvedCourseIds,
+                limit,
+            }),
+        [filters, resolvedCourseIds, limit],
+    );
+
+    function updateFilters(next) {
+        setFilters((prev) => ({ ...prev, ...next }));
+    }
+
+    function resetFilters() {
+        setFilters({
+            courseIds: courseId ? [courseId] : courseIds,
+            authorIds: [],
+            deleted: undefined,
+            edited: undefined,
+            hasReplies: undefined,
+            topLevelOnly: true,
+            sortBy: 'createdAt',
+            sortOrder: sort === 'oldest' ? 'asc' : 'desc',
+            populate: ['courseId'],
+        });
+    }
+
+    useEffect(() => {
+        let cancelled = false;
 
         setIsLoading(true);
         setError(null);
 
-        try {
-            const params = new URLSearchParams();
-            params.set('types', types.join(','));
-            params.set('sort', sort);
-            params.set('limit', String(limit));
+        async function fetchFeedItems() {
+            try {
+                const params = buildDiscussionFeedQuery({
+                    ...filters,
+                    courseIds: resolvedCourseIds,
+                    limit,
+                });
 
-            if (courseId) params.set('courseId', courseId);
-            else if (courseIds.length) params.set('courseIds', courseIds.join(','));
+                const token = localStorage.getItem("access_token");
+                const json = await apiClient(`/api/discussion?${params.toString()}`, {
+                    headers: token ? { Authorization: `Bearer ${token}` } : {},
+                });
 
-            const token = localStorage.getItem("access_token");
-            const json = await apiClient(`/api/common/feed?${params.toString()}`, {
-                headers: token ? { Authorization: `Bearer ${token}` } : {},
-            });
-
-            setItems(json.data ?? []);
-        } catch (err) {
-            setError(err.message || "Failed to fetch feed");
-        } finally {
-            setIsLoading(false);
+                if (!cancelled) {
+                    setItems(Array.isArray(json) ? json : (json.data ?? []));
+                }
+            } catch (err) {
+                if (!cancelled) {
+                    setError(err.message || "Failed to fetch feed");
+                }
+            } finally {
+                if (!cancelled) {
+                    setIsLoading(false);
+                }
+            }
         }
-    }
 
-    useEffect(() => {
         fetchFeedItems();
-    }, [courseId, courseIdsKey, showDiscussions, showResources, showCourses, sort, limit]);
 
-    if (isLoading) return <div className="hybrid-feed__loading">Loading...</div>;
-    if (error) return <div className="hybrid-feed__error">Error: {error}</div>;
-    if (!items.length) return <div className="hybrid-feed__empty">No items found</div>;
+        return () => {
+            cancelled = true;
+        };
+    }, [queryKey, filters, limit, resolvedCourseIds]);
 
     return (
         <div className="hybrid-feed">
+            <DiscussionFeedControls
+                filters={filters}
+                onChange={updateFilters}
+                onReset={resetFilters}
+                showCourseIds={!courseId}
+            />
+
+            {isLoading && <div className="hybrid-feed__loading">Loading...</div>}
+            {error && <div className="hybrid-feed__error">Error: {error}</div>}
+            {!isLoading && !error && !items.length && <div className="hybrid-feed__empty">No discussions found</div>}
+
             {items.map((item) => {
-                switch (item.type) {
-                    case 'discussion':
-                        return <DiscussionCard key={`${item.type}-${item.id}`} data={item.data} />;
-                    case 'resource':
-                        return <ResourceCard key={`${item.type}-${item.id}`} data={item.data} />;
-                    case 'course':
-                        return <CourseCard key={`${item.type}-${item.id}`} data={item.data} />;
-                    default:
-                        return null;
-                }
+                const discussionId = item._id || item.id;
+                return <DiscussionCard key={discussionId} data={item} />;
             })}
         </div>
     );
