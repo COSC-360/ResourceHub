@@ -25,14 +25,6 @@ export const discussionRoutes = Router();
  *         authorId:
  *           type: string
  *           example: 6614ef11d8a08a2f6fbc1011
- *         coursename:
- *           type: string
- *           nullable: true
- *           example: Intro to Databases
- *         coursecode:
- *           type: string
- *           nullable: true
- *           example: CS340
  *         deleted:
  *           type: boolean
  *           example: false
