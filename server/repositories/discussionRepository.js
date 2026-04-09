@@ -36,6 +36,73 @@ export const DiscussionRepository = {
     return query;
   },
 
+  async findByFilters(filters = {}) {
+    const {
+      courseId,
+      courseIds,
+      authorId,
+      authorIds,
+      parentId,
+      deleted,
+      edited,
+      hasReplies,
+      sortBy = "createdAt",
+      sortOrder = "desc",
+      limit = 100,
+      page = 1,
+      populate = [],
+    } = filters;
+
+    const queryList = {};
+
+    if (courseId) queryList.courseId = courseId;
+    if (courseIds?.length) queryList.courseId = { $in: courseIds };
+    if (authorId) queryList.authorId = authorId;
+    if (authorIds?.length) queryList.authorId = { $in: authorIds };
+    if (parentId !== undefined) queryList.parentId = parentId;
+    if (typeof deleted === "boolean") queryList.deleted = deleted;
+    if (typeof edited === "boolean") queryList.edited = edited;
+
+    if (typeof hasReplies === "boolean") {
+      queryList.replies = hasReplies ? { $gt: 0 } : { $lte: 0 };
+    }
+
+    const direction = sortOrder === "asc" ? 1 : -1;
+    const allowedSortFields = new Set([
+      "createdAt",
+      "updatedAt",
+      "upvotes",
+      "downvotes",
+      "replies",
+      "deleted",
+      "edited",
+      "score",
+    ]);
+
+    const safeSortBy = allowedSortFields.has(sortBy) ? sortBy : "createdAt";
+    const sort =
+      safeSortBy === "score"
+        ? { upvotes: direction, downvotes: -direction, createdAt: -1 }
+        : { [safeSortBy]: direction, _id: -1 };
+
+    let query = Discussion.find(queryList).sort(sort);
+
+    const allowedPopulateFields = new Set(["courseId", "authorId"]);
+    const safePopulate = Array.isArray(populate)
+      ? populate.filter((item) => allowedPopulateFields.has(item))
+      : [];
+
+    safePopulate.forEach((field) => {
+      query = query.populate(field);
+    });
+
+    if (limit && page) {
+      query = query.skip((page - 1) * limit).limit(limit);
+    }
+
+    return query;
+  },
+
   async findByAuthor(authorid) {
     return await Discussion.find({ authorId: authorid }).sort({
       timestamp: -1,

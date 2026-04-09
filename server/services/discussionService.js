@@ -9,6 +9,10 @@ export function findAll() {
   return DiscussionRepository.findAll();
 }
 
+export function findByFilters(filters = {}) {
+  return DiscussionRepository.findByFilters(filters);
+}
+
 // ids = courseIds
 export function findByIds(ids) {
   return DiscussionRepository.findByIds(ids);

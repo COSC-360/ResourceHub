@@ -1,41 +1,103 @@
 import * as discussionService from "../services/discussionService.js";
 import * as voteService from "../services/voteService.js";
 
-export async function getLatest(req, res) {
-  const courseIds = (req.query.courseIds ?? "")
+function parseCsv(value) {
+  if (!value || typeof value !== "string") return [];
+  return value
     .split(",")
-    .map((id) => id.trim())
+    .map((item) => item.trim())
     .filter(Boolean);
+}
 
-  const discussions = courseIds.length
-    ? await discussionService.findByIds(courseIds)
-    : await discussionService.findAll();
+function parseBoolean(value) {
+  if (typeof value === "boolean") return value;
+  if (typeof value !== "string") return undefined;
+  const normalized = value.trim().toLowerCase();
+  if (["1", "true", "yes"].includes(normalized)) return true;
+  if (["0", "false", "no"].includes(normalized)) return false;
+  return undefined;
+}
+
+function parsePositiveInt(value, fallback) {
+  const parsed = Number.parseInt(value, 10);
+  if (!Number.isFinite(parsed) || parsed <= 0) return fallback;
+  return parsed;
+}
+
+function parsePopulate(value) {
+  const allowed = new Set(["courseId", "authorId"]);
+  return parseCsv(value).filter((entry) => allowed.has(entry));
+}
+
+export async function getAll(req, res) {
+  const courseIds = parseCsv(req.query.courseIds);
+  const authorIds = parseCsv(req.query.authorIds);
+  const populate = parsePopulate(req.query.populate);
+  const deleted = parseBoolean(req.query.deleted);
+  const edited = parseBoolean(req.query.edited);
+  const hasReplies = parseBoolean(req.query.hasReplies);
+  const topLevelOnly = parseBoolean(req.query.topLevelOnly);
+  const sortBy = typeof req.query.sortBy === "string" ? req.query.sortBy : "createdAt";
+  const sortOrder = req.query.sortOrder === "asc" ? "asc" : "desc";
+  const page = parsePositiveInt(req.query.page, 1);
+  const limit = Math.min(parsePositiveInt(req.query.limit, 100), 200);
+
+  let parentId;
+  if (typeof req.query.parentId === "string") {
+    parentId = req.query.parentId === "null" ? null : req.query.parentId;
+  } else if (topLevelOnly === true) {
+    parentId = null;
+  }
+
+  // get raw discussions based on filters
+  const discussions = await discussionService.findByFilters({
+    courseIds,
+    authorIds,
+    deleted,
+    edited,
+    hasReplies,
+    parentId,
+    populate,
+    sortBy,
+    sortOrder,
+    page,
+    limit,
+  });
 
   const discussionsWithAuthor = await Promise.all(
     discussions.map(async (discussion) => {
       const obj = discussion.toJSON();
-      const hasUpvote = await voteService.hasUpvote(
-        discussion._id,
-        req.user?.id,
-        "Discussion",
-      );
-      const hasDownvote = await voteService.hasDownvote(
-        discussion._id,
-        req.user?.id,
-        "Discussion",
-      );
+
+      const authorId =
+        typeof discussion.authorId === "object" && discussion.authorId !== null
+          ? discussion.authorId._id?.toString()
+          : discussion.authorId?.toString();
+
+      // only check votes if user is logged in, otherwise skip to save time
+
+      // if user is logged in, check if they have upvoted or downvoted this discussion
+      const hasUpvote = req.user?.id
+        ? await voteService.hasUpvote(discussion._id, req.user.id, "Discussion")
+        : false;
+      const hasDownvote = req.user?.id
+        ? await voteService.hasDownvote(discussion._id, req.user.id, "Discussion")
+        : false;
+
       return {
         ...obj,
-        isAuthor: discussion.authorId?.toString() === req.user?.id,
+        isAuthor: authorId === req.user?.id,
         hasUpvote,
         hasDownvote,
-        hasImage: discussion.image.contentType ? true : false,
+        hasImage: Boolean(discussion.image?.contentType),
+        score: Number(discussion.upvotes || 0) - Number(discussion.downvotes || 0),
       };
     }),
   );
 
   res.json(discussionsWithAuthor);
 }
+
+export const getLatest = getAll;
 
 export async function getImage(req, res) {
   const { id } = req.params;
