@@ -36,7 +36,7 @@ const Comment = ({ onSubmit, parentid, parentUsername }) => {
           throw new Error("Cannot post comment without reference.");
         data.append("parentid", parentid);
         if (file) data.append("file", file);
-        await apiClient("/api/discussion", {
+        await apiClient(`/api/discussion/course/${courseId}`, {
           method: "POST",
           body: data,
           headers: {
