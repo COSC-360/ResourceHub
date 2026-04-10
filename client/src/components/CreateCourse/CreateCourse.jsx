@@ -67,24 +67,6 @@ export default function CreateCourse({
     );
   }, [isEdit, baseline, courseData]);
 
-  async function uploadCourseImage(courseId, file, token) {
-    if (!courseId || !file) return null;
-
-    const fd = new FormData();
-    fd.append("image", file);
-
-    setUploadingImage(true);
-    try {
-      return await apiClient(`/api/courses/${courseId}/updateimage`, {
-        method: "PATCH",
-        body: fd,
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
-    } finally {
-      setUploadingImage(false);
-    }
-  }
-
   function handleImageSelect(file) {
     if (!file.type?.startsWith("image/")) {
       setError("Only image files are allowed.");
@@ -193,7 +175,13 @@ export default function CreateCourse({
       let finalCourse = createdCourse.data;
       if (selectedImageFile) {
         try {
-          const imagePayload = await uploadCourseImage(newCourseId, selectedImageFile, token);
+          const fd = new FormData();
+          fd.append("image", selectedImageFile);
+          const imagePayload = await apiClient(`/api/courses/${newCourseId}/updateimage`, {
+            method: "PATCH",
+            body: fd,
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+          });
           finalCourse = imagePayload?.data ?? finalCourse;
         } catch {
           finalCourse = createdCourse.data;
@@ -275,7 +263,7 @@ export default function CreateCourse({
       submitLabel={isEdit ? "Save changes" : "Create Course"}
       submittingLabel={isEdit ? "Saving…" : "Creating…"}
       disableSubmit={isEdit && !hasChanges}
-      imageUrl={imagePreviewUrl}
+      imageUrl={!isEdit ? imagePreviewUrl : undefined}
       onImageSelect={!isEdit ? handleImageSelect : undefined}
     />
   );
