@@ -4,6 +4,7 @@ import { apiClient } from "../../lib/api-client";
 import CourseForm from "../CourseForm/CourseForm.jsx";
 import "./UpdateCourseInfo.css";
 import { coursePath } from "../../constants/RouteConstants.jsx";
+import { validateCourseFields } from "../../lib/formValidation.js";
 
 const trim = (v) => (typeof v === "string" ? v.trim() : "");
 
@@ -112,6 +113,13 @@ export default function UpdateCourseInfo({ asModal = false, onClose, onUpdated, 
 
     if (!cleaned.name) return setError("Course name is required.");
     if (!cleaned.code) return setError("Course code is required.");
+
+    const fieldErr = validateCourseFields(
+      cleaned.name,
+      cleaned.code,
+      cleaned.description,
+    );
+    if (fieldErr) return setError(fieldErr);
 
     const updates = {};
     if (cleaned.name !== trim(initial.name)) updates.name = cleaned.name;

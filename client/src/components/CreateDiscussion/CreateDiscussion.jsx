@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { apiClient } from "../../lib/api-client";
 import "../CreateDiscussion/CreateDiscussion.css";
+import {
+  LIMITS,
+  trimStr,
+  validateDiscussionCreate,
+} from "../../lib/formValidation.js";
 
 const CreateDiscussion = ({
   courseId,
@@ -41,26 +46,33 @@ const CreateDiscussion = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError(null);
     setSuccess(false);
 
     if (!courseId) {
-      setError("Missing course id.");
-      setLoading(false);
+      setError(
+        "A course is required. Open a course page to create a discussion there.",
+      );
       return;
     }
 
-    if (!formData.title.trim() || !formData.content.trim()) {
-      setError("Please fill in all fields");
-      setLoading(false);
+    const createErr = validateDiscussionCreate(
+      formData.title,
+      formData.content,
+    );
+    if (createErr) {
+      setError(createErr);
       return;
     }
 
+    const titleOut = trimStr(formData.title);
+    const contentOut = trimStr(formData.content);
+
+    setLoading(true);
     try {
       const data = new FormData();
-      data.append("title", formData.title);
-      data.append("content", formData.content);
+      data.append("title", titleOut);
+      data.append("content", contentOut);
       if (file) data.append("file", file);
 
       const token = localStorage.getItem("access_token");
@@ -108,12 +120,29 @@ const CreateDiscussion = ({
             <form onSubmit={handleSubmit}>
               <div className="form-group">
                 <label htmlFor="title">Title</label>
-                <input id="title" name="title" value={formData.title} onChange={handleChange} disabled={loading} />
+                <input
+                  id="title"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  disabled={loading}
+                  maxLength={LIMITS.DISCUSSION_TITLE_MAX}
+                  required
+                />
               </div>
 
               <div className="form-group">
                 <label htmlFor="content">Discussion Content</label>
-                <textarea id="content" name="content" value={formData.content} onChange={handleChange} rows="6" disabled={loading} />
+                <textarea
+                  id="content"
+                  name="content"
+                  value={formData.content}
+                  onChange={handleChange}
+                  rows="6"
+                  disabled={loading}
+                  maxLength={LIMITS.DISCUSSION_CONTENT_MAX}
+                  required
+                />
               </div>
 
               <div className="form-group">
@@ -151,11 +180,28 @@ const CreateDiscussion = ({
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="title">Title</label>
-            <input id="title" name="title" value={formData.title} onChange={handleChange} disabled={loading} />
+            <input
+              id="title"
+              name="title"
+              value={formData.title}
+              onChange={handleChange}
+              disabled={loading}
+              maxLength={LIMITS.DISCUSSION_TITLE_MAX}
+              required
+            />
           </div>
           <div className="form-group">
             <label htmlFor="content">Discussion Content</label>
-            <textarea id="content" name="content" value={formData.content} onChange={handleChange} rows="6" disabled={loading} />
+            <textarea
+              id="content"
+              name="content"
+              value={formData.content}
+              onChange={handleChange}
+              rows="6"
+              disabled={loading}
+              maxLength={LIMITS.DISCUSSION_CONTENT_MAX}
+              required
+            />
           </div>
           <button type="submit" className="submit-btn" disabled={loading}>
             {loading ? "Posting..." : "Post Discussion"}
