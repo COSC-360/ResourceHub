@@ -125,6 +125,32 @@ ResourceHub/
 
 ## Tech Stack
 
+### Frontend
+- **React** 19 - UI library
+- **Vite** - Build tool and dev server
+- **React Router DOM** - Client-side routing
+- **TailwindCSS** - Styling
+- **Socket.io Client** - Real-time communication
+- **Recharts** - Data visualization and charting
+- **ESLint** - Code linting
+
+### Backend
+- **Node.js** - JavaScript runtime
+- **Express** - Web framework
+- **MongoDB** - NoSQL database
+- **Mongoose** - MongoDB object modeling
+- **Socket.io** - Real-time bidirectional communication
+- **JWT (jsonwebtoken)** - Authentication
+- **Bcrypt** - Password hashing
+- **Multer** - File upload handling
+- **Swagger** - API documentation
+- **Jest** - Testing framework
+- **ESLint** - Code linting
+
+### DevOps
+- **Docker** - Containerization
+- **Docker Compose** - Multi-container orchestration
+
 ## Troubleshooting
 
 ## Development
