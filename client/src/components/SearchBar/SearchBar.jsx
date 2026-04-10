@@ -16,9 +16,10 @@ export function SearchBar(){
 
     return (
             <form id="searchForm" className="searchBarContainer" onSubmit={search}>
-                <img src="/src/assets/search-icon.svg" alt="search" className="searchIcon" />
+                <button type="submit" className="searchIconButton" aria-label="Search">
+                    <img src="/src/assets/search-icon.svg" alt="" className="searchIcon" />
+                </button>
                 <input id="search" placeholder="Search" className="searchBar" />
-                <button type="submit" className="searchButton">Search</button>
             </form>
     )
 }

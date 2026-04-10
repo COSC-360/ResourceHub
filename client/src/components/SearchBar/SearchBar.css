@@ -2,60 +2,51 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0;
   width: 100%;
   min-width: 0;
   height: 40px;
   margin: 0;
-  padding: 0;
+  padding: 0 8px 0 0;
+  border-radius: 8px;
+  background: #fff;
   box-sizing: border-box;
 }
 
 .searchBar {
   border: none;
   border-radius: 8px;
+  background: transparent;
   box-sizing: border-box;
   flex: 1;
   min-width: 0;
   height: 40px;
-  padding-left: 40px;
+  padding-left: 8px;
   margin: 0;
 }
 
-.searchButton {
-  flex-shrink: 0;
-  flex: 0 0 auto;
-  width: auto;
+.searchIconButton {
+  flex: 0 0 40px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   height: 40px;
-  padding: 0 16px;
+  width: 40px;
+  padding: 0;
   border: none;
   border-radius: 8px;
-  background: #2563eb;
-  color: #fff;
-  font: inherit;
-  font-weight: 600;
+  background: transparent;
   cursor: pointer;
 }
 
-.searchButton:hover {
-  background: #1d4ed8;
-}
-
-.searchButton:focus-visible {
-  outline: 2px solid #93c5fd;
+.searchIconButton:focus-visible {
+  outline: 2px solid #2563eb;
   outline-offset: 2px;
 }
 
 .searchIcon {
-    position: absolute;
-    left: 12px;
-    top: 10px;
-    width: 20px;
-    height: 20px;
-    pointer-events: none;
+  width: 20px;
+  height: 20px;
 }
 
 #searchForm {
