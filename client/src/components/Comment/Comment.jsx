@@ -1,10 +1,10 @@
 import { useState, useRef } from "react";
-import defaultProfile from "../../assets/profile.svg";
 import "./Comment.css";
 import { apiClient } from "../../lib/api-client";
 import { useNavigate } from "react-router-dom";
 import { LOGIN_ROUTE } from "../../constants/RouteConstants.jsx";
 import { LIMITS, trimStr, validateMaxLength } from "../../lib/formValidation.js";
+import ProfileAvatar from "../ProfileAvatar/ProfileAvatar.jsx";
 
 const Comment = ({ onSubmit, parentid, parentUsername, courseId: _courseId }) => {
   const [formData, setFormData] = useState({ content: "" });
@@ -96,12 +96,10 @@ const Comment = ({ onSubmit, parentid, parentUsername, courseId: _courseId }) =>
   return (
     <form className="container" onSubmit={handleSubmit}>
       <div className="form_body">
-        <img
-          src={`http://localhost:3000/api/user/getProfilePhoto/${userid}`}
+        <ProfileAvatar
+          userId={userid}
+          alt="profile photo"
           className="pfp"
-          onError={(e) => {
-            e.target.src = defaultProfile;
-          }}
         />
         <textarea
           className="text"
