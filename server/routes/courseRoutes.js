@@ -1,10 +1,9 @@
 import { Router } from "express";
 import * as courseController from "../controllers/courseController.js";
 import * as discussionController from "../controllers/discussionController.js";
-import upload from "../middleware/upload.js"; // use your multer middleware export
+import multerUpload from "../middleware/upload.js";
 import { verifyAccessToken } from "../middleware/authMiddleware.js";
 import { requireCourseMembership } from "../middleware/courseMembershipMiddleware.js";
-import discussionUpload from "../middleware/fileUploads.js";
 
 export const courseRoutes = Router();
 
@@ -16,7 +15,7 @@ courseRoutes.post("/create", verifyAccessToken, courseController.create); // cre
 
 // TODO: add auth middleware to these routes, also need to check if user is an instructor for the course when updating or deleting
 courseRoutes.patch("/:id/update", verifyAccessToken, courseController.update); // update a course by id
-courseRoutes.patch("/:id/updateimage", verifyAccessToken, upload.single("image"), courseController.updateImage); // update a course's image by id
+courseRoutes.patch("/:id/updateimage", verifyAccessToken, multerUpload.single("image"), courseController.updateImage); // update a course's image by id
 
 // TODO: delete a course by id, probably want auth also check membership and role (only allow instructors to delete courses)
 courseRoutes.delete("/:id", verifyAccessToken, courseController.deleteCourse); // delete a course by id
@@ -64,7 +63,7 @@ courseRoutes.post(
 	"/:courseId/discussions",
 	verifyAccessToken,
 	requireCourseMembership,
-	discussionUpload.single("file"),
+	multerUpload.single("file"),
 	discussionController.create,
 );
 
@@ -109,6 +108,6 @@ courseRoutes.post(
 	"/:courseId/discussions/:parentId/replies",
 	verifyAccessToken,
 	requireCourseMembership,
-	discussionUpload.single("file"),
+	multerUpload.single("file"),
 	discussionController.createReply,
 );
