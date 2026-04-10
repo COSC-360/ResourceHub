@@ -54,23 +54,25 @@ export function ProfilePage() {
   });
   const [saveErr, setSaveErr] = useState(null);
   const [file, setFile] = useState(null);
-  const [photoVersion, setPhotoVersion] = useState("");
+  /** Per-user cache-bust token after a successful save (avoids syncing photo version in an effect). */
+  const [photoBumpsByUserId, setPhotoBumpsByUserId] = useState({});
   const [activity, setActivity] = useState([]);
   const [activityErr, setActivityErr] = useState(null);
-  const [activityLoading, setActivityLoading] = useState(false);
+  /** Last `${token}:${effectiveUserId}` for which activity has been loaded. */
+  const [activityReadyKey, setActivityReadyKey] = useState(null);
   const fileRef = useRef(null);
 
-  useEffect(() => {
-    if (!effectiveUserId) {
-      setPhotoVersion("");
-      return;
-    }
-    if (effectiveUserId === storedUserId) {
-      setPhotoVersion(localStorage.getItem("profilePhotoVersion") ?? "");
-    } else {
-      setPhotoVersion("");
-    }
-  }, [effectiveUserId, storedUserId]);
+  const storagePhotoVersion =
+    effectiveUserId === storedUserId
+      ? (localStorage.getItem("profilePhotoVersion") ?? "")
+      : "";
+  const photoVersion =
+    (effectiveUserId && photoBumpsByUserId[effectiveUserId]) ??
+    storagePhotoVersion;
+
+  const activityKey = t && effectiveUserId ? `${t}:${effectiveUserId}` : null;
+  const activityLoading =
+    Boolean(activityKey) && activityReadyKey !== activityKey;
 
   const resetFile = () => {
     if (file && fileRef.current) {
@@ -98,7 +100,6 @@ export function ProfilePage() {
   useEffect(() => {
     if (!t || !effectiveUserId) return;
     let cancelled = false;
-    setFetchedForToken(null);
     apiClient(`/api/user/getUserById/${effectiveUserId}`, {
       headers: { Authorization: `Bearer ${t}` },
     })
@@ -123,8 +124,7 @@ export function ProfilePage() {
   useEffect(() => {
     if (!t || !effectiveUserId) return;
     let cancelled = false;
-    setActivityLoading(true);
-    setActivityErr(null);
+    const key = `${t}:${effectiveUserId}`;
     const params = new URLSearchParams({
       authorIds: effectiveUserId,
       limit: "200",
@@ -136,18 +136,16 @@ export function ProfilePage() {
       headers: { Authorization: `Bearer ${t}` },
     })
       .then((data) => {
-        if (!cancelled) {
-          setActivity(Array.isArray(data) ? data : []);
-        }
+        if (cancelled) return;
+        setActivity(Array.isArray(data) ? data : []);
+        setActivityErr(null);
+        setActivityReadyKey(key);
       })
       .catch((e) => {
-        if (!cancelled) {
-          setActivityErr(e.message || "Could not load activity");
-          setActivity([]);
-        }
-      })
-      .finally(() => {
-        if (!cancelled) setActivityLoading(false);
+        if (cancelled) return;
+        setActivityErr(e.message || "Could not load activity");
+        setActivity([]);
+        setActivityReadyKey(key);
       });
     return () => {
       cancelled = true;
@@ -212,7 +210,12 @@ export function ProfilePage() {
       });
       setProfile(data);
       const nextVersion = String(Date.now());
-      setPhotoVersion(nextVersion);
+      if (effectiveUserId) {
+        setPhotoBumpsByUserId((prev) => ({
+          ...prev,
+          [effectiveUserId]: nextVersion,
+        }));
+      }
       const isOwnProfile =
         !routeUserId || routeUserId === storedUserId;
       if (isOwnProfile) {
