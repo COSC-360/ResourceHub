@@ -5,6 +5,7 @@ import DiscussionFeedControls from './DiscussionFeedControls.jsx';
 import DiscussionFeedPagination from './DiscussionFeedPagination.jsx';
 import { apiClient } from "../../lib/api-client";
 import { buildDiscussionFeedQuery } from "../../lib/discussion-feed.js";
+import { socket } from "../../socket";
 
 function HybridFeed({
     courseId,
@@ -53,50 +54,131 @@ function HybridFeed({
     }));
 
     useEffect(() => {
-        if (courseId || courseScope !== 'my') return;
+  if (courseId || courseScope !== "my") return;
 
-        let cancelled = false;
+  let cancelled = false;
 
-        async function loadMyCourseIds() {
-            const token = localStorage.getItem("access_token");
-            if (!token) {
-                if (!cancelled) {
-                    setMyCourseIds([]);
-                    setMyCourseIdsLoaded(true);
-                }
-                return;
-            }
+  async function loadMyCourseIds() {
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      if (!cancelled) {
+        setMyCourseIds([]);
+        setMyCourseIdsLoaded(true);
+      }
+      return;
+    }
 
-            try {
-                const json = await apiClient('/api/memberships/me/course-ids', {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
+    try {
+      const json = await apiClient("/api/memberships/me/course-ids", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-                if (!cancelled) {
-                    const ids = Array.isArray(json?.data) ? json.data : [];
-                    setMyCourseIds(ids);
-                    setMyCourseIdsLoaded(true);
-                }
-            } catch {
-                if (!cancelled) {
-                    setMyCourseIds([]);
-                    setMyCourseIdsLoaded(true);
-                }
-            }
+      if (!cancelled) {
+        const ids = Array.isArray(json?.data) ? json.data : [];
+        setMyCourseIds(ids);
+        setMyCourseIdsLoaded(true);
+      }
+    } catch {
+      if (!cancelled) {
+        setMyCourseIds([]);
+        setMyCourseIdsLoaded(true);
+      }
+    }
+  }
+
+  loadMyCourseIds();
+
+  return () => {
+    cancelled = true;
+  };
+}, [courseId, courseScope]);
+
+const resolvedCourseIds = useMemo(() => {
+  if (courseId) return [courseId];
+  if (courseScope === "my") return myCourseIds;
+  return normalizedCourseIds;
+}, [courseId, courseScope, myCourseIds, normalizedCourseIds]);
+
+useEffect(() => {
+  console.log("HybridFeed mounted, courseId =", courseId);
+
+  if (courseId) {
+    console.log("Emitting joinCourse", courseId);
+    socket.emit("joinCourse", courseId);
+
+    return () => {
+      console.log("Emitting leaveCourse", courseId);
+      socket.emit("leaveCourse", courseId);
+    };
+  }
+
+  console.log("Emitting joinDiscussionsLobby");
+  socket.emit("joinDiscussionsLobby");
+
+  return () => {
+    console.log("Emitting leaveDiscussionsLobby");
+    socket.emit("leaveDiscussionsLobby");
+  };
+}, [courseId]);
+
+useEffect(() => {
+  function handlePostCreated(payload) {
+    console.log("post:created received", payload);
+
+    if (!payload?.post) return;
+
+    setItems((prev) => {
+      const newPostId = payload.post._id || payload.post.id;
+
+      const alreadyExists = prev.some((item) => {
+        const itemId = item._id || item.id;
+        return String(itemId) === String(newPostId);
+      });
+
+      if (alreadyExists) return prev;
+
+      return [payload.post, ...prev];
+    });
+  }
+
+  socket.on("post:created", handlePostCreated);
+
+  return () => {
+    socket.off("post:created", handlePostCreated);
+  };
+}, []);
+
+useEffect(() => {
+  function handleVoteUpdated(payload) {
+    console.log("vote:updated received", payload);
+
+    setItems((prev) =>
+      prev.map((item) => {
+        const itemId = item._id || item.id;
+        const targetId = payload.targetId?._id || payload.targetId;
+
+        if (String(itemId) !== String(targetId)) {
+          return item;
         }
 
-        loadMyCourseIds();
-
-        return () => {
-            cancelled = true;
+        return {
+          ...item,
+          upvotes: payload.upvotes,
+          downvotes: payload.downvotes,
+          score: payload.score,
         };
-    }, [courseId, courseScope]);
+      })
+    );
+  }
 
-    const resolvedCourseIds = useMemo(() => {
-        if (courseId) return [courseId];
-        if (courseScope === 'my') return myCourseIds;
-        return normalizedCourseIds;
-    }, [courseId, courseScope, myCourseIds, normalizedCourseIds]);
+  socket.on("vote:updated", handleVoteUpdated);
+
+  return () => {
+    socket.off("vote:updated", handleVoteUpdated);
+  };
+  }, []);
+
+
 
     function updateFilters(next) {
         setFilters((prev) => ({ ...prev, ...next }));

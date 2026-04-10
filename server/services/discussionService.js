@@ -92,6 +92,15 @@ export async function remove(id, userId, options = {}) {
   if (!isAdmin && discussion.authorId.toString() !== userId) {
     throw new Error("Not authorized");
   }
+
+   const result = {
+    _id: discussion._id.toString(),
+    courseId: discussion.courseId?.toString() || null,
+    parentId: discussion.parentId?.toString() || null,
+    replies: Number(discussion.replies || 0),
+    deleted: discussion.deleted || false,
+  };
+
   if (discussion.parentId) {
     const parent = await DiscussionRepository.findById(discussion.parentId);
     let replies = Number(parent.replies);
@@ -99,11 +108,26 @@ export async function remove(id, userId, options = {}) {
     parent.set({ replies: replies });
     await DiscussionRepository.save(parent);
   }
-  if (discussion.replies > 0) {
-    discussion.set({ content: "[deleted]", title: "[deleted]", deleted: true });
-    DiscussionRepository.save(discussion);
-  } else DiscussionRepository.delete(id);
-  return { id };
+   if (discussion.replies > 0) {
+    discussion.set({
+      content: "[deleted]",
+      title: "[deleted]",
+      deleted: true,
+    });
+    await DiscussionRepository.save(discussion);
+
+    return {
+      ...result,
+      softDeleted: true,
+    };
+  } else {
+    await DiscussionRepository.delete(id);
+
+    return {
+      ...result,
+      softDeleted: false,
+    };
+  }
 }
 
 export async function findImageById(id) {

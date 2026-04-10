@@ -43,6 +43,12 @@ await jest.unstable_mockModule("../../../errors/courseErrors.js", () => ({
   CourseCodeAlreadyExistsError: MockCourseCodeAlreadyExistsError,
 }));
 
+await jest.unstable_mockModule("../../../socket.js", () => ({
+  getIO: () => ({
+    to: jest.fn().mockReturnValue({ emit: jest.fn() }),
+  }),
+}));
+
 const controller = await import("../../../controllers/courseController.js");
 
 describe("course controller", () => {
