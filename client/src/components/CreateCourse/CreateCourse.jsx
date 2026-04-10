@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./CreateCourse.css";
 import { apiClient } from "../../lib/api-client";
+import CourseForm from "../CourseForm/CourseForm.jsx";
 
 const trim = (v) => (typeof v === "string" ? v.trim() : "");
 
@@ -27,6 +27,16 @@ export default function CreateCourse({
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState("");
+  const [selectedImageFile, setSelectedImageFile] = useState(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState("");
+  const previewObjectUrlRef = useRef(null);
+
+  function clearObjectPreview() {
+    if (previewObjectUrlRef.current) {
+      URL.revokeObjectURL(previewObjectUrlRef.current);
+      previewObjectUrlRef.current = null;
+    }
+  }
 
   useEffect(() => {
     if (!isEdit || !initialCourse) return;
@@ -37,8 +47,16 @@ export default function CreateCourse({
     };
     setCourseData(next);
     setBaseline(next);
+    clearObjectPreview();
+    setSelectedImageFile(null);
     setError("");
   }, [isEdit, initialCourse, editCourseId]);
+
+  useEffect(() => {
+    return () => {
+      clearObjectPreview();
+    };
+  }, []);
 
   const hasChanges = useMemo(() => {
     if (!isEdit || !baseline) return true;
@@ -48,6 +66,39 @@ export default function CreateCourse({
       trim(courseData.description) !== trim(baseline.description)
     );
   }, [isEdit, baseline, courseData]);
+
+  async function uploadCourseImage(courseId, file, token) {
+    if (!courseId || !file) return null;
+
+    const fd = new FormData();
+    fd.append("image", file);
+
+    setUploadingImage(true);
+    try {
+      return await apiClient(`/api/courses/${courseId}/updateimage`, {
+        method: "PATCH",
+        body: fd,
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+    } finally {
+      setUploadingImage(false);
+    }
+  }
+
+  function handleImageSelect(file) {
+    if (!file.type?.startsWith("image/")) {
+      setError("Only image files are allowed.");
+      return;
+    }
+
+    setError("");
+    clearObjectPreview();
+    const objectUrl = URL.createObjectURL(file);
+    previewObjectUrlRef.current = objectUrl;
+    setImagePreviewUrl(objectUrl);
+
+    setSelectedImageFile(file);
+  }
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -94,12 +145,27 @@ export default function CreateCourse({
       try {
         setSaving(true);
         const token = localStorage.getItem("access_token");
-        const payload = await apiClient(`/api/courses/${editCourseId}/update`, {
-          method: "PATCH",
-          body: updates,
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
-        const updated = payload?.data ?? null;
+        let updated = null;
+
+        if (Object.keys(updates).length > 0) {
+          const payload = await apiClient(`/api/courses/${editCourseId}/update`, {
+            method: "PATCH",
+            body: updates,
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+          });
+          updated = payload?.data ?? null;
+        }
+
+        if (updated) {
+          setBaseline({
+            name: updated.name ?? course.name,
+            code: updated.code ?? course.code,
+            description: updated.description ?? course.description,
+          });
+          clearObjectPreview();
+          setSelectedImageFile(null);
+        }
+
         onUpdated?.(updated);
         onClose?.();
       } catch (err) {
@@ -124,17 +190,30 @@ export default function CreateCourse({
         throw new Error("Created course ID missing from response");
       }
 
+      let finalCourse = createdCourse.data;
+      if (selectedImageFile) {
+        try {
+          const imagePayload = await uploadCourseImage(newCourseId, selectedImageFile, token);
+          finalCourse = imagePayload?.data ?? finalCourse;
+        } catch {
+          finalCourse = createdCourse.data;
+        }
+      }
+
       setCourseData({
         name: "",
         code: "",
         description: "",
       });
+      clearObjectPreview();
+      setSelectedImageFile(null);
+      setImagePreviewUrl("");
 
-      onCreated?.(createdCourse.data);
+      onCreated?.(finalCourse);
       onClose?.();
 
       navigate(`/courses/${newCourseId}`, {
-        state: { course: createdCourse.data },
+        state: { course: finalCourse },
       });
     } catch (err) {
       setError(err.message || "Failed to create course.");
@@ -173,96 +252,31 @@ export default function CreateCourse({
   const idSuffix = isEdit && editCourseId ? String(editCourseId) : "new";
 
   return (
-    <div className={asModal ? "create-course create-course--modal" : "create-course"}>
-      <form onSubmit={handleSubmit}>
-        <div className="create-course__top">
-          <legend>
-            {isEdit ? "Edit course" : "What is your course?"}
-          </legend>
-          {asModal && (
-            <button
-              type="button"
-              className="create-course__close"
-              onClick={onClose}
-              aria-label="Close"
-            >
-              ✕
-            </button>
-          )}
-        </div>
-        <p>
-          {isEdit
-            ? "Update the course details below."
-            : "Describe your course to help people find it."}
-        </p>
-        <fieldset>
-          <label htmlFor={`course-name-${idSuffix}`}>Course Name:</label>
-          <input
-            type="text"
-            id={`course-name-${idSuffix}`}
-            name="name"
-            value={courseData.name}
-            onChange={handleChange}
-            required
-            disabled={saving || deleting}
-          />
-        </fieldset>
-        <fieldset>
-          <label htmlFor={`course-code-${idSuffix}`}>Course Code:</label>
-          <input
-            type="text"
-            id={`course-code-${idSuffix}`}
-            name="code"
-            value={courseData.code}
-            onChange={handleChange}
-            required
-            disabled={saving || deleting}
-          />
-        </fieldset>
-        <fieldset>
-          <label htmlFor={`course-desc-${idSuffix}`}>Course Description:</label>
-          <textarea
-            id={`course-desc-${idSuffix}`}
-            name="description"
-            value={courseData.description}
-            onChange={handleChange}
-            required={!isEdit}
-            disabled={saving || deleting}
-          />
-        </fieldset>
-        {error ? <p className="create-course__error">{error}</p> : null}
-        <div className="create-course__actions">
-          {asModal && (
-            <button
-              type="button"
-              onClick={onClose}
-              className="create-course__secondary"
-              disabled={saving || deleting}
-            >
-              Cancel
-            </button>
-          )}
-          {isEdit && (
-            <button
-              type="button"
-              className="create-course__delete"
-              onClick={handleDelete}
-              disabled={saving || deleting}
-            >
-              {deleting ? "Deleting…" : "Delete course"}
-            </button>
-          )}
-          <button type="submit" disabled={saving || deleting || (isEdit && !hasChanges)}>
-            {saving
-              ? isEdit
-                ? "Saving…"
-                : "Creating…"
-              : isEdit
-                ? "Save changes"
-                : "Create Course"}
-          </button>
-        </div>
-      </form>
-    </div>
+    <CourseForm
+      asModal={asModal}
+      title={isEdit ? "Edit course" : "What is your course?"}
+      subtitle={
+        isEdit
+          ? "Update the course details below."
+          : "Describe your course to help people find it."
+      }
+      idSuffix={idSuffix}
+      formData={courseData}
+      onChange={handleChange}
+      onSubmit={handleSubmit}
+      error={error}
+      onClose={onClose}
+      onCancel={onClose}
+      showCancel={asModal}
+      canDelete={isEdit}
+      onDelete={handleDelete}
+      deleting={deleting}
+      submitting={saving}
+      submitLabel={isEdit ? "Save changes" : "Create Course"}
+      submittingLabel={isEdit ? "Saving…" : "Creating…"}
+      disableSubmit={isEdit && !hasChanges}
+      imageUrl={imagePreviewUrl}
+      onImageSelect={!isEdit ? handleImageSelect : undefined}
+    />
   );
 }
