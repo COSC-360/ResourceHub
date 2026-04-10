@@ -2,6 +2,7 @@ import * as courseService from '../services/courseService.js';
 import mongoose from 'mongoose';
 import { CourseCodeAlreadyExistsError } from '../errors/courseErrors.js';
 import * as discussionService from '../services/discussionService.js';
+import { getIO } from "../socket.js";
 
 export async function getById(req, res) {
     try {
@@ -51,6 +52,12 @@ export async function create(req, res) {
 
     // IMPORTANT: pass creatorUserId
     const createdCourse = await courseService.create(course, creatorUserId);
+
+    console.log("Emitting course:created to courses:lobby", createdCourse._id);
+
+    getIO().to("courses:lobby").emit("course:created", {
+    course: createdCourse,
+    });
 
     return res.status(201).json({ data: createdCourse });
   } catch (error) {
