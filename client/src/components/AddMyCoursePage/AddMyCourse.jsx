@@ -1,30 +1,29 @@
 import { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { apiClient } from "../../lib/api-client";
 import CourseCard from "../Cards/CourseCard.jsx";
 import CreateCourse from "../CreateCourse/CreateCourse.jsx";
 import "./AddMyCourse.css";
 
+function isLoggedIn() {
+  return Boolean(localStorage.getItem("access_token"));
+}
+
 export default function AddMyCoursePage() {
   const [availableCourses, setAvailableCourses] = useState([]);
   const [error, setError] = useState("");
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const navigate = useNavigate();
 
   const loadAvailableCourses = useCallback(async () => {
     try {
       const token = localStorage.getItem("access_token");
-      if (!token) {
-        navigate("/login");
-        return;
-      }
+      const allCoursesPromise = apiClient("/api/courses");
+      const myIdsPromise = token
+        ? apiClient("/api/memberships/me/course-ids", {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+        : Promise.resolve({ data: [] });
 
-      const [allCoursesRes, myIdsRes] = await Promise.all([
-        apiClient("/api/courses"),
-        apiClient("/api/memberships/me/course-ids", {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-      ]);
+      const [allCoursesRes, myIdsRes] = await Promise.all([allCoursesPromise, myIdsPromise]);
 
       const allCourses = allCoursesRes.data || [];
       const myIds = new Set((myIdsRes.data || []).map(String));
@@ -38,7 +37,7 @@ export default function AddMyCoursePage() {
     } catch (err) {
       setError(err.message || "Failed to load courses.");
     }
-  }, [navigate]);
+  }, []);
 
   useEffect(() => {
     const id = setTimeout(() => {
@@ -68,9 +67,11 @@ export default function AddMyCoursePage() {
           <h1>All Courses</h1>
           <p>Select a course to open it, then join from the course page.</p>
         </div>
-        <button className="add-my-course-page__create-btn" onClick={openCreateModal}>
-          + Create Course
-        </button>
+        {isLoggedIn() ? (
+          <button className="add-my-course-page__create-btn" onClick={openCreateModal}>
+            + Create Course
+          </button>
+        ) : null}
       </div>
 
       {error && <p className="mycourses-error">{error}</p>}
