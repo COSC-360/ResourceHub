@@ -34,8 +34,8 @@ async function getCourse(courseId) {
 export default function ResourceCard({ data }) {
   const [author, setAuthor] = useState(null);
   const [course, setCourse] = useState(null);
-  const [likes, setLikes] = useState(data?.likes ?? 0);
-  const [dislikes, setDislikes] = useState(data?.dislikes ?? 0);
+  const likes = data?.likes ?? 0;
+  const dislikes = data?.dislikes ?? 0;
   const [downloadCount, setDownloadCount] = useState(data?.downloadCount ?? 0);
 
   useEffect(() => {

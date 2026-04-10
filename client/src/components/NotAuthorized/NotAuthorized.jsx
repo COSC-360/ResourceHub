@@ -1,4 +1,3 @@
-import Header from '../Header/Header';
 import './NotAuthorized.css';
 import { Link } from 'react-router-dom';
 

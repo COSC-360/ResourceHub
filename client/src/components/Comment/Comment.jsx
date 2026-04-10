@@ -1,10 +1,10 @@
-import React, { useState, useRef } from "react";
+import { useState, useRef } from "react";
 import defaultProfile from "../../assets/profile.svg";
 import "./Comment.css";
 import { apiClient } from "../../lib/api-client";
 import { useNavigate } from "react-router-dom";
 
-const Comment = ({ onSubmit, parentid, parentUsername, courseId }) => {
+const Comment = ({ onSubmit, parentid, parentUsername, courseId: _courseId }) => {
   const [formData, setFormData] = useState({ content: "" });
   const [file, setFile] = useState(null);
   const [error, setError] = useState("");
