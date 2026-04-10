@@ -10,6 +10,8 @@ const SORT_OPTIONS = [
   { value: "score", label: "Best score" },
 ];
 
+const OPTIONAL_CHECKBOX_FILTERS = new Set(["deleted", "edited", "hasReplies"]);
+
 export default function DiscussionFeedControls({
   filters,
   onChange,
@@ -24,7 +26,8 @@ export default function DiscussionFeedControls({
 
   function handleCheckbox(name) {
     return (event) => {
-      onChange({ [name]: event.target.checked });
+      const checked = event.target.checked;
+      onChange({ [name]: OPTIONAL_CHECKBOX_FILTERS.has(name) ? (checked ? true : undefined) : checked });
     };
   }
 
