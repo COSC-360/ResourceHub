@@ -71,7 +71,7 @@ While the docker container is running in a different terminal window. Client or 
 
 If you downloaded a release tarball instead of cloning the repository:
 
-1. Get a release from the releases folder and extract the archive:
+1. Get a release from the [releases folder](releases/) and extract the archive:
 
 ~~~
 tar -xzf ResourceHub-alpha-YYYY-MM-DD-HHMM.tar.gz
