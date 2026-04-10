@@ -14,119 +14,158 @@ export default function VoteControls({
   activeClassName = "active",
 }) {
   const navigate = useNavigate();
-  const [upvotes, setUpvotes] = useState(initialUpvotes);
-  const [downvotes, setDownvotes] = useState(initialDownvotes);
-  const [hasUpvote, setHasUpvote] = useState(initialHasUpvote);
-  const [hasDownvote, setHasDownvote] = useState(initialHasDownvote);
-
-  const [prevFromProps, setPrevFromProps] = useState(() => ({
+  const [voteState, setVoteState] = useState(() => ({
     targetId,
-    initialUpvotes,
-    initialDownvotes,
-    initialHasUpvote,
-    initialHasDownvote,
+    upvotes: Number(initialUpvotes) || 0,
+    downvotes: Number(initialDownvotes) || 0,
+    hasUpvote: Boolean(initialHasUpvote),
+    hasDownvote: Boolean(initialHasDownvote),
   }));
+  const [voteBusy, setVoteBusy] = useState(false);
 
-  if (
-    prevFromProps.targetId !== targetId ||
-    prevFromProps.initialUpvotes !== initialUpvotes ||
-    prevFromProps.initialDownvotes !== initialDownvotes ||
-    prevFromProps.initialHasUpvote !== initialHasUpvote ||
-    prevFromProps.initialHasDownvote !== initialHasDownvote
-  ) {
-    setPrevFromProps({
+  const current =
+    String(voteState.targetId) === String(targetId)
+      ? voteState
+      : {
+          targetId,
+          upvotes: Number(initialUpvotes) || 0,
+          downvotes: Number(initialDownvotes) || 0,
+          hasUpvote: Boolean(initialHasUpvote),
+          hasDownvote: Boolean(initialHasDownvote),
+        };
+
+  const updateCurrentState = (next) => {
+    setVoteState({
       targetId,
-      initialUpvotes,
-      initialDownvotes,
-      initialHasUpvote,
-      initialHasDownvote,
+      upvotes: next.upvotes,
+      downvotes: next.downvotes,
+      hasUpvote: next.hasUpvote,
+      hasDownvote: next.hasDownvote,
     });
-    setUpvotes(initialUpvotes);
-    setDownvotes(initialDownvotes);
-    setHasUpvote(initialHasUpvote);
-    setHasDownvote(initialHasDownvote);
-  }
+  };
 
   const handleUpvote = async () => {
+    if (voteBusy) return;
     try {
       const token = localStorage.getItem("access_token");
       if (!token) return navigate(LOGIN_ROUTE);
+      setVoteBusy(true);
 
-      if (hasUpvote || hasDownvote) {
+      const wasUp = current.hasUpvote;
+      const wasDown = current.hasDownvote;
+      const next = {
+        upvotes: current.upvotes,
+        downvotes: current.downvotes,
+        hasUpvote: current.hasUpvote,
+        hasDownvote: current.hasDownvote,
+      };
+
+      if (wasUp || wasDown) {
         await apiClient("/api/vote/remove", {
           method: "DELETE",
           body: { targetType, targetId },
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        if (hasDownvote) {
-          setHasDownvote(false);
+        if (wasDown) {
+          next.downvotes = Math.max(0, next.downvotes - 1);
+          next.hasDownvote = false;
+        }
+        if (wasUp) {
+          next.upvotes = Math.max(0, next.upvotes - 1);
+          next.hasUpvote = false;
         }
       }
 
-      if (!hasUpvote) {
+      if (!wasUp) {
         await apiClient("/api/vote/up", {
           method: "POST",
           body: { targetType, targetId },
           headers: { Authorization: `Bearer ${token}` },
         });
-        setHasUpvote(true);
-      } else {
-        setHasUpvote(false);
+        next.upvotes += 1;
+        next.hasUpvote = true;
       }
+
+      updateCurrentState(next);
     } catch (err) {
       console.error("Upvote failed:", err);
+    } finally {
+      setVoteBusy(false);
     }
   };
 
   const handleDownvote = async () => {
+    if (voteBusy) return;
     try {
       const token = localStorage.getItem("access_token");
       if (!token) return navigate(LOGIN_ROUTE);
+      setVoteBusy(true);
 
-      if (hasUpvote || hasDownvote) {
+      const wasUp = current.hasUpvote;
+      const wasDown = current.hasDownvote;
+      const next = {
+        upvotes: current.upvotes,
+        downvotes: current.downvotes,
+        hasUpvote: current.hasUpvote,
+        hasDownvote: current.hasDownvote,
+      };
+
+      if (wasUp || wasDown) {
         await apiClient("/api/vote/remove", {
           method: "DELETE",
           body: { targetType, targetId },
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        if (hasUpvote) {
-          setHasUpvote(false);
+        if (wasUp) {
+          next.upvotes = Math.max(0, next.upvotes - 1);
+          next.hasUpvote = false;
+        }
+        if (wasDown) {
+          next.downvotes = Math.max(0, next.downvotes - 1);
+          next.hasDownvote = false;
         }
       }
 
-      if (!hasDownvote) {
+      if (!wasDown) {
         await apiClient("/api/vote/down", {
           method: "POST",
           body: { targetType, targetId },
           headers: { Authorization: `Bearer ${token}` },
         });
-        setHasDownvote(true);
-      } else {
-        setHasDownvote(false);
+        next.downvotes += 1;
+        next.hasDownvote = true;
       }
+
+      updateCurrentState(next);
     } catch (err) {
       console.error("Downvote failed:", err);
+    } finally {
+      setVoteBusy(false);
     }
   };
 
   return (
     <>
       <button
-        className={`${buttonClassName} ${hasUpvote ? activeClassName : ""}`.trim()}
+        type="button"
+        className={`${buttonClassName} ${current.hasUpvote ? activeClassName : ""}`.trim()}
         onClick={handleUpvote}
+        disabled={voteBusy}
       >
         <i className="bi bi-arrow-up"></i>
-        <span>{upvotes}</span>
+        <span>{current.upvotes}</span>
       </button>
 
       <button
-        className={`${buttonClassName} ${hasDownvote ? activeClassName : ""}`.trim()}
+        type="button"
+        className={`${buttonClassName} ${current.hasDownvote ? activeClassName : ""}`.trim()}
         onClick={handleDownvote}
+        disabled={voteBusy}
       >
         <i className="bi bi-arrow-down"></i>
-        <span>{downvotes}</span>
+        <span>{current.downvotes}</span>
       </button>
     </>
   );
