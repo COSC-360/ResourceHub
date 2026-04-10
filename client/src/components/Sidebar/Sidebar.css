@@ -61,3 +61,32 @@
   color: white;
   font-weight: 600;
 }
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+    align-self: stretch;
+  }
+
+  .sidebar-title {
+    font-size: 1.15rem;
+    margin-bottom: 10px;
+  }
+
+  .nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .nav li {
+    margin: 0;
+    padding: 0;
+  }
+
+  .nav li a {
+    padding: 10px 12px;
+    font-size: 0.95rem;
+  }
+}

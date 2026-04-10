@@ -42,16 +42,21 @@
   flex-direction: column;
   gap: 0.35rem;
   font-size: 0.9rem;
+  min-width: 0;
+  flex: 1 1 auto;
 }
 
 .discussion-feed-controls__selects select,
 .discussion-feed-controls__field input {
-  min-width: 12rem;
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
   border-radius: 0.65rem;
   border: 1px solid #ccc;
   background: #fff;
   color: var(--rh-text);
   padding: 0.6rem 0.75rem;
+  box-sizing: border-box;
 }
 
 .discussion-feed-controls__panel {

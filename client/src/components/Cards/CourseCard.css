@@ -40,6 +40,8 @@
 .course-card__title {
     margin: 0 0 6px;
     font-size: 1.05rem;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .course-card__description {

@@ -61,3 +61,14 @@
 .replies__status--error {
   color: #d32f2f;
 }
+
+@media (max-width: 640px) {
+  .replies--depth-2,
+  .replies--depth-3,
+  .replies--depth-4,
+  .replies--depth-5,
+  .replies--depth-6 {
+    margin-left: 0.35rem;
+    padding-left: 0.5rem;
+  }
+}

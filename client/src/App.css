@@ -2,15 +2,27 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  padding-top: var(--header-height);
 }
 
 .body-layout {
   display: flex;
   flex: 1;
+  min-width: 0;
 }
 
 .main-content {
   flex: 1;
+  min-width: 0;
   padding: 20px;
+  overflow-wrap: break-word;
+}
+
+@media (max-width: 768px) {
+  .body-layout {
+    flex-direction: column;
+  }
+
+  .main-content {
+    padding: 12px;
+  }
 }

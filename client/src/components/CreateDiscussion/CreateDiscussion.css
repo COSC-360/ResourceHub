@@ -117,3 +117,13 @@
 .create-discussion-cancel:hover:not(:disabled) {
   background-color: #565e64;
 }
+
+@media (max-width: 480px) {
+  .create-discussion-card {
+    padding: 18px;
+  }
+
+  .create-discussion-card h2 {
+    font-size: 1.15rem;
+  }
+}
