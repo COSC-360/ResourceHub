@@ -12,6 +12,7 @@ import ProfileAvatar from "../ProfileAvatar/ProfileAvatar.jsx";
 import { useNavigate } from "react-router-dom";
 import { LOGIN_ROUTE } from "../../constants/RouteConstants.jsx";
 import { createdAtFromObjectId } from "../../lib/dateUtils";
+import { displayFaculty } from "../../lib/userUtils";
 import {
   LIMITS,
   trimStr,
@@ -34,7 +35,7 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
   const [hasDownvote, setHasDownvote] = useState(post_props.hasDownvote);
   const [replies, setReplies] = useState(post_props.replies);
   const [username, setUsername] = useState("Unknown User");
-  const [faculty, setFaculty] = useState("None");
+  const [faculty, setFaculty] = useState("No Faculty");
 
   const [comments, setComments] = useState([]);
   const [showComments, setShowComments] = useState(false);
@@ -370,7 +371,7 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
           `http://localhost:3000/api/user/getUserById/${post_props.authorid}`,
         );
         setUsername(response.data.username);
-        setFaculty(response.data.faculty);
+        setFaculty(displayFaculty(response.data.faculty));
       } catch (err) {
         console.log(err);
       }

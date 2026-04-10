@@ -1,6 +1,6 @@
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { fetchUserById } from "../../lib/userUtils";
+import { displayFaculty, fetchUserById } from "../../lib/userUtils";
 import { createdAtFromObjectId, timeAgo } from "../../lib/dateUtils";
 import { apiClient } from "../../lib/api-client";
 import AuthContext from "../../AuthContext.jsx";
@@ -107,7 +107,7 @@ export default function DiscussionCard({
   }, [authorId, populatedAuthor]);
 
   const username = user?.username || populatedAuthor?.username || "Unknown User";
-  const faculty = user?.faculty || populatedAuthor?.faculty || "";
+  const faculty = displayFaculty(user?.faculty ?? populatedAuthor?.faculty);
 
   const isAuthor = Boolean(merged?.isAuthor);
   const isAdmin = Boolean(sessionUser?.admin);
@@ -289,7 +289,7 @@ export default function DiscussionCard({
               </Link>
             )}
             <span className="discussion-card__username">{username}</span>
-            {faculty && <span className="discussion-card__faculty">{faculty}</span>}
+            <span className="discussion-card__faculty">{faculty}</span>
             <span className="discussion-card__time">{timeStr}</span>
             {merged.edited && <span className="discussion-card__edited">edited</span>}
             {canEditPost && !isDeleted && (
