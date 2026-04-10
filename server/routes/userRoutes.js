@@ -200,3 +200,8 @@ userRoutes.get("/verifytoken", verifyAccessToken, userController.verifyToken);
 
 //Everything past this point requires admin privileges
 userRoutes.get("/admin/users", requireAdmin, userController.searchUsers);
+userRoutes.patch(
+  "/admin/users/:id/enabled",
+  requireAdmin,
+  userController.setUserEnabled,
+);

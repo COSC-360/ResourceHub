@@ -1,0 +1,42 @@
+.confirm-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.confirm-dialog-card {
+  width: min(460px, calc(100vw - 2rem));
+  background: #fff;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.14);
+}
+
+.confirm-dialog-card p {
+  margin: 0 0 1rem;
+}
+
+.confirm-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.confirm-dialog-cancel,
+.confirm-dialog-confirm {
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  background: rgb(167, 165, 165);
+  cursor: pointer;
+}
+
+.confirm-dialog-confirm {
+  background: #214cd6;
+  border-color: #222;
+  color: #fff;
+}

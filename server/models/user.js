@@ -46,6 +46,10 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    enabled: {
+      type: Boolean,
+      default: true,
+    },
   },
   { timestamps: true },
 ); // Automatically adds createdAt and updatedAt fields
