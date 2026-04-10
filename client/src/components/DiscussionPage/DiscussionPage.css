@@ -1,0 +1,20 @@
+.discussion-page__back {
+  margin-bottom: 1rem;
+}
+
+.discussion-page__back-link {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--rh-text);
+  padding: 6px 10px;
+  margin: -6px -10px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.discussion-page__back-link:hover {
+  background: var(--rh-redirect-hover-bg);
+  color: var(--rh-redirect-hover-color);
+}

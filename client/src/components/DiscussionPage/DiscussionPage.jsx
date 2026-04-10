@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import DiscussionCard from "../Cards/DiscussionCard.jsx";
 import Replies from "./Replies.jsx";
 import Reply from "./Reply.jsx";
 import { apiClient } from "../../lib/api-client";
+import { coursePath } from "../../constants/RouteConstants.jsx";
 import { socket } from "../../socket";
+import "./DiscussionPage.css";
 
 export default function DiscussionPage({ discussionId: discussionIdProp }) {
   const params = useParams();
   const discussionId = discussionIdProp || params.discussionId;
+  const routeCourseId = params.courseId;
 
   const [discussion, setDiscussion] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -152,6 +155,7 @@ export default function DiscussionPage({ discussionId: discussionIdProp }) {
   }
 
   const rootCourseId = resolveCourseId(discussion?.courseId);
+  const backCourseId = routeCourseId || rootCourseId;
 
   function handleRootReplySubmitted() {
     setShowRootReply(false);
@@ -165,6 +169,13 @@ export default function DiscussionPage({ discussionId: discussionIdProp }) {
 
   return (
     <div className="discussion-page">
+      {backCourseId ? (
+        <div className="discussion-page__back">
+          <Link to={coursePath(backCourseId)} className="discussion-page__back-link">
+            ← Back to course
+          </Link>
+        </div>
+      ) : null}
       {isLoading && <div className="discussion-page__status">Loading discussion...</div>}
       {error && <div className="discussion-page__status discussion-page__status--error">{error}</div>}
 
