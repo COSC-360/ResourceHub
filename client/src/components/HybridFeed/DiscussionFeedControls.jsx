@@ -14,6 +14,7 @@ export default function DiscussionFeedControls({
   filters,
   onChange,
   onReset,
+  showCourseScope = true,
   courseScope = "any",
   onCourseScopeChange,
   disableMyCourses = false,
@@ -65,7 +66,7 @@ export default function DiscussionFeedControls({
             </select>
           </label>
 
-          {onCourseScopeChange && (
+          {showCourseScope && onCourseScopeChange ? (
             <label>
               Course scope
               <select
@@ -76,7 +77,7 @@ export default function DiscussionFeedControls({
                 <option value="my" disabled={disableMyCourses}>My courses</option>
               </select>
             </label>
-          )}
+          ) : null}
         </div>
 
         <button

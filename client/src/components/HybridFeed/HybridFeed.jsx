@@ -12,6 +12,7 @@ function HybridFeed({
     sort = 'newest',
     limit = 20,
     maxItemsPerPage,
+    showCourseScope = true,
     initialFilters = {},
 }) {
     const hasToken = Boolean(localStorage.getItem("access_token"));
@@ -189,6 +190,7 @@ function HybridFeed({
                 filters={filters}
                 onChange={updateFilters}
                 onReset={resetFilters}
+                showCourseScope={showCourseScope}
                 courseScope={courseScope}
                 onCourseScopeChange={handleCourseScopeChange}
                 disableMyCourses={!hasToken}
