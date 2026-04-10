@@ -103,8 +103,20 @@ export async function remove(id, userId) {
 
 export async function findImageById(id) {
   const discussion = await findById(id);
-  return {
-    contentType: discussion.image.contentType,
-    data: discussion.image.data,
-  };
+  if (!discussion?.image) {
+    return null;
+  }
+
+  if (typeof discussion.image === "string") {
+    return discussion.image;
+  }
+
+  if (discussion.image?.contentType && discussion.image?.data) {
+    return {
+      contentType: discussion.image.contentType,
+      data: discussion.image.data,
+    };
+  }
+
+  return null;
 }

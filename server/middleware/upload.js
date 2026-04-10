@@ -28,13 +28,20 @@ const fileFilter = (_req, file, cb) => {
   cb(null, true);
 };
 
-const multerUpload = multer({
-  storage,
+const sharedOptions = {
   fileFilter,
   limits: {
     fileSize: 5 * 1024 * 1024, // 5MB
   },
+};
+
+const multerUpload = multer({
+  storage,
+  ...sharedOptions,
 });
 
+const multerDiskUpload = multerUpload;
+
+export { multerDiskUpload };
 export { multerUpload };
 export default multerUpload;

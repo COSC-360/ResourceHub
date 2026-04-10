@@ -23,10 +23,7 @@ const DiscussionSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    image: {
-      data: { type: Buffer, default: null },
-      contentType: { type: String, default: null },
-    },
+    image: { type: mongoose.Schema.Types.Mixed, default: null },
     deleted: { type: Boolean, default: false },
     title: { type: String, default: null },
     content: { type: String, required: true },
