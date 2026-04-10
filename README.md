@@ -20,21 +20,21 @@ This project can be run using Docker, which starts the frontend, backend, and Mo
 
 1. Create a `.env` file for the backend by copying the example:
 
-```
+~~~
 cp server/.env.example server/.env
-```
+~~~
 
 2. Add the required environment variables inside `server/.env`:
 
 ##### Database
-```
+~~~
 MONGO_URI=mongodb://mongo:27017/resourcehub
-```
+~~~
 
 ##### JWT
-```
+~~~
 ACCESS_TOKEN_SECRET_KEY=your_access_token_secret
-```
+~~~
 
 #### Run the application
 
@@ -59,15 +59,15 @@ docker compose down
 
 If there are issues with npm packages not resolving while the docker container is up, run:
 
-```
+~~~
 docker compose exec client npm install
-```
+~~~
 
 or
 
-```
+~~~
 docker compose exec server npm install
-```
+~~~
 
 While the docker container is running in a different terminal window. Client or server keyword dependent on where the package needs to be installed.
 
@@ -101,7 +101,7 @@ docker compose up --build
 
 ## Project Structure
 
-```
+~~~
 ResourceHub/
 ├── client/                    # Frontend (React + Vite)
 │   ├── src/
@@ -138,7 +138,7 @@ ResourceHub/
 ├── docker-compose.yml       # Docker Compose configuration
 ├── README.md
 └── LICENSE
-```
+~~~
 
 ## Tech Stack
 
