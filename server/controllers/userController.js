@@ -159,7 +159,9 @@ export async function searchUsers(req, res) {
   const name = req.query.name;
   const email = req.query.email;
   const faculty = req.query.faculty;
-  const isAdmin = Boolean(req.query.isAdmin);
+  let isAdmin;
+  if (req.query.isAdmin === "true") isAdmin = true;
+  if (req.query.isAdmin === "false") isAdmin = false;
   const users = await userService.searchUsers(name, email, faculty, isAdmin);
   res.status(200).json({ data: users });
 }

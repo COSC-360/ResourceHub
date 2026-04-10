@@ -15,7 +15,7 @@ services:
       - "3000:3000"
     env_file:
       - ./server/.env
-    command: npm run dev
+    command: npm run dev -- --legacy-watch
     depends_on:
       - mongo
     volumes:
