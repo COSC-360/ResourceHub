@@ -2,6 +2,13 @@ import { jest, describe, test, expect, beforeEach } from "@jest/globals";
 
 const mockIsValid = jest.fn();
 
+class MockSchema {
+  constructor(definition, options) {
+    this.definition = definition;
+    this.options = options;
+  }
+}
+
 await jest.unstable_mockModule("mongoose", () => ({
   default: {
     Types: {
@@ -9,6 +16,12 @@ await jest.unstable_mockModule("mongoose", () => ({
         isValid: mockIsValid,
       },
     },
+    Schema: Object.assign(MockSchema, {
+      Types: {
+        Mixed: "Mixed",
+      },
+    }),
+    model: jest.fn(),
   },
 }));
 

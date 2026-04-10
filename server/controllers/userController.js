@@ -93,11 +93,11 @@ export async function getUserById(req, res) {
 
   try {
     const user = await userService.getUserById(String(id));
-    delete user.pfp;
     if (!user) {
       res.status(404).json({ error: "User not found" });
       return;
     }
+    delete user.pfp;
     res.json({ data: user });
   } catch (err) {
     console.log(err);
