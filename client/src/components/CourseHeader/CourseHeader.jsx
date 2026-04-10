@@ -3,7 +3,6 @@ import { apiClient } from "../../lib/api-client";
 import AuthContext from "../../AuthContext.jsx";
 import { DEFAULT_COURSE_COVER, resolveCourseImageSrc } from "../../lib/course-cover.js";
 import CreateCourse from "../CreateCourse/CreateCourse.jsx";
-import CourseImageMenu from "../CourseImageMenu/CourseImageMenu.jsx";
 import CourseMembershipButton from "../CourseMembershipButton/CourseMembershipButton.jsx";
 import MemberCount from "../MemberCount/MemberCount.jsx";
 import UpdateCourseInfo from "../UpdateCourseInfo/UpdateCourseInfo.jsx";
@@ -26,13 +25,7 @@ function PeopleIcon() {
 
 export function CourseHeader({ course, onMembershipChanged, onCourseUpdated, onCourseDeleted }) {
     const { user: sessionUser } = useContext(AuthContext);
-    const [displayCourse, setDisplayCourse] = useState(course);
-
-    useEffect(() => {
-        setDisplayCourse(course);
-    }, [course]);
-
-    const courseId = displayCourse._id || displayCourse.id;
+    const courseId = course._id || course.id;
 
     const [isInstructor, setIsInstructor] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
@@ -64,34 +57,23 @@ export function CourseHeader({ course, onMembershipChanged, onCourseUpdated, onC
     }, [courseId]);
 
     const memberCount = Number(
-        displayCourse.memberCount ?? displayCourse.numberOfStudents ?? 0
+        course.memberCount ?? course.numberOfStudents ?? 0
     );
 
-    const imageSrc = resolveCourseImageSrc(displayCourse.image);
+    const imageSrc = resolveCourseImageSrc(course.image);
     const coverSrc = imageSrc || DEFAULT_COURSE_COVER;
-    const coverAlt = imageSrc ? displayCourse.name : "";
+    const coverAlt = imageSrc ? course.name : "";
 
     return (
         <section className="course-header">
             <div className="course-header__image-wrap">
                 <img className="course-header__image" src={coverSrc} alt={coverAlt} />
-                {canManageCourse && (
-                    <CourseImageMenu
-                        courseId={courseId}
-                        onUpdated={(updated) => {
-                            if (updated) setDisplayCourse(updated);
-                            onCourseUpdated?.(updated);
-                        }}
-                    />
-                )}
             </div>
 
             <div className="course-header__content">
                 <div className="course-header__main">
-                    <h1 className="course-header__title">{displayCourse.name} - {displayCourse.code}</h1>
-                    <p className="course-header__description">
-                        {displayCourse.description?.trim() ? displayCourse.description : "No description"}
-                    </p>
+                    <h1 className="course-header__title">{course.name} - {course.code}</h1>
+                    <p className="course-header__description">{course.description}</p>
                 </div>
 
                 <div className="course-header__side">
@@ -134,24 +116,18 @@ export function CourseHeader({ course, onMembershipChanged, onCourseUpdated, onC
                                 <UpdateCourseInfo
                                     asModal
                                     courseId={courseId}
-                                    initialCourse={displayCourse}
+                                    initialCourse={course}
                                     onClose={() => setShowEditModal(false)}
-                                    onUpdated={(updated) => {
-                                        if (updated) setDisplayCourse(updated);
-                                        onCourseUpdated?.(updated);
-                                    }}
+                                    onUpdated={(updated) => onCourseUpdated?.(updated)}
                                 />
                             ) : isAdmin ? (
                                 <CreateCourse
                                     asModal
                                     mode="edit"
                                     courseId={courseId}
-                                    initialCourse={displayCourse}
+                                    initialCourse={course}
                                     onClose={() => setShowEditModal(false)}
-                                    onUpdated={(updated) => {
-                                        if (updated) setDisplayCourse(updated);
-                                        onCourseUpdated?.(updated);
-                                    }}
+                                    onUpdated={(updated) => onCourseUpdated?.(updated)}
                                     onDeleted={() => {
                                         setShowEditModal(false);
                                         onCourseDeleted?.();
