@@ -45,24 +45,26 @@ export function AdminDashboard() {
       )}
 
       {!loading && !error && admins.length > 0 && (
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Username</th>
-              <th>Email</th>
-              <th>Faculty</th>
-            </tr>
-          </thead>
-          <tbody>
-            {admins.map((admin) => (
-              <tr key={admin._id || admin.email}>
-                <td>{admin.username || "Unknown user"}</td>
-                <td>{admin.email || "—"}</td>
-                <td>{admin.faculty || "—"}</td>
+        <div className="admin-table-scroll">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Faculty</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {admins.map((admin) => (
+                <tr key={admin._id || admin.email}>
+                  <td>{admin.username || "Unknown user"}</td>
+                  <td>{admin.email || "—"}</td>
+                  <td>{admin.faculty || "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

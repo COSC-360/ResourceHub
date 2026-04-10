@@ -2,6 +2,17 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  min-width: 0;
+}
+
+.admin-table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+}
+
+.admin-table-scroll .admin-table {
+  min-width: 36rem;
 }
 
 .admin-table {

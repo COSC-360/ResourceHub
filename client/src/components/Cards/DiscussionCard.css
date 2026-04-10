@@ -97,11 +97,15 @@
     margin: 8px 0;
     font-size: 1.05rem;
     font-weight: 600;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .discussion-card__content {
     margin: 8px 0;
     line-height: 1.5;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .discussion-card__image {
@@ -249,4 +253,26 @@
 
 .discussion-card__save:hover {
     background: #0956b0;
+}
+
+@media (max-width: 640px) {
+    .discussion-card--reply {
+        margin-left: 6px;
+    }
+
+    .discussion-card--depth-1 {
+        margin-left: 10px;
+    }
+
+    .discussion-card--depth-2 {
+        margin-left: 14px;
+    }
+
+    .discussion-card--depth-3 {
+        margin-left: 18px;
+    }
+
+    .discussion-card--depth-4 {
+        margin-left: 22px;
+    }
 }

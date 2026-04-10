@@ -119,116 +119,118 @@ export function ViewUsers() {
       {!loading && error && <p>{error}</p>}
 
       {!error && loaded && (
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Username</th>
-              <th>Email</th>
-              <th>Faculty</th>
-              <th>Admin</th>
-              <th>Enabled</th>
-            </tr>
-            <tr>
-              <th>
-                <input
-                  type="text"
-                  value={filters.name}
-                  onChange={handleFilterChange("name")}
-                  placeholder="Filter username"
-                />
-              </th>
-              <th>
-                <input
-                  type="text"
-                  value={filters.email}
-                  onChange={handleFilterChange("email")}
-                  placeholder="Filter email"
-                />
-              </th>
-              <th>
-                <input
-                  type="text"
-                  value={filters.faculty}
-                  onChange={handleFilterChange("faculty")}
-                  placeholder="Filter faculty"
-                />
-              </th>
-              <th>
-                <select
-                  value={filters.isAdmin}
-                  onChange={handleFilterChange("isAdmin")}
-                >
-                  <option value="both">Both</option>
-                  <option value="true">True</option>
-                  <option value="false">False</option>
-                </select>
-              </th>
-              <th>
-                <select
-                  value={filters.enabled}
-                  onChange={handleFilterChange("enabled")}
-                >
-                  <option value="enabled">Enabled</option>
-                  <option value="disabled">Disabled</option>
-                  <option value="both">Both</option>
-                </select>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredUsers.length === 0 ? (
+        <div className="admin-table-scroll">
+          <table className="admin-table">
+            <thead>
               <tr>
-                <td colSpan={5}>No users found.</td>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Faculty</th>
+                <th>Admin</th>
+                <th>Enabled</th>
               </tr>
-            ) : (
-              filteredUsers.map((user) => (
-                <tr
-                  key={user._id || user.email}
-                  className="admin-table-row-clickable"
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => {
-                    const id = user._id ?? user.id;
-                    if (id) navigate(profileUserPath(id));
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
+              <tr>
+                <th>
+                  <input
+                    type="text"
+                    value={filters.name}
+                    onChange={handleFilterChange("name")}
+                    placeholder="Filter username"
+                  />
+                </th>
+                <th>
+                  <input
+                    type="text"
+                    value={filters.email}
+                    onChange={handleFilterChange("email")}
+                    placeholder="Filter email"
+                  />
+                </th>
+                <th>
+                  <input
+                    type="text"
+                    value={filters.faculty}
+                    onChange={handleFilterChange("faculty")}
+                    placeholder="Filter faculty"
+                  />
+                </th>
+                <th>
+                  <select
+                    value={filters.isAdmin}
+                    onChange={handleFilterChange("isAdmin")}
+                  >
+                    <option value="both">Both</option>
+                    <option value="true">True</option>
+                    <option value="false">False</option>
+                  </select>
+                </th>
+                <th>
+                  <select
+                    value={filters.enabled}
+                    onChange={handleFilterChange("enabled")}
+                  >
+                    <option value="enabled">Enabled</option>
+                    <option value="disabled">Disabled</option>
+                    <option value="both">Both</option>
+                  </select>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredUsers.length === 0 ? (
+                <tr>
+                  <td colSpan={5}>No users found.</td>
+                </tr>
+              ) : (
+                filteredUsers.map((user) => (
+                  <tr
+                    key={user._id || user.email}
+                    className="admin-table-row-clickable"
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => {
                       const id = user._id ?? user.id;
                       if (id) navigate(profileUserPath(id));
-                    }
-                  }}
-                >
-                  <td>{user.username || "—"}</td>
-                  <td>{user.email || "—"}</td>
-                  <td>{user.faculty || "—"}</td>
-                  <td>{user.isAdmin ? "Yes" : "No"}</td>
-                  <td>
-                    {(() => {
-                      const isEnabled = user.enabled ?? true;
-                      const buttonClass = isEnabled
-                        ? "user-toggle-btn user-toggle-btn-disable"
-                        : "user-toggle-btn user-toggle-btn-enable";
-                      return (
-                    <button
-                      className={buttonClass}
-                      type="button"
-                      disabled={Boolean(toggleInFlightByUser[user._id])}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleToggleEnabled(user._id, user.username, !isEnabled);
-                      }}
-                    >
-                      {isEnabled ? "Disable" : "Enable"}
-                    </button>
-                      );
-                    })()}
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        const id = user._id ?? user.id;
+                        if (id) navigate(profileUserPath(id));
+                      }
+                    }}
+                  >
+                    <td>{user.username || "—"}</td>
+                    <td>{user.email || "—"}</td>
+                    <td>{user.faculty || "—"}</td>
+                    <td>{user.isAdmin ? "Yes" : "No"}</td>
+                    <td>
+                      {(() => {
+                        const isEnabled = user.enabled ?? true;
+                        const buttonClass = isEnabled
+                          ? "user-toggle-btn user-toggle-btn-disable"
+                          : "user-toggle-btn user-toggle-btn-enable";
+                        return (
+                          <button
+                            className={buttonClass}
+                            type="button"
+                            disabled={Boolean(toggleInFlightByUser[user._id])}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleToggleEnabled(user._id, user.username, !isEnabled);
+                            }}
+                          >
+                            {isEnabled ? "Disable" : "Enable"}
+                          </button>
+                        );
+                      })()}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       )}
 
       {pendingToggle && (

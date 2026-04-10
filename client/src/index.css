@@ -9,8 +9,13 @@
   --rh-redirect-hover-color: #4a148c;
 }
 
+html {
+  overflow-x: clip;
+}
+
 body {
   margin: 0;
   color: var(--rh-text);
   background-color: var(--rh-bg);
+  overflow-x: clip;
 }

@@ -1,5 +1,7 @@
 .profile-page {
   max-width: 640px;
+  width: 100%;
+  box-sizing: border-box;
   color: var(--rh-text);
 }
 
