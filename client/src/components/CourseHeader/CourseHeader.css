@@ -5,11 +5,11 @@
 }
 
 .course-header__image-wrap {
-    @apply relative w-full;
+    @apply w-full overflow-hidden rounded-2xl shadow-sm;
 }
 
 .course-header__image {
-    @apply block h-[190px] w-full rounded-2xl object-cover shadow-sm;
+    @apply block h-[190px] w-full object-cover;
 }
 
 .course-header__content {
@@ -40,10 +40,6 @@
     @apply bg-neutral-800;
 }
 
-.course-header__edit-link {
-    @apply cursor-pointer rounded-[14px] border-none bg-blue-600 px-[18px] py-[12px] text-base font-medium text-white transition-colors hover:bg-blue-700;
-}
-
 .course-header__members {
     @apply flex items-center gap-2 text-base font-medium text-neutral-900;
 }
@@ -67,9 +63,7 @@
 }
 
 .course-header__modal-panel {
-        width: min(760px, 92vw);
-        max-height: 90vh;
-        overflow-y: auto;
+  width: min(760px, 92vw);
 }
 
 @media (max-width: 700px) {

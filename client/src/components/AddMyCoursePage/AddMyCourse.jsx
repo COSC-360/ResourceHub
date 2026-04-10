@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { apiClient } from "../../lib/api-client";
 import CourseCard from "../Cards/CourseCard.jsx";
 import CreateCourse from "../CreateCourse/CreateCourse.jsx";
@@ -9,6 +10,7 @@ function isLoggedIn() {
 }
 
 export default function AddMyCoursePage({showAll = false}) {
+  const navigate = useNavigate();
   const [availableCourses, setAvailableCourses] = useState([]);
   const [error, setError] = useState("");
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -24,6 +26,11 @@ export default function AddMyCoursePage({showAll = false}) {
         : Promise.resolve({ data: [] });
 
       const [allCoursesRes, myIdsRes] = await Promise.all([allCoursesPromise, myIdsPromise]);
+
+      if (!token) {
+        navigate("/login");
+        return;
+      }
       const allCourses = allCoursesRes.data || [];
 
       if (showAll) {
@@ -41,7 +48,7 @@ export default function AddMyCoursePage({showAll = false}) {
     } catch (err) {
       setError(err.message || "Failed to load courses.");
     }
-  }, [showAll]);
+  }, [navigate, showAll]);
 
   useEffect(() => {
     const id = setTimeout(() => {
