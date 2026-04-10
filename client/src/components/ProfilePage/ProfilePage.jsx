@@ -20,6 +20,9 @@ export function ProfilePage() {
   const [draft, setDraft] = useState({ username: "", email: "", bio: "" });
   const [saveErr, setSaveErr] = useState(null);
   const [file, setFile] = useState(null);
+  const [photoVersion, setPhotoVersion] = useState(
+    () => localStorage.getItem("profilePhotoVersion") ?? "",
+  );
   const userid = localStorage.getItem("userid");
   const fileRef = useRef(null);
 
@@ -118,11 +121,19 @@ export function ProfilePage() {
         body: formData,
       });
       setProfile(data);
+      const nextVersion = String(Date.now());
+      setPhotoVersion(nextVersion);
+      localStorage.setItem("profilePhotoVersion", nextVersion);
+      window.dispatchEvent(new Event("profile-photo-updated"));
       setEditing(false);
     } catch (e) {
       setSaveErr(e.message || "Save failed");
     }
   };
+
+  const profilePhotoSrc = userid
+    ? `http://localhost:3000/api/user/getProfilePhoto/${userid}?v=${encodeURIComponent(photoVersion)}`
+    : defaultAvatar;
 
   return (
     <div className="profile-page">
@@ -136,7 +147,7 @@ export function ProfilePage() {
             src={
               editing && file
                 ? URL.createObjectURL(file)
-                : `http://localhost:3000/api/user/getProfilePhoto/${userid}`
+                : profilePhotoSrc
             }
             alt=""
             width={96}
