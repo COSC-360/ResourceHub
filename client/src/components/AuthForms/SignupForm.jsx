@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import "./AuthForms.css";
 import AuthContext from "../../AuthContext.jsx";
+import { LOGIN_ROUTE } from "../../constants/RouteConstants.jsx";
 
 export function SignupForm() {
   const { signup } = useContext(AuthContext);
@@ -110,7 +111,7 @@ export function SignupForm() {
           <button type="submit" disabled={isSubmitting}>
             {isSubmitting ? "Signing up…" : "Sign Up"}
           </button>
-          <Link to="/login">
+          <Link to={LOGIN_ROUTE}>
             <button type="button" className="redirect_button">
               Go to Login
             </button>

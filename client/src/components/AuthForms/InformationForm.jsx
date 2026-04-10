@@ -3,6 +3,7 @@ import "./AuthForms.css";
 import defaultAvatar from "../../assets/profile.svg";
 import { useNavigate } from "react-router-dom";
 import { apiClient } from "../../lib/api-client";
+import { HOMEROUTE, REGISTER_ROUTE } from "../../constants/RouteConstants.jsx";
 
 const InformationForm = () => {
   const [file, setFile] = useState(null);
@@ -41,11 +42,11 @@ const InformationForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!present) router("/");
+    if (!present) router(HOMEROUTE);
     (async () => {
       try {
         const token = localStorage.getItem("access_token");
-        if (!token) router("/register");
+        if (!token) router(REGISTER_ROUTE);
         const data = new FormData();
         data.append("bio", formData.bio);
         data.append("file", file);
@@ -59,7 +60,7 @@ const InformationForm = () => {
         });
         console.log(response);
         localStorage.removeItem("first_time");
-        router("/");
+        router(HOMEROUTE);
       } catch (err) {
         console.log(err);
       }
@@ -68,7 +69,7 @@ const InformationForm = () => {
 
   useEffect(() => {
     const status = localStorage.getItem("first_time");
-    if (!status) router("/");
+    if (!status) router(HOMEROUTE);
   }, [formData, file, router]);
 
   return (

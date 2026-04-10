@@ -4,6 +4,10 @@ import AuthContext from "../../AuthContext.jsx";
 import { apiClient } from "../../lib/api-client";
 import defaultAvatar from "../../assets/profile.svg";
 import "./ProfilePage.css";
+import {
+  courseDiscussionPath,
+  LOGIN_ROUTE,
+} from "../../constants/RouteConstants.jsx";
 
 function token() {
   return localStorage.getItem("access_token");
@@ -158,7 +162,7 @@ export function ProfilePage() {
     return (
       <div className="profile-page">
         <p>Sign in to view your profile.</p>
-        <Link to="/login">Log in</Link>
+        <Link to={LOGIN_ROUTE}>Log in</Link>
       </div>
     );
   }
@@ -369,7 +373,7 @@ export function ProfilePage() {
                   const cid = resolveCourseId(d.courseId);
                   const code = courseCode(d.courseId);
                   const href = cid
-                    ? `/courses/${cid}/discussions/${d._id}`
+                    ? courseDiscussionPath(cid, d._id)
                     : "#";
                   const title = d.title?.trim() || "(No title)";
                   return (
@@ -406,7 +410,7 @@ export function ProfilePage() {
                   const cid = resolveCourseId(d.courseId);
                   const code = courseCode(d.courseId);
                   const href = cid
-                    ? `/courses/${cid}/discussions/${d._id}`
+                    ? courseDiscussionPath(cid, d._id)
                     : "#";
                   return (
                     <li key={d._id} className="profile-activity-item">

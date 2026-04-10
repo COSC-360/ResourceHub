@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import FeedPost from "../components/Feed/FeedPost";
 import { apiClient } from "../lib/api-client";
 import "./css/FeedPage.css";
+import { CREATE_POST_ROUTE } from "../constants/RouteConstants.jsx";
 
 const Feed = () => {
   const [discussions, setDiscussions] = useState([]);
@@ -55,7 +56,7 @@ const Feed = () => {
 
   return (
     <div className="body">
-      <button className="create_post" onClick={() => router("/create")}>
+      <button className="create_post" onClick={() => router(CREATE_POST_ROUTE)}>
         <i className="bi bi-plus" />
         New Discussion
       </button>

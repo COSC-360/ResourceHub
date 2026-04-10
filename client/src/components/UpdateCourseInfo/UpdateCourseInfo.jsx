@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { apiClient } from "../../lib/api-client";
 import CourseForm from "../CourseForm/CourseForm.jsx";
 import "./UpdateCourseInfo.css";
+import { coursePath } from "../../constants/RouteConstants.jsx";
 
 const trim = (v) => (typeof v === "string" ? v.trim() : "");
 
@@ -88,7 +89,7 @@ export default function UpdateCourseInfo({ asModal = false, onClose, onUpdated, 
       return;
     }
     if (courseId) {
-      navigate(`/courses/${courseId}`, { replace: true });
+      navigate(coursePath(courseId), { replace: true });
     } else {
       navigate(-1);
     }
@@ -137,7 +138,7 @@ export default function UpdateCourseInfo({ asModal = false, onClose, onUpdated, 
       onUpdated?.(updatedCourse);
 
       if (asModal) onClose?.();
-      else navigate(`/courses/${courseId}`, { replace: true });
+      else navigate(coursePath(courseId), { replace: true });
     } catch (err) {
       setError(err.message || "Failed to update course.");
     } finally {

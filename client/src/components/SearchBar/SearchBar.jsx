@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { searchPathWithTerm } from '../../constants/RouteConstants.jsx';
 import "./SearchBar.css"
 
 export function SearchBar(){
@@ -9,7 +10,7 @@ export function SearchBar(){
         const input = document.getElementById("search");
         const term = input.value;             
         if(!term.trim()) return;
-        navigate(`/search?term=${encodeURIComponent(term)}`);
+        navigate(searchPathWithTerm(term));
         input.value = "";
     }
 

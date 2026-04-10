@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { apiClient } from "../../../lib/api-client";
 import "../AdminDashboard/AdminDashboard.css";
 import "./ViewUsers.css";
+import { profileUserPath } from "../../../constants/RouteConstants.jsx";
 
 export function ViewUsers() {
   const navigate = useNavigate();
@@ -188,13 +189,13 @@ export function ViewUsers() {
                   tabIndex={0}
                   onClick={() => {
                     const id = user._id ?? user.id;
-                    if (id) navigate(`/profile/${id}`);
+                    if (id) navigate(profileUserPath(id));
                   }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
                       e.preventDefault();
                       const id = user._id ?? user.id;
-                      if (id) navigate(`/profile/${id}`);
+                      if (id) navigate(profileUserPath(id));
                     }
                   }}
                 >

@@ -3,6 +3,7 @@ import defaultProfile from "../../assets/profile.svg";
 import "./Comment.css";
 import { apiClient } from "../../lib/api-client";
 import { useNavigate } from "react-router-dom";
+import { LOGIN_ROUTE } from "../../constants/RouteConstants.jsx";
 
 const Comment = ({ onSubmit, parentid, parentUsername, courseId: _courseId }) => {
   const [formData, setFormData] = useState({ content: "" });
@@ -28,7 +29,7 @@ const Comment = ({ onSubmit, parentid, parentUsername, courseId: _courseId }) =>
         const token = localStorage.getItem("access_token");
         const data = new FormData();
         if (!token) {
-          router("/login");
+          router(LOGIN_ROUTE);
           return;
         }
         data.append("content", `@${parentUsername} ${formData.content}`);

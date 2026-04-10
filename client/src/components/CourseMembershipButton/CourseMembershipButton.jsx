@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiClient } from "../../lib/api-client";
+import { LOGIN_ROUTE } from "../../constants/RouteConstants.jsx";
 
 export default function CourseMembershipButton({ courseId, onMembershipChanged }) {
   const navigate = useNavigate();
@@ -38,7 +39,7 @@ export default function CourseMembershipButton({ courseId, onMembershipChanged }
   async function onClick() {
     const token = localStorage.getItem("access_token");
     if (!token) {
-      navigate("/login");
+      navigate(LOGIN_ROUTE);
       return;
     }
 

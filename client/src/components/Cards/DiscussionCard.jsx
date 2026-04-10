@@ -6,6 +6,11 @@ import { apiClient } from "../../lib/api-client";
 import AuthContext from "../../AuthContext.jsx";
 import VoteControls from "../VoteControls/VoteControls.jsx";
 import defaultProfile from "../../assets/profile.svg";
+import {
+  courseDiscussionPath,
+  coursePath,
+  LOGIN_ROUTE,
+} from "../../constants/RouteConstants.jsx";
 import "./DiscussionCard.css";
 
 export default function DiscussionCard({
@@ -54,7 +59,7 @@ export default function DiscussionCard({
     merged && (merged.hasImage || merged.image?.contentType),
   );
   const replyHref =
-    discussionId && courseId ? `/courses/${courseId}/discussions/${discussionId}` : null;
+    discussionId && courseId ? courseDiscussionPath(courseId, discussionId) : null;
 
   const createdAt = merged?.updatedAt || merged?.createdAt || data?.createdAt || data?.updatedAt;
   const timeStr = useMemo(() => {
@@ -155,7 +160,7 @@ export default function DiscussionCard({
       try {
         const token = localStorage.getItem("access_token");
         if (!token) {
-          navigate("/login");
+          navigate(LOGIN_ROUTE);
           return;
         }
         await apiClient(`/api/discussion/${discussionId}`, {
@@ -183,7 +188,7 @@ export default function DiscussionCard({
       try {
         const token = localStorage.getItem("access_token");
         if (!token) {
-          navigate("/login");
+          navigate(LOGIN_ROUTE);
           return;
         }
         const fd = new FormData();
@@ -257,7 +262,7 @@ export default function DiscussionCard({
           <div className="discussion-card__user-info">
             {!isReply && courseId && (
               <Link
-                to={`/courses/${courseId}`}
+                to={coursePath(courseId)}
                 className="discussion-card__forum"
                 onClick={(event) => event.stopPropagation()}
               >
