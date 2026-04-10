@@ -7,9 +7,9 @@
 }
 
 .discussion-feed-pagination__button {
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.06);
-  color: inherit;
+  border: 1px solid #d9d3e6;
+  background: #f7f4fb;
+  color: var(--rh-text);
   border-radius: 0.75rem;
   padding: 0.55rem 0.85rem;
   cursor: pointer;
