@@ -100,7 +100,7 @@ const InformationForm = () => {
           </p>
         ) : null}
         <div className="avatar_wrapper">
-          <ProfileAvatar file={file} className="avatar_preview" />
+          <ProfileAvatar file={file} fit="contain" className="avatar_preview" />
           <input
             type="file"
             className="file_upload"

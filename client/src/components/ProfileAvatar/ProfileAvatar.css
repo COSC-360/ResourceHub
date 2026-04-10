@@ -1,9 +1,16 @@
 .rh-profile-avatar {
   display: block;
-  object-fit: cover;
   object-position: center;
   background: #f0f0f0;
   flex-shrink: 0;
+}
+
+.rh-profile-avatar--fit-cover {
+  object-fit: cover;
+}
+
+.rh-profile-avatar--fit-contain {
+  object-fit: contain;
 }
 
 .rh-profile-avatar--circle {

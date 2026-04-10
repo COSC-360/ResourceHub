@@ -20,6 +20,7 @@ export default function ProfileAvatar({
   alt = "Profile avatar",
   className = "",
   shape = "circle",
+  fit = "cover",
   onError,
   ...imgProps
 }) {
@@ -44,6 +45,7 @@ export default function ProfileAvatar({
   const avatarClassName = [
     "rh-profile-avatar",
     `rh-profile-avatar--${shape}`,
+    `rh-profile-avatar--fit-${fit}`,
     className,
   ]
     .filter(Boolean)
