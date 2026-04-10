@@ -187,6 +187,11 @@ To run tests on the backend, make sure your current directory is `.../server`, t
 npm run test
 ~~~
 
+To run tests on the frontend, make sure your current directory is `.../client`, then run:
+~~~
+npm run test:run
+~~~
+
 ### Running Linter
 
 To run the linter on the frontend, make sure your current directory is `.../client`, then run:
