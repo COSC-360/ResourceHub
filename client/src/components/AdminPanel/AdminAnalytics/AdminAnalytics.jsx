@@ -16,6 +16,43 @@ function formatDayLabel(isoDate) {
   return d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
 }
 
+function WeekMetricCard({ title, value, caption }) {
+  return (
+    <section className="admin-analytics-card admin-analytics-stat-card" aria-label={title}>
+      <h2 className="admin-analytics-card-title">{title}</h2>
+      <p className="admin-analytics-metric-hero">{value}</p>
+      <p className="admin-analytics-stat-metric">
+        <span className="admin-analytics-stat-label">{caption}</span>
+      </p>
+    </section>
+  );
+}
+
+function LeaderStatCard({ title, leader, variant }) {
+  const active = leader && leader.postsAndComments > 0;
+  return (
+    <section className="admin-analytics-card admin-analytics-stat-card" aria-label={title}>
+      <h2 className="admin-analytics-card-title">{title}</h2>
+      {active ? (
+        <>
+          <p className="admin-analytics-stat-main">
+            {variant === "user" ? leader.username : leader.name}
+          </p>
+          {variant === "course" && leader.code ? (
+            <p className="admin-analytics-stat-sub">{leader.code}</p>
+          ) : null}
+          <p className="admin-analytics-stat-metric">
+            <span className="admin-analytics-stat-value">{leader.postsAndComments}</span>
+            <span className="admin-analytics-stat-label"> combined posts & comments</span>
+          </p>
+        </>
+      ) : (
+        <p className="admin-analytics-muted admin-analytics-stat-empty">No activity yet</p>
+      )}
+    </section>
+  );
+}
+
 function MiniLineChart({ title, dataKey, color, data, loading }) {
   return (
     <section className="admin-analytics-card" aria-label={title}>
@@ -59,7 +96,7 @@ export function AdminAnalytics() {
     const accessToken = localStorage.getItem("access_token");
     let cancelled = false;
 
-    apiClient("/api/user/admin/analytics/week", {
+    apiClient("/api/analytics/week", {
       headers: { Authorization: `Bearer ${accessToken}` },
     })
       .then((response) => {
@@ -94,13 +131,43 @@ export function AdminAnalytics() {
     <div className="admin-analytics">
       <header className="admin-analytics-header">
         <h1>Analytics</h1>
-        <p className="admin-analytics-subtitle">
-          Daily counts for the last seven days. Discussion threads count as posts; replies count as comments.
-        </p>
       </header>
 
       {loading && <p>Loading charts…</p>}
       {!loading && error && <p className="admin-analytics-error">{error}</p>}
+
+      {!loading && !error && payload && (payload.weekDiscussionEngagement || payload.leaders) && (
+        <div className="admin-analytics-leaders">
+          {payload.weekDiscussionEngagement && (
+            <>
+              <WeekMetricCard
+                title="Active users (7 days)"
+                value={payload.weekDiscussionEngagement.distinctUsers}
+                caption="Distinct users who posted or commented"
+              />
+              <WeekMetricCard
+                title="Courses with activity (7 days)"
+                value={payload.weekDiscussionEngagement.distinctCourses}
+                caption="Distinct courses with at least one post or comment"
+              />
+            </>
+          )}
+          {payload.leaders && (
+            <>
+              <LeaderStatCard
+                title="Most active user"
+                leader={payload.leaders.mostActiveUser}
+                variant="user"
+              />
+              <LeaderStatCard
+                title="Most active course"
+                leader={payload.leaders.mostActiveCourse}
+                variant="course"
+              />
+            </>
+          )}
+        </div>
+      )}
 
       {!loading && !error && chartData.length > 0 && (
         <div className="admin-analytics-grid">
