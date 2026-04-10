@@ -174,6 +174,7 @@ export default function CreateCourse({
       }
 
       let finalCourse = createdCourse.data;
+      let imageUploadWarning = "";
       if (selectedImageFile) {
         try {
           const fd = new FormData();
@@ -184,7 +185,8 @@ export default function CreateCourse({
             headers: token ? { Authorization: `Bearer ${token}` } : {},
           });
           finalCourse = imagePayload?.data ?? finalCourse;
-        } catch {
+        } catch (uploadErr) {
+          imageUploadWarning = uploadErr.message || "Course created, but image upload failed. You can upload an image later.";
           finalCourse = createdCourse.data;
         }
       }
@@ -202,7 +204,7 @@ export default function CreateCourse({
       onClose?.();
 
       navigate(coursePath(newCourseId), {
-        state: { course: finalCourse },
+        state: { course: finalCourse, warning: imageUploadWarning || undefined },
       });
     } catch (err) {
       setError(err.message || "Failed to create course.");
