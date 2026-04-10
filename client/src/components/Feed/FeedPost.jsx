@@ -16,6 +16,7 @@ import {
   trimStr,
   validateDiscussionEdit,
 } from "../../lib/formValidation.js";
+import { socket } from "../../socket";
 
 export const FeedPost = ({ post_props, depth, expandDown }) => {
   const [edit, setEdit] = useState(false);
@@ -39,9 +40,14 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
   const [deleted, setDeleted] = useState(post_props.deleted);
 
   const router = useNavigate();
+  const seenReplyIdsRef = useRef(new Set());
+  const showCommentsRef = useRef(showComments);
+
+  useEffect(() => {
+    showCommentsRef.current = showComments;
+  }, [showComments]);
 
   const loadReplies = useCallback(async () => {
-    if (post_props.replies <= 0) return;
     try {
       const auth = localStorage.getItem("access_token");
       const discussions = await apiClient(
@@ -50,7 +56,8 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
           headers: auth ? { Authorization: `Bearer ${auth}` } : {},
         },
       );
-      const transformedData = discussions.map((discussion) => ({
+      const rows = Array.isArray(discussions) ? discussions : (discussions?.data ?? []);
+      const transformedData = rows.map((discussion) => ({
         username: discussion.username,
         title: discussion.title,
         timeline: discussion.updatedAt,
@@ -68,15 +75,21 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
         hasDownvote: discussion.hasDownvote,
         deleted: discussion.deleted,
         authorid: discussion.authorId,
+        courseId: discussion.courseId,
       }));
+      transformedData.forEach((row) => {
+        const id = row._id;
+        if (id != null) seenReplyIdsRef.current.add(String(id));
+      });
       setComments(transformedData);
+      setReplies(transformedData.length);
     } catch (err) {
       console.log(err);
     }
-  }, [post_props._id, post_props.replies]);
+  }, [post_props._id]);
 
   const fetchComments = () => {
-    if (post_props.replies <= 0) {
+    if (replies <= 0) {
       setShowComments((open) => !open);
       return;
     }
@@ -284,12 +297,59 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
   );
 
   useEffect(() => {
-    if (!expandDown || post_props.replies <= 0) return;
+    if (!expandDown || replies <= 0) return;
     const id = setTimeout(() => {
       void loadReplies();
     }, 0);
     return () => clearTimeout(id);
-  }, [expandDown, post_props.replies, loadReplies]);
+  }, [expandDown, replies, loadReplies]);
+
+  useEffect(() => {
+    const postId = post_props._id;
+    if (!postId) return;
+
+    socket.emit("joinDiscussion", postId);
+
+    function matchesParent(payload) {
+      return String(payload?.parentId) === String(postId);
+    }
+
+    function handleReplyCreated(payload) {
+      if (!matchesParent(payload)) return;
+      const rid = payload?.reply?._id ?? payload?.reply?.id;
+      if (rid != null) {
+        const sid = String(rid);
+        if (seenReplyIdsRef.current.has(sid)) return;
+        seenReplyIdsRef.current.add(sid);
+      }
+      setReplies((n) => n + 1);
+      if (showCommentsRef.current) void loadReplies();
+    }
+
+    function handleReplyUpdated(payload) {
+      if (!matchesParent(payload)) return;
+      if (showCommentsRef.current) void loadReplies();
+    }
+
+    function handleReplyDeleted(payload) {
+      if (!matchesParent(payload)) return;
+      const rid = payload?.replyId?._id ?? payload?.replyId;
+      if (rid != null) seenReplyIdsRef.current.delete(String(rid));
+      setReplies((n) => Math.max(0, n - 1));
+      if (showCommentsRef.current) void loadReplies();
+    }
+
+    socket.on("reply:created", handleReplyCreated);
+    socket.on("reply:updated", handleReplyUpdated);
+    socket.on("reply:deleted", handleReplyDeleted);
+
+    return () => {
+      socket.emit("leaveDiscussion", postId);
+      socket.off("reply:created", handleReplyCreated);
+      socket.off("reply:updated", handleReplyUpdated);
+      socket.off("reply:deleted", handleReplyDeleted);
+    };
+  }, [post_props._id, loadReplies]);
 
   useEffect(() => {
     (async () => {
@@ -484,11 +544,20 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
           courseId={post_props.courseId?._id || post_props.courseId}
           parentUsername={post_props.username}
           parentid={post_props._id}
-          onSubmit={() => {
+          onSubmit={(created) => {
             showCommentBox(false);
             setShowComments(true);
-            fetchComments();
-            setReplies(replies + 1);
+            const cid = created?._id ?? created?.id;
+            if (cid != null) {
+              const sid = String(cid);
+              if (!seenReplyIdsRef.current.has(sid)) {
+                seenReplyIdsRef.current.add(sid);
+                setReplies((n) => n + 1);
+              }
+            } else {
+              setReplies((n) => n + 1);
+            }
+            void loadReplies();
           }}
         />
       )}

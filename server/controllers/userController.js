@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import * as userService from "../services/userService.js";
 import * as userRepository from "../repositories/userRepository.js";
+import { getIO } from "../socket.js";
+import { ACCOUNT_DISABLED_MESSAGE } from "../middleware/authMiddleware.js";
 
 export async function createUser(req, res) {
   const user = {
@@ -76,6 +78,13 @@ export async function authenticateUser(req, res) {
     req.body.email,
     req.body.password,
   );
+  if (accessToken === userService.USER_SIGNIN_ACCOUNT_DISABLED) {
+    res.status(403).json({
+      error: ACCOUNT_DISABLED_MESSAGE,
+      code: "ACCOUNT_DISABLED",
+    });
+    return;
+  }
   if (!accessToken) {
     res.status(401).json({ error: "Wrong email or password" });
     return;
@@ -219,6 +228,18 @@ export async function setUserEnabled(req, res) {
       res.status(404).json({ error: "User not found" });
       return;
     }
+
+    if (enabled === false) {
+      try {
+        const roomId = String(updated?._id ?? updated?.id ?? id);
+        getIO().to(`user:${roomId}`).emit("account:disabled", {
+          userId: roomId,
+        });
+      } catch {
+        /* Socket may be unavailable in tests or during startup */
+      }
+    }
+
     res.status(200).json({ data: updated });
   } catch (error) {
     console.error(error);

@@ -2,7 +2,6 @@ import { jest } from "@jest/globals";
 // Import the service and the repository it depends on
 import * as DiscussionService from "../../../services/discussionService.js";
 import { DiscussionRepository } from "../../../repositories/discussionRepository.js";
-import { Discussion } from "../../../models/discussion.js";
 
 describe("Discussion Service (ESM)", () => {
   beforeEach(() => {

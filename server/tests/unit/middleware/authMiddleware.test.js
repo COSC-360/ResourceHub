@@ -1,17 +1,24 @@
 import { jest, describe, expect, beforeEach } from "@jest/globals";
 
-const mockVerify = jest.fn();
+const mockJwtVerify = jest.fn();
+const mockGetUserById = jest.fn();
+
+await jest.unstable_mockModule("../../../repositories/userRepository.js", () => ({
+  getUserById: mockGetUserById,
+}));
 
 await jest.unstable_mockModule("jsonwebtoken", () => ({
   default: {
-    verify: mockVerify,
+    verify: mockJwtVerify,
   },
 }));
 
-const { verifyAccessToken, decodeAccessToken } =
+const { verifyAccessToken, decodeAccessToken, ACCOUNT_DISABLED_MESSAGE } =
   await import("../../../middleware/authMiddleware.js");
 
-const { default: jwt } = await import("jsonwebtoken");
+function flushAsync() {
+  return new Promise((resolve) => setImmediate(resolve));
+}
 
 describe("verifyAccessToken", () => {
   let req, res, next;
@@ -26,6 +33,7 @@ describe("verifyAccessToken", () => {
     next = jest.fn();
 
     process.env.ACCESS_TOKEN_SECRET_KEY = "testsecret";
+    mockGetUserById.mockResolvedValue({ _id: "1", enabled: true });
   });
 
   afterEach(() => {
@@ -83,7 +91,7 @@ describe("verifyAccessToken", () => {
   test("returns 403 if token is invalid", () => {
     req.headers.authorization = "Bearer badtoken";
 
-    jwt.verify.mockImplementation((token, secret, cb) => {
+    mockJwtVerify.mockImplementation((_token, _secret, cb) => {
       cb(new Error("Invalid"), null);
     });
 
@@ -98,7 +106,7 @@ describe("verifyAccessToken", () => {
   test("returns 403 if token payload is invalid", () => {
     req.headers.authorization = "Bearer validtoken";
 
-    jwt.verify.mockImplementation((token, secret, cb) => {
+    mockJwtVerify.mockImplementation((_token, _secret, cb) => {
       cb(null, {});
     });
 
@@ -110,16 +118,36 @@ describe("verifyAccessToken", () => {
     });
   });
 
-  test("sets req fields and calls next for valid token", () => {
+  test("returns 403 if account is disabled in DB", async () => {
+    req.headers.authorization = "Bearer validtoken";
+
+    mockJwtVerify.mockImplementation((_token, _secret, cb) => {
+      cb(null, { id: 1, admin: false });
+    });
+    mockGetUserById.mockResolvedValue({ _id: "1", enabled: false });
+
+    verifyAccessToken(req, res, next);
+    await flushAsync();
+
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(res.json).toHaveBeenCalledWith({
+      error: ACCOUNT_DISABLED_MESSAGE,
+      code: "ACCOUNT_DISABLED",
+    });
+    expect(next).not.toHaveBeenCalled();
+  });
+
+  test("sets req fields and calls next for valid token", async () => {
     req.headers.authorization = "Bearer validtoken";
 
     const mockUser = { id: 1, admin: true };
 
-    jwt.verify.mockImplementation((token, secret, cb) => {
+    mockJwtVerify.mockImplementation((_token, _secret, cb) => {
       cb(null, mockUser);
     });
 
     verifyAccessToken(req, res, next);
+    await flushAsync();
 
     expect(req.user).toEqual(mockUser);
     expect(req.userId).toBe(1);
@@ -137,6 +165,7 @@ describe("decodeAccessToken", () => {
     next = jest.fn();
 
     process.env.ACCESS_TOKEN_SECRET_KEY = "testsecret";
+    mockGetUserById.mockResolvedValue({ _id: "42", enabled: true });
   });
 
   afterEach(() => {
@@ -162,7 +191,7 @@ describe("decodeAccessToken", () => {
   test("stores error if token is invalid", () => {
     req.headers.authorization = "Bearer badtoken";
 
-    jwt.verify.mockImplementation((token, secret, cb) => {
+    mockJwtVerify.mockImplementation((_token, _secret, cb) => {
       cb(new Error("Bad token"), null);
     });
 
@@ -173,19 +202,36 @@ describe("decodeAccessToken", () => {
     expect(next).toHaveBeenCalled();
   });
 
-  test("decodes token successfully", () => {
+  test("decodes token successfully", async () => {
     req.headers.authorization = "Bearer goodtoken";
 
     const mockUser = { id: 42 };
 
-    jwt.verify.mockImplementation((token, secret, cb) => {
+    mockJwtVerify.mockImplementation((_token, _secret, cb) => {
       cb(null, mockUser);
     });
 
     decodeAccessToken(req, res, next);
+    await flushAsync();
 
     expect(req.user).toEqual(mockUser);
     expect(req.err).toBeNull();
+    expect(next).toHaveBeenCalled();
+  });
+
+  test("clears user if account disabled", async () => {
+    req.headers.authorization = "Bearer goodtoken";
+
+    mockJwtVerify.mockImplementation((_token, _secret, cb) => {
+      cb(null, { id: 42 });
+    });
+    mockGetUserById.mockResolvedValue({ enabled: false });
+
+    decodeAccessToken(req, res, next);
+    await flushAsync();
+
+    expect(req.user).toBeNull();
+    expect(req.err?.code).toBe("ACCOUNT_DISABLED");
     expect(next).toHaveBeenCalled();
   });
 });

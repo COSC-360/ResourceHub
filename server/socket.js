@@ -61,6 +61,16 @@ export function initSocket(server) {
     console.log("leaveDiscussionsLobby");
     socket.leave("discussions:lobby");
     });
+
+    socket.on("joinUserSession", (userId) => {
+      if (!userId) return;
+      socket.join(`user:${String(userId)}`);
+    });
+
+    socket.on("leaveUserSession", (userId) => {
+      if (!userId) return;
+      socket.leave(`user:${String(userId)}`);
+    });
     });
 
   return io;

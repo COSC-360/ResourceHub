@@ -24,6 +24,11 @@ export async function getUserById(id) {
   return User.findById(id).select("-password").lean();
 }
 
+export async function findAdminUserIds() {
+  const rows = await User.find({ isAdmin: true }).select("_id").lean();
+  return rows.map((r) => String(r._id));
+}
+
 export async function updateProfile(userid, data) {
   if (!userid) return null;
 

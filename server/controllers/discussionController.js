@@ -2,6 +2,7 @@ import * as discussionService from "../services/discussionService.js";
 import * as voteService from "../services/voteService.js";
 import mongoose from "mongoose";
 import { getIO } from "../socket.js";
+import { pushNewDiscussionNotification } from "../services/notificationPush.js";
 
 import {
   hasInvalidObjectId,
@@ -25,7 +26,9 @@ export async function getAll(req, res) {
   const courseIds = parseCsv(req.query.courseIds);
   const authorIds = parseCsv(req.query.authorIds);
   const populate = parsePopulate(req.query.populate);
-  const deleted = parseBoolean(req.query.deleted);
+  const deletedParam = parseBoolean(req.query.deleted);
+  // Omitting ?deleted=… excludes soft-deleted posts (reload / normal feeds). ?deleted=true shows only deleted.
+  const deleted = deletedParam === undefined ? false : deletedParam;
   const edited = parseBoolean(req.query.edited);
   const hasReplies = parseBoolean(req.query.hasReplies);
   const topLevelOnly = parseBoolean(req.query.topLevelOnly);
@@ -138,6 +141,9 @@ export async function getById(req, res) {
 
   try {
     const discussion = await discussionService.findById(id);
+    if (discussion.deleted) {
+      return res.status(404).json({ error: "Discussion not found" });
+    }
     await discussion.populate({ path: "courseId", select: "code" });
     const obj = discussion.toJSON();
 
@@ -226,6 +232,8 @@ export async function create(req, res) {
     });
   }
 
+    void pushNewDiscussionNotification(discussion, courseId, req.user.id);
+
     return res.status(201).json({ data: discussion });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
@@ -289,10 +297,12 @@ export async function update(req, res) {
         courseId: discussion.courseId,
       });
     } else {
-      io.to(`course:${discussion.courseId}`).emit("post:updated", {
-        post: discussion,
-        courseId: discussion.courseId,
-      });
+      const rootId = String(discussion._id ?? discussion.id ?? "");
+      const courseKey = discussion.courseId != null ? String(discussion.courseId) : "";
+      const payload = { post: discussion, courseId: discussion.courseId };
+      if (rootId) io.to(`discussion:${rootId}`).emit("post:updated", payload);
+      if (courseKey) io.to(`course:${courseKey}`).emit("post:updated", payload);
+      io.to("discussions:lobby").emit("post:updated", payload);
     }
 
     res.status(200).json({ data: discussion });
@@ -320,16 +330,17 @@ export async function remove(req, res) {
         courseId: result.courseId,
       });
     } else {
-  io.to(`course:${result.courseId}`).emit("post:deleted", {
-    postId: result._id,
-    courseId: result.courseId,
-  });
-
-  io.to("discussions:lobby").emit("post:deleted", {
-    postId: result._id,
-    courseId: result.courseId,
-  });
-}
+      const rootId = result._id != null ? String(result._id) : "";
+      const courseKey = result.courseId != null ? String(result.courseId) : "";
+      const deletePayload = {
+        postId: result._id,
+        courseId: result.courseId,
+        softDeleted: Boolean(result.softDeleted),
+      };
+      if (rootId) io.to(`discussion:${rootId}`).emit("post:deleted", deletePayload);
+      if (courseKey) io.to(`course:${courseKey}`).emit("post:deleted", deletePayload);
+      io.to("discussions:lobby").emit("post:deleted", deletePayload);
+    }
 
     res.status(200).json({ data: result });
   } catch (err) {

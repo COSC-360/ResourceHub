@@ -54,7 +54,7 @@ const Comment = ({ onSubmit, parentid, parentUsername, courseId: _courseId }) =>
       data.append("content", fullContent);
       data.append("parentid", parentid);
       if (file) data.append("file", file);
-      await apiClient(`/api/discussion`, {
+      const json = await apiClient(`/api/discussion`, {
         method: "POST",
         body: data,
         headers: {
@@ -62,7 +62,7 @@ const Comment = ({ onSubmit, parentid, parentUsername, courseId: _courseId }) =>
         },
       });
       setFormData({ content: "" });
-      onSubmit();
+      onSubmit?.(json?.data ?? json);
     } catch (err) {
       setError(err?.message || "Failed to post comment");
     } finally {

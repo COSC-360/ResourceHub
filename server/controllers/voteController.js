@@ -20,10 +20,13 @@ async function emitDiscussionVoteUpdated(targetId) {
   const updatedDiscussion = await discussionService.findById(targetId);
   const io = getIO();
   const payload = buildDiscussionVotePayload(updatedDiscussion);
+  const selfId = String(updatedDiscussion._id);
 
   if (updatedDiscussion.parentId) {
     io.to(`discussion:${updatedDiscussion.parentId}`).emit("vote:updated", payload);
   } else {
+    // Thread page joins discussion:<rootId>; home/course feeds use lobby or course rooms.
+    io.to(`discussion:${selfId}`).emit("vote:updated", payload);
     io.to(`course:${updatedDiscussion.courseId}`).emit("vote:updated", payload);
     io.to("discussions:lobby").emit("vote:updated", payload);
   }

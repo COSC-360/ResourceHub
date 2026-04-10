@@ -1,5 +1,6 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef, useCallback } from "react";
 import AuthContext from "../../AuthContext.jsx";
+import { socket } from "../../socket";
 import "./Notifications.css";
 
 export function Notifications() {
@@ -7,6 +8,11 @@ export function Notifications() {
     const [notifications, setNotifications] = useState([]);
     const [notificationCount, setNotificationCount] = useState(0);
     const [showNotifications, setShowNotifications] = useState(false);
+    const notificationsRef = useRef([]);
+
+    useEffect(() => {
+        notificationsRef.current = notifications;
+    }, [notifications]);
 
     useEffect(() => {
         const token = user?.access_token;
@@ -40,6 +46,21 @@ export function Notifications() {
 
         fetchNotifications();
     }, [user?.access_token]);
+
+    const onSocketNotification = useCallback(({ item }) => {
+        if (!item || (item.id == null && item.id !== 0)) return;
+        const key = `${item.type}-${String(item.id)}`;
+        const prev = notificationsRef.current;
+        if (prev.some((p) => `${p.type}-${String(p.id)}` === key)) return;
+        setNotifications([item, ...prev].slice(0, 10));
+        setNotificationCount((c) => c + 1);
+    }, []);
+
+    useEffect(() => {
+        if (!user?.access_token) return;
+        socket.on("notification:new", onSocketNotification);
+        return () => socket.off("notification:new", onSocketNotification);
+    }, [user?.access_token, onSocketNotification]);
 
     const handleNotificationClick = () => {
         const opening = !showNotifications;

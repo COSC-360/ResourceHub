@@ -45,20 +45,23 @@ export default function AddMyCoursePage({showAll = false}) {
   }, [showAll]);
 
   useEffect(() => {
-  console.log("Joining courses lobby");
-  socket.emit("joinCoursesLobby");
+    const loadId = setTimeout(() => {
+      void loadAvailableCourses();
+    }, 0);
+    socket.emit("joinCoursesLobby");
 
-  async function handleCourseCreatedSocket(payload) {
-    console.log("course:created received", payload);
-    await loadAvailableCourses();
-  }
+    async function handleCourseCreatedSocket(payload) {
+      console.log("course:created received", payload);
+      await loadAvailableCourses();
+    }
 
-  socket.on("course:created", handleCourseCreatedSocket);
+    socket.on("course:created", handleCourseCreatedSocket);
 
-  return () => {
-    socket.emit("leaveCoursesLobby");
-    socket.off("course:created", handleCourseCreatedSocket);
-  };
+    return () => {
+      clearTimeout(loadId);
+      socket.emit("leaveCoursesLobby");
+      socket.off("course:created", handleCourseCreatedSocket);
+    };
   }, [loadAvailableCourses]);
 
   function openCreateModal() {

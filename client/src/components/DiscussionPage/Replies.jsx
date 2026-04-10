@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import DiscussionCard from "../Cards/DiscussionCard.jsx";
 import { apiClient } from "../../lib/api-client";
 import Reply from "./Reply.jsx";
+import { socket } from "../../socket";
 import "./Replies.css";
 
 function pluralizeReplies(count) {
@@ -53,6 +54,64 @@ export default function Replies({
 		if (!expanded || loaded) return;
 		loadReplies();
 	}, [expanded, loaded, loadReplies]);
+
+	useEffect(() => {
+		if (!parentId) return;
+
+		socket.emit("joinDiscussion", parentId);
+
+		function matchesParent(payload) {
+			return String(payload?.parentId) === String(parentId);
+		}
+
+		function handleReplyCreated(payload) {
+			if (!matchesParent(payload)) return;
+			void loadReplies();
+		}
+
+		function handleReplyUpdated(payload) {
+			if (!matchesParent(payload)) return;
+			void loadReplies();
+		}
+
+		function handleReplyDeleted(payload) {
+			if (!matchesParent(payload)) return;
+			void loadReplies();
+		}
+
+		function handleVoteUpdated(payload) {
+			const tid = payload?.targetId?._id ?? payload?.targetId;
+			if (!tid) return;
+			setItems((prev) => {
+				let hit = false;
+				const next = prev.map((item) => {
+					const iid = item?._id ?? item?.id;
+					if (String(iid) !== String(tid)) return item;
+					hit = true;
+					return {
+						...item,
+						upvotes: payload.upvotes,
+						downvotes: payload.downvotes,
+						score: payload.score,
+					};
+				});
+				return hit ? next : prev;
+			});
+		}
+
+		socket.on("reply:created", handleReplyCreated);
+		socket.on("reply:updated", handleReplyUpdated);
+		socket.on("reply:deleted", handleReplyDeleted);
+		socket.on("vote:updated", handleVoteUpdated);
+
+		return () => {
+			socket.emit("leaveDiscussion", parentId);
+			socket.off("reply:created", handleReplyCreated);
+			socket.off("reply:updated", handleReplyUpdated);
+			socket.off("reply:deleted", handleReplyDeleted);
+			socket.off("vote:updated", handleVoteUpdated);
+		};
+	}, [parentId, loadReplies]);
 
 	function toggleExpanded() {
 		setExpanded((prev) => !prev);
