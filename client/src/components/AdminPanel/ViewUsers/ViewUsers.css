@@ -40,3 +40,16 @@
   border-color: #222;
   color: #fff;
 }
+
+.admin-table-row-clickable {
+  cursor: pointer;
+}
+
+.admin-table-row-clickable:hover {
+  background: rgba(33, 76, 214, 0.08);
+}
+
+.admin-table-row-clickable:focus-visible {
+  outline: 2px solid #214cd6;
+  outline-offset: -2px;
+}

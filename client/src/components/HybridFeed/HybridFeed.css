@@ -9,9 +9,11 @@
 .hybrid-feed__empty {
 	padding: 1rem;
 	border-radius: 0.9rem;
-	background: rgba(255, 255, 255, 0.04);
+	background: #f0ecf5;
+	border: 1px solid #e8e0ef;
+	color: var(--rh-text);
 }
 
 .hybrid-feed__error {
-	color: #ffb3b3;
+	color: #9a1c1c;
 }

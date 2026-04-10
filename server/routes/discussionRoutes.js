@@ -2,7 +2,7 @@ import { Router } from "express";
 import * as discussionController from "../controllers/discussionController.js";
 import { verifyAccessToken, decodeAccessToken } from "../middleware/authMiddleware.js";
 import { requireCourseMembership } from "../middleware/courseMembershipMiddleware.js";
-import upload from "../middleware/fileUploads.js";
+import multerUpload from "../middleware/upload.js";
 
 export const discussionRoutes = Router();
 
@@ -344,7 +344,7 @@ discussionRoutes.post(
   "/course/:courseId",
   verifyAccessToken,
   requireCourseMembership,
-  upload.single("file"),
+  multerUpload.single("file"),
   discussionController.create,
 );
 
@@ -396,7 +396,7 @@ discussionRoutes.patch(
   "/:id",
   verifyAccessToken,
   requireCourseMembership,
-  upload.single("file"),
+  multerUpload.single("file"),
   discussionController.update,
 );
 

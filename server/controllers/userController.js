@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import * as userService from "../services/userService.js";
 import * as userRepository from "../repositories/userRepository.js";
 
@@ -26,14 +27,36 @@ export async function createUser(req, res) {
 
 export async function getProfilePhoto(req, res) {
   const { id } = req.params;
+
+  if (!id || String(id).trim() === "") {
+    return res.status(400).json({ error: "Invalid user ID" });
+  }
+
   let found = null;
   try {
     found = await userService.getUserById(id);
-  } catch (err) {
-    return res.status(404).json({ message: "user not found" });
+  } catch {
+    return res.status(404).json({ error: "user not found" });
   }
-  res.set("Content-Type", found.pfp.contentType);
-  res.status(200).send(found.pfp.data.buffer);
+
+  if (!found) {
+    return res.status(404).json({ error: "User not found" });
+  }
+
+  if (!found.pfp) {
+    return res.status(404).json({ error: "Profile photo not found" });
+  }
+
+  if (typeof found.pfp === "string") {
+    return res.redirect(found.pfp);
+  }
+
+  if (found.pfp?.data && found.pfp?.contentType) {
+    res.set("Content-Type", found.pfp.contentType);
+    return res.status(200).send(found.pfp.data);
+  }
+
+  return res.status(404).json({ error: "Profile photo not found" });
 }
 
 export async function authenticateUser(req, res) {
@@ -83,14 +106,29 @@ export async function getUserById(req, res) {
 }
 
 export async function updateProfile(req, res) {
-  const id = req.user?.id;
-  if (id == null || String(id).trim() === "") {
+  const rawTarget = req.body?.targetUserId;
+  let targetId = req.user?.id;
+
+  if (rawTarget != null && String(rawTarget).trim() !== "") {
+    if (!req.user?.admin) {
+      res.status(403).json({ error: "Not authorized to update this profile" });
+      return;
+    }
+    const tid = String(rawTarget).trim();
+    if (!mongoose.Types.ObjectId.isValid(tid)) {
+      res.status(400).json({ error: "Invalid target user ID" });
+      return;
+    }
+    targetId = tid;
+  }
+
+  if (targetId == null || String(targetId).trim() === "") {
     res.status(400).json({ error: "Invalid user ID" });
     return;
   }
 
   try {
-    const updated = await userService.updateProfile(String(id), {
+    const updated = await userService.updateProfile(String(targetId), {
       ...req.body,
       file: req.file,
     });

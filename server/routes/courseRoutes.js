@@ -1,11 +1,10 @@
 import { Router } from "express";
 import * as courseController from "../controllers/courseController.js";
 import * as discussionController from "../controllers/discussionController.js";
-import upload from "../middleware/upload.js"; // use your multer middleware export
+import multerUpload, { multerDiskUpload } from "../middleware/upload.js";
 import { verifyAccessToken } from "../middleware/authMiddleware.js";
-import { requireAdmin } from "../middleware/adminMiddleware.js";
+import { requireAdminOrCourseInstructor } from "../middleware/courseInstructorMiddleware.js";
 import { requireCourseMembership } from "../middleware/courseMembershipMiddleware.js";
-import discussionUpload from "../middleware/fileUploads.js";
 
 export const courseRoutes = Router();
 
@@ -15,15 +14,16 @@ courseRoutes.get("/:id", courseController.getById); // get one course by id
 // TODO: when course is created, also need to create a course membership for the creator (probably want to do this in the service layer)
 courseRoutes.post("/create", verifyAccessToken, courseController.create); // create a new course
 
-courseRoutes.patch("/:id/update", requireAdmin, courseController.update);
+courseRoutes.patch("/:id/update", verifyAccessToken, requireAdminOrCourseInstructor, courseController.update);
 courseRoutes.patch(
-  "/:id/updateimage",
-  requireAdmin,
-  upload.single("image"),
-  courseController.updateImage,
+	"/:id/updateimage",
+	verifyAccessToken,
+	requireAdminOrCourseInstructor,
+	multerDiskUpload.single("image"),
+	courseController.updateImage,
 );
 
-courseRoutes.delete("/:id", requireAdmin, courseController.deleteCourse);
+courseRoutes.delete("/:id", verifyAccessToken, requireAdminOrCourseInstructor, courseController.deleteCourse);
 
 // additional routes for discussions, resources, and members specific pages
 courseRoutes.get("/:id/discussions", courseController.getDiscussions); // get all discussions for a course by id
@@ -68,7 +68,7 @@ courseRoutes.post(
 	"/:courseId/discussions",
 	verifyAccessToken,
 	requireCourseMembership,
-	discussionUpload.single("file"),
+	multerUpload.single("file"),
 	discussionController.create,
 );
 
@@ -113,6 +113,6 @@ courseRoutes.post(
 	"/:courseId/discussions/:parentId/replies",
 	verifyAccessToken,
 	requireCourseMembership,
-	discussionUpload.single("file"),
+	multerUpload.single("file"),
 	discussionController.createReply,
 );

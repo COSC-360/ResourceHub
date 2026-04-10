@@ -7,6 +7,9 @@ export function ProfileHeader({ userType }) {
   const navigate = useNavigate();
   const { logout } = useContext(AuthContext);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [photoVersion, setPhotoVersion] = useState(
+    () => localStorage.getItem("profilePhotoVersion") ?? "",
+  );
   const menuRef = useRef(null);
   const userid = localStorage.getItem("userid");
 
@@ -33,6 +36,24 @@ export function ProfileHeader({ userType }) {
     };
   }, [menuOpen]);
 
+  useEffect(() => {
+    const syncPhotoVersion = () => {
+      setPhotoVersion(localStorage.getItem("profilePhotoVersion") ?? "");
+    };
+
+    window.addEventListener("profile-photo-updated", syncPhotoVersion);
+    window.addEventListener("storage", syncPhotoVersion);
+
+    return () => {
+      window.removeEventListener("profile-photo-updated", syncPhotoVersion);
+      window.removeEventListener("storage", syncPhotoVersion);
+    };
+  }, []);
+
+  const profilePhotoSrc = userid
+    ? `http://localhost:3000/api/user/getProfilePhoto/${userid}?v=${encodeURIComponent(photoVersion)}`
+    : "/src/assets/profile.svg";
+
   return (
     <>
       <div className="profileContainer">
@@ -52,7 +73,7 @@ export function ProfileHeader({ userType }) {
               onClick={() => setMenuOpen((o) => !o)}
             >
               <img
-                src={`http://localhost:3000/api/user/getProfilePhoto/${userid}`}
+                src={profilePhotoSrc}
                 alt="profile"
                 className="icon"
                 onError={(e) => (e.target.src = "/src/assets/profile.svg")}

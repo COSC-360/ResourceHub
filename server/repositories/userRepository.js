@@ -38,10 +38,11 @@ export async function updateProfile(userid, data) {
     $set.bio = String(data.bio);
   }
   if (data.file != null) {
-    $set.pfp = { data: data.file.buffer, contentType: data.file.mimetype };
+    $set.pfp = `/uploads/${data.file.filename}`;
   }
-  if (data.faculty != null && String(data.faculty).trim()) {
-    $set.faculty = String(data.faculty);
+  if (data.faculty != null) {
+    const f = String(data.faculty).trim();
+    $set.faculty = f || "None";
   }
 
   if (Object.keys($set).length > 0) {
