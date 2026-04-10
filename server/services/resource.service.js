@@ -1,4 +1,3 @@
-import { Resource } from '../models/resource.js';
 import * as resourceRepository from '../repositories/resource.repository.js';
 
 export async function get(id) {
