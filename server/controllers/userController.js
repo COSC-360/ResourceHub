@@ -4,6 +4,19 @@ import * as userRepository from "../repositories/userRepository.js";
 import { getIO } from "../socket.js";
 import { ACCOUNT_DISABLED_MESSAGE } from "../middleware/authMiddleware.js";
 
+const DEFAULT_PROFILE_AVATAR_SVG = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Default profile avatar">
+  <circle cx="32" cy="32" r="32" fill="#E7E3EF"/>
+  <circle cx="32" cy="24" r="12" fill="#9A4AE3"/>
+  <path d="M12 56c2-11 10-18 20-18s18 7 20 18" fill="#9A4AE3"/>
+</svg>
+`;
+
+function sendDefaultProfilePhoto(res) {
+  res.set("Content-Type", "image/svg+xml; charset=utf-8");
+  return res.status(200).send(DEFAULT_PROFILE_AVATAR_SVG.trim());
+}
+
 export async function createUser(req, res) {
   const user = {
     username: req.body.username,
@@ -38,15 +51,15 @@ export async function getProfilePhoto(req, res) {
   try {
     found = await userService.getUserById(id);
   } catch {
-    return res.status(404).json({ error: "user not found" });
+    return sendDefaultProfilePhoto(res);
   }
 
   if (!found) {
-    return res.status(404).json({ error: "User not found" });
+    return sendDefaultProfilePhoto(res);
   }
 
   if (!found.pfp) {
-    return res.status(404).json({ error: "Profile photo not found" });
+    return sendDefaultProfilePhoto(res);
   }
 
   if (typeof found.pfp === "string") {
@@ -58,7 +71,7 @@ export async function getProfilePhoto(req, res) {
     return res.status(200).send(found.pfp.data);
   }
 
-  return res.status(404).json({ error: "Profile photo not found" });
+  return sendDefaultProfilePhoto(res);
 }
 
 export async function authenticateUser(req, res) {

@@ -9,6 +9,7 @@ import { apiClient } from "../../lib/api-client";
 import "./Feed.css";
 import Comment from "../Comment/Comment";
 import ProfileAvatar from "../ProfileAvatar/ProfileAvatar.jsx";
+import noImage from "../../assets/no-image.png";
 import { useNavigate } from "react-router-dom";
 import { LOGIN_ROUTE } from "../../constants/RouteConstants.jsx";
 import { createdAtFromObjectId } from "../../lib/dateUtils";
@@ -493,10 +494,15 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
                           ? URL.createObjectURL(file)
                           : post_props.hasImage && !removeImage
                             ? `http://localhost:3000/api/discussion/${post_props._id}/image`
-                            : null
+                            : noImage
                       }
                       alt="preview"
                       width={100}
+                      onError={(event) => {
+                        if (event.currentTarget.src !== noImage) {
+                          event.currentTarget.src = noImage;
+                        }
+                      }}
                     />
                     <button
                       className="remove_image"
@@ -518,6 +524,11 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
                 <img
                   src={`http://localhost:3000/api/discussion/${post_props._id}/image`}
                   alt="attached image"
+                  onError={(event) => {
+                    if (event.currentTarget.src !== noImage) {
+                      event.currentTarget.src = noImage;
+                    }
+                  }}
                 />
               ) : null}
             </>
