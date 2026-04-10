@@ -1,7 +1,7 @@
 import { Router } from "express";
 import * as userController from "../controllers/userController.js";
 import { verifyAccessToken } from "../middleware/authMiddleware.js";
-import upload from "../middleware/fileUploads.js";
+import multerUpload from "../middleware/upload.js";
 import { requireAdmin } from "../middleware/adminMiddleware.js";
 
 export const userRoutes = Router();
@@ -189,7 +189,7 @@ userRoutes.post("/login", userController.authenticateUser);
 userRoutes.patch(
   "/updateProfile",
   verifyAccessToken,
-  upload.single("file"),
+  multerUpload.single("file"),
   userController.updateProfile,
 );
 userRoutes.get("/courses", verifyAccessToken, userController.getUserCourses);

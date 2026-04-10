@@ -51,7 +51,11 @@ export async function feed(req, res) {
                 const doc = item?.data;
 
                 // read image from the original mongoose doc first
-                const hasImage = Boolean(doc?.image?.contentType || doc?.hasImage);
+                const hasImage = Boolean(
+                    (typeof doc?.image === "string" && doc.image.trim()) ||
+                    doc?.image?.contentType ||
+                    doc?.hasImage
+                );
 
                 const base =
                     doc?.toJSON?.() ??

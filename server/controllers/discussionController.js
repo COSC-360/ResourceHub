@@ -62,6 +62,12 @@ function hasInvalidObjectId(ids = []) {
   return ids.some((id) => !mongoose.Types.ObjectId.isValid(id));
 }
 
+function discussionHasImage(image) {
+  if (!image) return false;
+  if (typeof image === "string") return image.trim().length > 0;
+  return Boolean(image?.contentType);
+}
+
 export async function getAll(req, res) {
   const courseIds = parseCsv(req.query.courseIds);
   const authorIds = parseCsv(req.query.authorIds);
@@ -138,7 +144,7 @@ export async function getAll(req, res) {
           isAuthor: authorId === req.user?.id,
           hasUpvote,
           hasDownvote,
-          hasImage: Boolean(discussion.image?.contentType),
+          hasImage: discussionHasImage(discussion.image),
           score: Number(discussion.upvotes || 0) - Number(discussion.downvotes || 0),
         };
       }),
@@ -178,7 +184,7 @@ export async function getById(req, res) {
       isAuthor: authorId === req.user?.id,
       hasUpvote,
       hasDownvote,
-      hasImage: Boolean(discussion.image?.contentType),
+      hasImage: discussionHasImage(discussion.image),
       score: Number(discussion.upvotes || 0) - Number(discussion.downvotes || 0),
     });
   } catch (error) {
@@ -191,8 +197,17 @@ export async function getById(req, res) {
 export async function getImage(req, res) {
   const { id } = req.params;
   const found = await discussionService.findImageById(id);
+
+  if (!found) {
+    return res.status(404).json({ error: "Discussion image not found" });
+  }
+
+  if (typeof found === "string") {
+    return res.redirect(found);
+  }
+
   res.set("Content-Type", found.contentType);
-  res.status(200).send(found.data);
+  return res.status(200).send(found.data);
 }
 
 export async function create(req, res) {
@@ -212,9 +227,7 @@ export async function create(req, res) {
       courseId,
       content,
       title,
-      image: req.file
-        ? { data: req.file.buffer, contentType: req.file.mimetype }
-        : null,
+      image: req.file ? `/uploads/${req.file.filename}` : null,
       authorId: req.user.id,
       parentId: parentid || null,
     });
@@ -254,12 +267,7 @@ export async function update(req, res) {
       discussion = await discussionService.update(id, {
         _id: id,
         title: title,
-        image: req.file
-          ? {
-              data: req.file.buffer,
-              contentType: req.file.mimetype,
-            }
-          : null,
+        image: req.file ? `/uploads/${req.file.filename}` : null,
         edited: true,
         content: content,
         authorId: req.userId,
