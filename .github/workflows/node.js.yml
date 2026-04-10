@@ -36,6 +36,12 @@ jobs:
       env:
         CI: true
 
+    - name: Test Client
+      working-directory: ./client
+      run: npm run test:run
+      env:
+        CI: true
+
     - name: Build Server
       working-directory: ./server
       run: |
