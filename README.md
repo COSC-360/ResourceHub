@@ -98,7 +98,15 @@ docker compose up --build
 ~~~
 
 ## Environment Variables
+##### Database
+~~~
+MONGO_URI=mongodb://mongo:27017/resourcehub
+~~~
 
+##### JWT
+~~~
+ACCESS_TOKEN_SECRET_KEY=your_access_token_secret
+~~~
 ## Project Structure
 
 ~~~
