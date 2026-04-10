@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { apiClient } from "../../lib/api-client";
 import { CourseHeader } from "../CourseHeader/CourseHeader.jsx";
 import HybridFeed from "../HybridFeed/HybridFeed.jsx";
@@ -7,6 +7,7 @@ import CreateDiscussion from "../CreateDiscussion/CreateDiscussion.jsx";
 
 export default function CoursePage() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { courseId } = useParams();
 
   // keep state as initial skeleton only
@@ -91,6 +92,7 @@ export default function CoursePage() {
         course={course}
         onMembershipChanged={handleMembershipChanged}
         onCourseUpdated={handleCourseUpdated}
+        onCourseDeleted={() => navigate("/courses", { replace: true })}
       />
       <CreateDiscussion
         courseId={courseId}

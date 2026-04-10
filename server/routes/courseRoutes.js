@@ -3,6 +3,7 @@ import * as courseController from "../controllers/courseController.js";
 import * as discussionController from "../controllers/discussionController.js";
 import multerUpload, { multerDiskUpload } from "../middleware/upload.js";
 import { verifyAccessToken } from "../middleware/authMiddleware.js";
+import { requireAdmin } from "../middleware/adminMiddleware.js";
 import { requireCourseMembership } from "../middleware/courseMembershipMiddleware.js";
 
 export const courseRoutes = Router();
@@ -17,8 +18,7 @@ courseRoutes.post("/create", verifyAccessToken, courseController.create); // cre
 courseRoutes.patch("/:id/update", verifyAccessToken, courseController.update); // update a course by id
 courseRoutes.patch("/:id/updateimage", verifyAccessToken, multerDiskUpload.single("image"), courseController.updateImage); // update a course's image by id
 
-// TODO: delete a course by id, probably want auth also check membership and role (only allow instructors to delete courses)
-courseRoutes.delete("/:id", verifyAccessToken, courseController.deleteCourse); // delete a course by id
+courseRoutes.delete("/:id", requireAdmin, courseController.deleteCourse);
 
 // additional routes for discussions, resources, and members specific pages
 courseRoutes.get("/:id/discussions", courseController.getDiscussions); // get all discussions for a course by id

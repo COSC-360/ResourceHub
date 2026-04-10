@@ -256,9 +256,14 @@ export async function update(req, res) {
   const { id } = req.params;
   const { updatedImage, content, title } = req.body;
 
+  const wantsImageUpdate =
+    updatedImage === true ||
+    updatedImage === "true" ||
+    updatedImage === "1";
+
   try {
     let discussion = null;
-    if (updatedImage) {
+    if (wantsImageUpdate) {
       discussion = await discussionService.update(id, {
         _id: id,
         title: title,
@@ -266,6 +271,7 @@ export async function update(req, res) {
         edited: true,
         content: content,
         authorId: req.userId,
+        isAdmin: Boolean(req.admin),
         hasImage: req.file ? true : false,
       });
     } else {
@@ -275,7 +281,7 @@ export async function update(req, res) {
         edited: true,
         content: content,
         authorId: req.userId,
-        hasImage: req.file ? true : false,
+        isAdmin: Boolean(req.admin),
       });
     }
     res.status(200).json({ data: discussion });
@@ -290,7 +296,9 @@ export async function update(req, res) {
 export async function remove(req, res) {
   const { id } = req.params;
   try {
-    const result = await discussionService.remove(id, req.userId);
+    const result = await discussionService.remove(id, req.userId, {
+      isAdmin: Boolean(req.admin),
+    });
     res.status(200).json({ data: result });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
