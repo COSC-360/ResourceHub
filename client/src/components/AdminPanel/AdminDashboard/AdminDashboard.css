@@ -1,0 +1,67 @@
+.admin-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th,
+.admin-table td {
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.admin-table th {
+  background-color: #f5f5f5;
+}
+
+.admin-table thead tr:nth-child(2) th {
+  background-color: #fff;
+}
+
+.admin-table input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.35rem;
+}
+
+.user-toggle-btn {
+  padding: 0.2rem 0.55rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.user-toggle-btn-enable {
+  color: #1d7a34;
+  border-color: #b9dfc5;
+  background-color: #f3fbf6;
+}
+
+.user-toggle-btn-enable:hover {
+  background-color: #e6f5eb;
+}
+
+.user-toggle-btn-disable {
+  color: #a8373c;
+  border-color: #ebc2c4;
+  background-color: #fff5f5;
+}
+
+.user-toggle-btn-disable:hover {
+  background-color: #fde9ea;
+}
+
+.user-toggle-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}

@@ -87,3 +87,25 @@ export async function hideUserCourses(userId, courseId) {
 
   return await getUserCourses(userId);
 }
+
+export async function searchUsers(name, email, faculty, isAdmin) {
+  const query = {};
+  if (typeof name === "string" && name.trim()) {
+    query.username = { $regex: name.trim(), $options: "i" };
+  }
+  if (typeof email === "string" && email.trim()) {
+    query.email = { $regex: email.trim(), $options: "i" };
+  }
+  if (typeof faculty === "string" && faculty.trim()) {
+    query.faculty = { $regex: faculty.trim(), $options: "i" };
+  }
+  if (typeof isAdmin === "boolean") query.isAdmin = isAdmin;
+  return await User.find(query).select("-password").lean();
+}
+
+export async function setUserEnabled(userId, enabled) {
+  if (!userId || typeof enabled !== "boolean") return null;
+
+  await User.updateOne({ _id: userId }, { $set: { enabled } });
+  return User.findById(userId).select("-password").lean();
+}

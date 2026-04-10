@@ -8,7 +8,7 @@ function isLoggedIn() {
   return Boolean(localStorage.getItem("access_token"));
 }
 
-export default function AddMyCoursePage() {
+export default function AddMyCoursePage({showAll = false}) {
   const [availableCourses, setAvailableCourses] = useState([]);
   const [error, setError] = useState("");
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -25,7 +25,22 @@ export default function AddMyCoursePage() {
 
       const [allCoursesRes, myIdsRes] = await Promise.all([allCoursesPromise, myIdsPromise]);
 
+      if (!token) {
+        navigate("/login");
+        return;
+      }
+
+      const allCoursesRes = await apiClient("/api/courses");
       const allCourses = allCoursesRes.data || [];
+
+      if (showAll) {
+        setAvailableCourses(allCourses);
+        return;
+      }
+
+      const myIdsRes = await apiClient("/api/memberships/me/course-ids", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const myIds = new Set((myIdsRes.data || []).map(String));
 
       const filtered = allCourses.filter((course) => {
@@ -37,7 +52,7 @@ export default function AddMyCoursePage() {
     } catch (err) {
       setError(err.message || "Failed to load courses.");
     }
-  }, []);
+  }, [navigate, showAll]);
 
   useEffect(() => {
     const id = setTimeout(() => {

@@ -8,6 +8,7 @@ import CoursePage from "./components/CoursePage/CoursePage.jsx";
 import DiscussionPage from "./components/DiscussionPage/DiscussionPage.jsx";
 import Feed from "./pages/Feed.jsx";
 import Sidebar from "./components/Sidebar/Sidebar.jsx";
+import AdminSidebar from "./components/AdminPanel/AdminSidebar/AdminSidebar.jsx";
 import LoginForm from "./components/AuthForms/LoginForm.jsx";
 import SignupForm from "./components/AuthForms/SignupForm.jsx";
 import InformationForm from "./components/AuthForms/InformationForm.jsx";
@@ -16,12 +17,14 @@ import MyCoursesPage from "./components/MyCoursesPage/MyCoursesPage.jsx";
 import AddMyCoursePage from "./components/AddMyCoursePage/AddMyCourse.jsx";
 import CreatePost from "./pages/CreatePost.jsx";
 import ProfilePage from "./components/ProfilePage/ProfilePage.jsx";
-import AdminPanel from "./components/AdminPanel/AdminPanel.jsx";
+import AdminDashboard from "./components/AdminPanel//AdminDashboard/AdminDashboard.jsx";
 import CreateCourse from "./components/CreateCourse/CreateCourse.jsx";
 import UpdateCourseInfo from "./components/UpdateCourseInfo/UpdateCourseInfo.jsx";
 import NotAuthorized from "./components/NotAuthorized/NotAuthorized.jsx";
 import AuthContext from "./AuthContext.jsx";
 import GlobalApiError from "./components/GlobalApiError/GlobalApiError";
+import ViewUsers from "./components/AdminPanel/ViewUsers/ViewUsers.jsx";
+import ViewCourses from "./components/AdminPanel/ViewCourses/ViewCourses.jsx";
 import HybridFeed from "./components/HybridFeed/HybridFeed.jsx";
 
 // Main layout component that includes the header and sidebar,
@@ -32,6 +35,21 @@ function MainLayout() {
       <Header />
       <div className="body-layout">
         <Sidebar />
+        <main className="main-content">
+          <Outlet />
+        </main>
+      </div>
+      {/* Footer here if that ever gets added idk tbh */}
+    </div>
+  );
+}
+
+function AdminLayout() {
+  return (
+    <div className="app-layout">
+      <Header />
+      <div className="body-layout">
+        <AdminSidebar />
         <main className="main-content">
           <Outlet />
         </main>
@@ -66,14 +84,22 @@ function App() {
           <Route path="/register" element={<SignupForm />} />
           <Route path="/information" element={<InformationForm />} />
           <Route path="/profile" element={<ProfilePage />} />
-          <Route
-            path="/admin"
-            element={
-              <AdminRoute>
-                <AdminPanel />
-              </AdminRoute>
-            }
-          />
+
+          {/* redirect /courses to home */}
+          <Route path="/courses" element={<Navigate to="/" replace />} />
+        </Route>
+
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminLayout />
+            </AdminRoute>
+          }
+        >
+          <Route index element={<AdminDashboard />} />
+          <Route path="/admin/users" element={<ViewUsers />} />
+          <Route path="/admin/courses" element={<ViewCourses />} />
         </Route>
 
         <Route path="/courses/create" element={<CreateCourse />} />

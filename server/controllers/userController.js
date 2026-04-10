@@ -146,6 +146,44 @@ export async function hideUserCourses(req, res) {
 }
 
 export function verifyToken(req, res) {
-  if (req.user) return res.status(200).json("Valid access token.");
-  return res.status(403).json("Invalid access token.");
+  if (req.user) return res.status(200).json(req.user);
+  return res.status(403).json({ error: "Invalid access token." });
+}
+
+export async function searchUsers(req, res) {
+  const name = req.query.name;
+  const email = req.query.email;
+  const faculty = req.query.faculty;
+  let isAdmin;
+  if (req.query.isAdmin === "true") isAdmin = true;
+  if (req.query.isAdmin === "false") isAdmin = false;
+  const users = await userService.searchUsers(name, email, faculty, isAdmin);
+  res.status(200).json({ data: users });
+}
+
+export async function setUserEnabled(req, res) {
+  const { id } = req.params;
+  const { enabled } = req.body ?? {};
+
+  if (!id || String(id).trim() === "") {
+    res.status(400).json({ error: "Invalid user ID" });
+    return;
+  }
+
+  if (typeof enabled !== "boolean") {
+    res.status(400).json({ error: "enabled must be a boolean" });
+    return;
+  }
+
+  try {
+    const updated = await userService.setUserEnabled(String(id), enabled);
+    if (!updated) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+    res.status(200).json({ data: updated });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to update user enabled state" });
+  }
 }

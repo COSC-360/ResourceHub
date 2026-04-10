@@ -5,6 +5,16 @@ import { apiClient } from "./lib/api-client";
 
 const AuthContext = createContext();
 
+const decodeTokenPayload = (token) => {
+  const payload = JSON.parse(atob(token.split(".")[1]));
+  return {
+    ...payload,
+    admin: payload.admin ?? payload.isadmin ?? payload.isAdmin ?? false,
+    isadmin: payload.isadmin ?? payload.admin ?? payload.isAdmin ?? false,
+    enabled: payload.enabled ?? true,
+  };
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const router = useNavigate();
@@ -15,7 +25,7 @@ export const AuthProvider = ({ children }) => {
       if (!token) return;
 
       try {
-        const data = await apiClient(
+        await apiClient(
           `http://localhost:3000/api/user/verifytoken/`,
           {
             method: "GET",
@@ -25,8 +35,9 @@ export const AuthProvider = ({ children }) => {
           },
         );
 
+        const payload = decodeTokenPayload(token);
         setUser({
-          ...data,
+          ...payload,
           access_token: token,
         });
       } catch (e) {
@@ -46,7 +57,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("access_token", response.access_token);
 
       const token = response.access_token;
-      const payload = JSON.parse(atob(token.split(".")[1]));
+      const payload = decodeTokenPayload(token);
 
       localStorage.setItem("userid", payload.id);
 
@@ -57,7 +68,16 @@ export const AuthProvider = ({ children }) => {
 
       console.log("Token payload:", payload);
 
-      router("/"); //change this if homepage route changes
+      if (payload.enabled === false) {
+        setTimeout(() => {
+          window.alert("Your account is disabled. Contact an admin to reactivate your account.");
+          setUser(null);
+          localStorage.removeItem("access_token");
+          localStorage.removeItem("userid");
+        }, 0);
+      } else{
+        router("/");
+      }
     } catch (error) {
       console.error("Login failed:", error);
       throw error;
@@ -79,7 +99,7 @@ export const AuthProvider = ({ children }) => {
 
       localStorage.setItem("access_token", token);
 
-      const payload = JSON.parse(atob(token.split(".")[1]));
+      const payload = decodeTokenPayload(token);
 
       localStorage.setItem("userid", payload.id);
 
@@ -100,6 +120,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setUser(null);
     localStorage.removeItem("access_token");
+    localStorage.removeItem("userid");
     router("/");
   };
 
