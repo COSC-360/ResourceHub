@@ -5,31 +5,38 @@ import CourseCard from "../Cards/CourseCard.jsx";
 import CreateCourse from "../CreateCourse/CreateCourse.jsx";
 import "./AddMyCourse.css";
 
+function isLoggedIn() {
+  return Boolean(localStorage.getItem("access_token"));
+}
+
 export default function AddMyCoursePage({showAll = false}) {
+  const navigate = useNavigate();
   const [availableCourses, setAvailableCourses] = useState([]);
   const [error, setError] = useState("");
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const navigate = useNavigate();
 
   const loadAvailableCourses = useCallback(async () => {
     try {
       const token = localStorage.getItem("access_token");
+      const allCoursesPromise = apiClient("/api/courses");
+      const myIdsPromise = token
+        ? apiClient("/api/memberships/me/course-ids", {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+        : Promise.resolve({ data: [] });
+
+      const [allCoursesRes, myIdsRes] = await Promise.all([allCoursesPromise, myIdsPromise]);
+
       if (!token) {
         navigate("/login");
         return;
       }
-
-      const allCoursesRes = await apiClient("/api/courses");
       const allCourses = allCoursesRes.data || [];
 
       if (showAll) {
         setAvailableCourses(allCourses);
         return;
       }
-
-      const myIdsRes = await apiClient("/api/memberships/me/course-ids", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
       const myIds = new Set((myIdsRes.data || []).map(String));
 
       const filtered = allCourses.filter((course) => {
@@ -71,9 +78,11 @@ export default function AddMyCoursePage({showAll = false}) {
           <h1>All Courses</h1>
           <p>Select a course to open it, then join from the course page.</p>
         </div>
-        <button className="add-my-course-page__create-btn" onClick={openCreateModal}>
-          + Create Course
-        </button>
+        {isLoggedIn() ? (
+          <button className="add-my-course-page__create-btn" onClick={openCreateModal}>
+            + Create Course
+          </button>
+        ) : null}
       </div>
 
       {error && <p className="mycourses-error">{error}</p>}

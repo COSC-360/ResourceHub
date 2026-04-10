@@ -10,10 +10,13 @@ const SORT_OPTIONS = [
   { value: "score", label: "Best score" },
 ];
 
+const OPTIONAL_CHECKBOX_FILTERS = new Set(["deleted", "edited", "hasReplies"]);
+
 export default function DiscussionFeedControls({
   filters,
   onChange,
   onReset,
+  showCourseScope = true,
   courseScope = "any",
   onCourseScopeChange,
   disableMyCourses = false,
@@ -23,7 +26,8 @@ export default function DiscussionFeedControls({
 
   function handleCheckbox(name) {
     return (event) => {
-      onChange({ [name]: event.target.checked });
+      const checked = event.target.checked;
+      onChange({ [name]: OPTIONAL_CHECKBOX_FILTERS.has(name) ? (checked ? true : undefined) : checked });
     };
   }
 
@@ -65,7 +69,7 @@ export default function DiscussionFeedControls({
             </select>
           </label>
 
-          {onCourseScopeChange && (
+          {showCourseScope && onCourseScopeChange ? (
             <label>
               Course scope
               <select
@@ -76,7 +80,7 @@ export default function DiscussionFeedControls({
                 <option value="my" disabled={disableMyCourses}>My courses</option>
               </select>
             </label>
-          )}
+          ) : null}
         </div>
 
         <button

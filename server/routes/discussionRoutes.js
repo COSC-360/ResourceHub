@@ -25,14 +25,6 @@ export const discussionRoutes = Router();
  *         authorId:
  *           type: string
  *           example: 6614ef11d8a08a2f6fbc1011
- *         coursename:
- *           type: string
- *           nullable: true
- *           example: Intro to Databases
- *         coursecode:
- *           type: string
- *           nullable: true
- *           example: CS340
  *         deleted:
  *           type: boolean
  *           example: false
@@ -80,6 +72,9 @@ export const discussionRoutes = Router();
  *         hasImage:
  *           type: boolean
  *           example: true
+ *         score:
+ *           type: integer
+ *           example: 3
  *     DiscussionCreateResponse:
  *       type: object
  *       properties:
@@ -218,6 +213,23 @@ export const discussionRoutes = Router();
  *                 $ref: '#/components/schemas/Discussion'
  */
 discussionRoutes.get("/", decodeAccessToken, discussionController.getAll);
+
+/**
+ * @swagger
+ * /api/discussion/{id}:
+ *   get:
+ *     summary: Get a single discussion
+ *     description: Returns one discussion with vote and author metadata.
+ *     tags: [Discussions]
+ *     parameters:
+ *       - $ref: '#/components/parameters/DiscussionId'
+ *     responses:
+ *       200:
+ *         description: Discussion details
+ *       404:
+ *         description: Discussion not found
+ */
+discussionRoutes.get("/:id", decodeAccessToken, discussionController.getById);
 
 /**
  * @swagger

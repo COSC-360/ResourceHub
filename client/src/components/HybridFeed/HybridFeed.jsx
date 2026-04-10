@@ -12,6 +12,7 @@ function HybridFeed({
     sort = 'newest',
     limit = 20,
     maxItemsPerPage,
+    showCourseScope = true,
     initialFilters = {},
 }) {
     const hasToken = Boolean(localStorage.getItem("access_token"));
@@ -40,6 +41,7 @@ function HybridFeed({
         topLevelOnly: true,
         sortBy: 'createdAt',
         sortOrder: sort === 'oldest' ? 'asc' : 'desc',
+        populate: ['courseId'],
     }), [sort]);
 
     const [filters, setFilters] = useState(() => ({
@@ -47,6 +49,7 @@ function HybridFeed({
         ...initialFilters,
         sortBy: initialFilters.sortBy ?? baseFilters.sortBy,
         sortOrder: initialFilters.sortOrder ?? baseFilters.sortOrder,
+        populate: ['courseId'],
     }));
 
     useEffect(() => {
@@ -108,6 +111,7 @@ function HybridFeed({
             topLevelOnly: true,
             sortBy: 'createdAt',
             sortOrder: sort === 'oldest' ? 'asc' : 'desc',
+            populate: ['courseId'],
         });
         setPage(1);
     }
@@ -186,6 +190,7 @@ function HybridFeed({
                 filters={filters}
                 onChange={updateFilters}
                 onReset={resetFilters}
+                showCourseScope={showCourseScope}
                 courseScope={courseScope}
                 onCourseScopeChange={handleCourseScopeChange}
                 disableMyCourses={!hasToken}

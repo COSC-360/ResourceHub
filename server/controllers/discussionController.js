@@ -153,6 +153,41 @@ export async function getAll(req, res) {
 
 export const getLatest = getAll;
 
+export async function getById(req, res) {
+  const { id } = req.params;
+
+  try {
+    const discussion = await discussionService.findById(id);
+    await discussion.populate({ path: "courseId", select: "code" });
+    const obj = discussion.toJSON();
+
+    const authorId =
+      typeof discussion.authorId === "object" && discussion.authorId !== null
+        ? discussion.authorId._id?.toString()
+        : discussion.authorId?.toString();
+
+    const hasUpvote = req.user?.id
+      ? await voteService.hasUpvote(discussion._id, req.user.id, "Discussion")
+      : false;
+    const hasDownvote = req.user?.id
+      ? await voteService.hasDownvote(discussion._id, req.user.id, "Discussion")
+      : false;
+
+    return res.json({
+      ...obj,
+      isAuthor: authorId === req.user?.id,
+      hasUpvote,
+      hasDownvote,
+      hasImage: Boolean(discussion.image?.contentType),
+      score: Number(discussion.upvotes || 0) - Number(discussion.downvotes || 0),
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    const status = message.includes("No discussion") ? 404 : 500;
+    return res.status(status).json({ error: message });
+  }
+}
+
 export async function getImage(req, res) {
   const { id } = req.params;
   const found = await discussionService.findImageById(id);
@@ -260,13 +295,14 @@ export async function getReplies(req, res) {
   const { id } = req.params;
 
   const discussions = await discussionService.findReplies(id);
-  const discussionsWithAuthor = discussions.map((discussion) => {
+  const discussionsWithAuthor = await Promise.all(discussions.map(async (discussion) => {
+    await discussion.populate({ path: "courseId", select: "code" });
     const obj = discussion.toJSON();
 
     return {
       ...obj,
       isAuthor: discussion.authorId?.toString() === req.user?.id,
     };
-  });
+  }));
   res.status(200).json(discussionsWithAuthor);
 }

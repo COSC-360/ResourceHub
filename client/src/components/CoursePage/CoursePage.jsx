@@ -103,6 +103,7 @@ export default function CoursePage() {
         courseId={courseId}
         sort="newest"
         limit={20}
+        showCourseScope={false}
       />
     </div>
   );
