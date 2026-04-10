@@ -78,6 +78,7 @@ export async function getAll(req, res) {
   const topLevelOnly = parseBoolean(req.query.topLevelOnly);
   const sortBy = typeof req.query.sortBy === "string" ? req.query.sortBy : "createdAt";
   const sortOrder = req.query.sortOrder === "asc" ? "asc" : "desc";
+  const term = typeof req.query.term === "string" ? req.query.term.trim() : "";
   const page = parsePositiveInt(req.query.page, 1);
   const limit = Math.min(parsePositiveInt(req.query.limit, 100), 200);
 
@@ -138,6 +139,7 @@ export async function getAll(req, res) {
       populate,
       sortBy,
       sortOrder,
+      term,
       page,
       limit,
     });

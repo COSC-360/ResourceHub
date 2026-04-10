@@ -46,6 +46,7 @@ export const DiscussionRepository = {
       deleted,
       edited,
       hasReplies,
+      term,
       sortBy = "createdAt",
       sortOrder = "desc",
       limit = 100,
@@ -65,6 +66,14 @@ export const DiscussionRepository = {
 
     if (typeof hasReplies === "boolean") {
       queryList.replies = hasReplies ? { $gt: 0 } : { $lte: 0 };
+    }
+
+    if (typeof term === "string" && term.trim()) {
+      const safeTerm = term.trim();
+      queryList.$or = [
+        { title: { $regex: safeTerm, $options: "i" } },
+        { content: { $regex: safeTerm, $options: "i" } },
+      ];
     }
 
     const direction = sortOrder === "asc" ? 1 : -1;

@@ -9,6 +9,7 @@ import { buildDiscussionFeedQuery } from "../../lib/discussion-feed.js";
 function HybridFeed({
     courseId,
     courseIds,
+    searchTerm,
     sort = 'newest',
     limit = 20,
     maxItemsPerPage,
@@ -131,11 +132,12 @@ function HybridFeed({
     const queryInput = useMemo(
         () => ({
             ...filters,
+            term: searchTerm,
             courseIds: resolvedCourseIds,
             page,
             limit: Math.min(pageSize + 1, 200),
         }),
-        [filters, resolvedCourseIds, page, pageSize],
+        [filters, searchTerm, resolvedCourseIds, page, pageSize],
     );
 
     useEffect(() => {
@@ -207,7 +209,11 @@ function HybridFeed({
 
             {isLoading && <div className="hybrid-feed__loading">Loading...</div>}
             {error && <div className="hybrid-feed__error">Error: {error}</div>}
-            {!isLoading && !error && !items.length && <div className="hybrid-feed__empty">No discussions found</div>}
+            {!isLoading && !error && !items.length && (
+                <div className="hybrid-feed__empty">
+                    {searchTerm ? "No discussions match this search." : "No discussions found"}
+                </div>
+            )}
 
             {items.map((item) => {
                 const discussionId = item._id || item.id;

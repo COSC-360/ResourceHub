@@ -3,9 +3,49 @@ import * as ResourceRepository from "./resource.repository.js";
 import courseRepository from "./courseRepository.js";
 
 export async function search(searchTerm) {
-    const discussions = await DiscussionRepository.search(searchTerm);
-    // const courses = await courseRepository.search(searchTerm); // if/when added
-    return { discussions };
+    const defaults = {
+        term: "",
+        courseIds: [],
+        sortOrder: "desc",
+        page: 1,
+        limit: 20,
+        deleted: undefined,
+        edited: undefined,
+        hasReplies: undefined,
+        topLevelOnly: true,
+    };
+
+    const input =
+        typeof searchTerm === "string"
+            ? { ...defaults, term: searchTerm }
+            : { ...defaults, ...(searchTerm ?? {}) };
+
+    const scopedCourseIds = Array.isArray(input.courseIds)
+        ? input.courseIds.filter(Boolean)
+        : [];
+
+    const discussions = await DiscussionRepository.findByFilters({
+        courseIds: scopedCourseIds,
+        deleted: input.deleted,
+        edited: input.edited,
+        hasReplies: input.hasReplies,
+        parentId: input.topLevelOnly === false ? undefined : null,
+        term: input.term,
+        sortBy: "createdAt",
+        sortOrder: input.sortOrder,
+        page: input.page,
+        limit: input.limit,
+    });
+
+    const courses = await courseRepository.search({
+        term: input.term,
+        scopedCourseIds,
+        page: input.page,
+        limit: input.limit,
+        sortOrder: input.sortOrder,
+    });
+
+    return { discussions, courses };
 }
 
 function toFeedItem(type, doc) {

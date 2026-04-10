@@ -51,7 +51,17 @@ describe("common controller", () => {
 
     await controller.search(req, res);
 
-    expect(mockCommonService.search).toHaveBeenCalledWith("test");
+    expect(mockCommonService.search).toHaveBeenCalledWith({
+      term: "test",
+      courseIds: [],
+      sortOrder: "desc",
+      page: 1,
+      limit: 20,
+      deleted: undefined,
+      edited: undefined,
+      hasReplies: undefined,
+      topLevelOnly: true,
+    });
     expect(res.json).toHaveBeenCalledWith({
       searchResults: ["result"],
     });

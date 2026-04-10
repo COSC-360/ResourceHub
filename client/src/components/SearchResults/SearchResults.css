@@ -1,0 +1,22 @@
+.search-results {
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+}
+
+.search-results__section {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.search-results__course-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+	gap: 1rem;
+}
+
+.search-results__empty,
+.search-results__status {
+	margin: 0;
+}

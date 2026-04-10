@@ -94,6 +94,31 @@ export const courseRepository = {
 
         return Course.find(query).sort({ createdAt: -1, _id: -1 }).limit(limit);
     },
+
+    async search({ term, scopedCourseIds = null, limit = 20, page = 1, sortOrder = "desc" } = {}) {
+        const query = {};
+
+        if (Array.isArray(scopedCourseIds) && scopedCourseIds.length) {
+            query._id = { $in: scopedCourseIds };
+        }
+
+        if (typeof term === "string" && term.trim()) {
+            const safeTerm = term.trim();
+            query.$or = [
+                { name: { $regex: safeTerm, $options: "i" } },
+                { code: { $regex: safeTerm, $options: "i" } },
+                { description: { $regex: safeTerm, $options: "i" } },
+            ];
+        }
+
+        const direction = sortOrder === "asc" ? 1 : -1;
+        const offset = Math.max(0, (Math.max(1, Number(page) || 1) - 1) * (Math.max(1, Number(limit) || 20)));
+
+        return Course.find(query)
+            .sort({ createdAt: direction, _id: direction })
+            .skip(offset)
+            .limit(Math.max(1, Number(limit) || 20));
+    },
 };
 
 export default courseRepository;
