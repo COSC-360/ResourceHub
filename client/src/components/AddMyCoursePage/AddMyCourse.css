@@ -61,4 +61,6 @@
 
 .modal-panel {
   width: min(720px, 92vw);
+  max-height: 90vh;
+  overflow-y: auto;
 }
