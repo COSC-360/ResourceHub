@@ -12,6 +12,21 @@ await jest.unstable_mockModule(
   () => mockVoteService,
 );
 
+const mockDiscussionService = {
+  findById: jest.fn(),
+};
+
+await jest.unstable_mockModule(
+  "../../../services/discussionService.js",
+  () => mockDiscussionService,
+);
+
+await jest.unstable_mockModule("../../../socket.js", () => ({
+  getIO: () => ({
+    to: jest.fn().mockReturnValue({ emit: jest.fn() }),
+  }),
+}));
+
 const controller = await import("../../../controllers/voteController.js");
 
 describe("vote controller", () => {
@@ -31,6 +46,14 @@ describe("vote controller", () => {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
     };
+
+    mockDiscussionService.findById.mockResolvedValue({
+      _id: "t1",
+      parentId: null,
+      courseId: "c1",
+      upvotes: 0,
+      downvotes: 0,
+    });
 
     jest.clearAllMocks();
   });

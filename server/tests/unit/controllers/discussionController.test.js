@@ -37,6 +37,12 @@ await jest.unstable_mockModule(
   () => mockVoteService,
 );
 
+await jest.unstable_mockModule("../../../socket.js", () => ({
+  getIO: () => ({
+    to: jest.fn().mockReturnValue({ emit: jest.fn() }),
+  }),
+}));
+
 const controller = await import("../../../controllers/discussionController.js");
 
 describe("discussion controller", () => {
