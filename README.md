@@ -22,10 +22,10 @@ cp server/.env.example server/.env
 
 2. Add the required environment variables inside `server/.env`:
 
-# Database
+##### Database
 MONGO_URI=your_mongodb_connection_string
 
-# JWT
+##### JWT
 ACCESS_TOKEN_SECRET_KEY=your_access_token_secret
 
 #### Run the application
