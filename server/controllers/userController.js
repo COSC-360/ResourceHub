@@ -26,14 +26,36 @@ export async function createUser(req, res) {
 
 export async function getProfilePhoto(req, res) {
   const { id } = req.params;
+
+  if (!id || String(id).trim() === "") {
+    return res.status(400).json({ error: "Invalid user ID" });
+  }
+
   let found = null;
   try {
     found = await userService.getUserById(id);
   } catch {
-    return res.status(404).json({ message: "user not found" });
+    return res.status(404).json({ error: "user not found" });
   }
-  res.set("Content-Type", found.pfp.contentType);
-  res.status(200).send(found.pfp.data.buffer);
+
+  if (!found) {
+    return res.status(404).json({ error: "User not found" });
+  }
+
+  if (!found.pfp) {
+    return res.status(404).json({ error: "Profile photo not found" });
+  }
+
+  if (typeof found.pfp === "string") {
+    return res.redirect(found.pfp);
+  }
+
+  if (found.pfp?.data && found.pfp?.contentType) {
+    res.set("Content-Type", found.pfp.contentType);
+    return res.status(200).send(found.pfp.data);
+  }
+
+  return res.status(404).json({ error: "Profile photo not found" });
 }
 
 export async function authenticateUser(req, res) {

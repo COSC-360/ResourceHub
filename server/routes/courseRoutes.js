@@ -1,11 +1,10 @@
 import { Router } from "express";
 import * as courseController from "../controllers/courseController.js";
 import * as discussionController from "../controllers/discussionController.js";
-import upload from "../middleware/upload.js"; // use your multer middleware export
+import multerUpload, { multerDiskUpload } from "../middleware/upload.js";
 import { verifyAccessToken } from "../middleware/authMiddleware.js";
 import { requireAdmin } from "../middleware/adminMiddleware.js";
 import { requireCourseMembership } from "../middleware/courseMembershipMiddleware.js";
-import discussionUpload from "../middleware/fileUploads.js";
 
 export const courseRoutes = Router();
 
@@ -15,13 +14,9 @@ courseRoutes.get("/:id", courseController.getById); // get one course by id
 // TODO: when course is created, also need to create a course membership for the creator (probably want to do this in the service layer)
 courseRoutes.post("/create", verifyAccessToken, courseController.create); // create a new course
 
-courseRoutes.patch("/:id/update", requireAdmin, courseController.update);
-courseRoutes.patch(
-  "/:id/updateimage",
-  requireAdmin,
-  upload.single("image"),
-  courseController.updateImage,
-);
+// TODO: add auth middleware to these routes, also need to check if user is an instructor for the course when updating or deleting
+courseRoutes.patch("/:id/update", verifyAccessToken, courseController.update); // update a course by id
+courseRoutes.patch("/:id/updateimage", verifyAccessToken, multerDiskUpload.single("image"), courseController.updateImage); // update a course's image by id
 
 courseRoutes.delete("/:id", requireAdmin, courseController.deleteCourse);
 
@@ -68,7 +63,7 @@ courseRoutes.post(
 	"/:courseId/discussions",
 	verifyAccessToken,
 	requireCourseMembership,
-	discussionUpload.single("file"),
+	multerUpload.single("file"),
 	discussionController.create,
 );
 
@@ -113,6 +108,6 @@ courseRoutes.post(
 	"/:courseId/discussions/:parentId/replies",
 	verifyAccessToken,
 	requireCourseMembership,
-	discussionUpload.single("file"),
+	multerUpload.single("file"),
 	discussionController.createReply,
 );
