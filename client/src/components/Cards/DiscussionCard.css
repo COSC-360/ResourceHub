@@ -56,6 +56,7 @@
     gap: 8px;
     font-size: 0.9rem;
     flex-wrap: wrap;
+    width: 100%;
 }
 
 .discussion-card__forum {
@@ -148,4 +149,104 @@
     color: #d32f2f;
     font-size: 0.85rem;
     margin-top: 8px;
+}
+
+.discussion-card__actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+}
+
+.discussion-card__action-edit,
+.discussion-card__action-cancel,
+.discussion-card__action-delete {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #fff;
+    font-size: 0.8rem;
+    cursor: pointer;
+    color: #333;
+}
+
+.discussion-card__action-edit:hover,
+.discussion-card__action-cancel:hover {
+    background: #f5f5f5;
+}
+
+.discussion-card__action-delete {
+    border-color: #e0a0a0;
+    color: #c62828;
+}
+
+.discussion-card__action-delete:hover {
+    background: #ffebee;
+}
+
+.discussion-card__deleted {
+    color: #666;
+    font-style: italic;
+    margin: 8px 0;
+}
+
+.discussion-card__edit-form {
+    margin-top: 8px;
+}
+
+.discussion-card__field {
+    margin-bottom: 10px;
+}
+
+.discussion-card__field label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.discussion-card__field input,
+.discussion-card__field textarea {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font: inherit;
+}
+
+.discussion-card__image-preview {
+    margin: 8px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+.discussion-card__remove-image {
+    padding: 4px 8px;
+    border: none;
+    border-radius: 4px;
+    background: #f0f0f0;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.discussion-card__save {
+    margin-top: 8px;
+    padding: 6px 16px;
+    border: none;
+    border-radius: 4px;
+    background: #0b66d1;
+    color: #fff;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.discussion-card__save:hover {
+    background: #0956b0;
 }

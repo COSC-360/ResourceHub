@@ -77,6 +77,9 @@ export default function DiscussionPage({ discussionId: discussionIdProp }) {
         <DiscussionCard
           key={discussionId}
           data={discussion}
+          onDiscussionUpdated={(patch) =>
+            setDiscussion((prev) => (prev ? { ...prev, ...patch } : prev))
+          }
           onReplyClick={() => setShowRootReply((prev) => !prev)}
         />
       )}
