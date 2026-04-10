@@ -47,14 +47,18 @@ export async function create(data) {
 
 export async function update(id, data) {
   if (data._id) delete data._id;
+  const { authorId: actorId, isAdmin, ...rest } = data;
   const discussion = await DiscussionRepository.findById(id);
   if (!discussion) {
     throw new Error("discussion not found");
   }
-  if (discussion.authorId.toString() !== data.authorId) {
+  const authorized =
+    isAdmin === true ||
+    discussion.authorId.toString() === String(actorId);
+  if (!authorized) {
     throw new Error("Not authorized");
   }
-  discussion.set(data);
+  discussion.set(rest);
   return DiscussionRepository.save(discussion);
 }
 
@@ -79,12 +83,13 @@ export function findByAuthor(authorid) {
   return discussions;
 }
 
-export async function remove(id, userId) {
+export async function remove(id, userId, options = {}) {
+  const { isAdmin = false } = options;
   const discussion = await DiscussionRepository.findById(id);
   if (!discussion) {
     throw new Error(`No discussions with the id ${id} found`);
   }
-  if (discussion.authorId.toString() !== userId) {
+  if (!isAdmin && discussion.authorId.toString() !== userId) {
     throw new Error("Not authorized");
   }
   if (discussion.parentId) {

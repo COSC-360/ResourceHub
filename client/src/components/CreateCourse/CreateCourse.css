@@ -95,10 +95,33 @@ button:hover {
 .create-course__actions {
   display: flex;
   justify-content: flex-end;
+  flex-wrap: wrap;
   gap: 10px;
+}
+
+.create-course__actions button {
+  width: auto;
+  min-width: 120px;
+  flex: 1 1 auto;
 }
 
 .create-course__secondary {
   background: #eee;
   color: #333;
+}
+
+.create-course__delete {
+  width: auto;
+  background: #c62828;
+  color: #fff;
+}
+
+.create-course__delete:hover {
+  background: #b71c1c;
+}
+
+.create-course__error {
+  color: #c62828;
+  font-size: 0.9rem;
+  margin: 0 0 12px;
 }
