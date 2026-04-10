@@ -26,6 +26,15 @@ function AdminSideBarNav() {
           All Courses
         </NavLink>
       </li>
+
+      <li>
+        <NavLink
+          to="/admin/analytics"
+          className={({ isActive }) => (isActive ? "active-link" : "")}
+        >
+          Analytics
+        </NavLink>
+      </li>
     </ul>
   );
 }

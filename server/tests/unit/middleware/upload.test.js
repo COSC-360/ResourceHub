@@ -25,8 +25,6 @@ await jest.unstable_mockModule("fs", () => ({
   },
 }));
 
-const { default: upload } = await import("../../../middleware/upload.js");
-
 describe("multer upload config", () => {
   beforeEach(() => {
     jest.clearAllMocks();
