@@ -216,6 +216,23 @@ discussionRoutes.get("/", decodeAccessToken, discussionController.getAll);
 
 /**
  * @swagger
+ * /api/discussion/{id}:
+ *   get:
+ *     summary: Get a single discussion
+ *     description: Returns one discussion with vote and author metadata.
+ *     tags: [Discussions]
+ *     parameters:
+ *       - $ref: '#/components/parameters/DiscussionId'
+ *     responses:
+ *       200:
+ *         description: Discussion details
+ *       404:
+ *         description: Discussion not found
+ */
+discussionRoutes.get("/:id", decodeAccessToken, discussionController.getById);
+
+/**
+ * @swagger
  * /api/discussion/{id}/image:
  *   get:
  *     summary: Get discussion image

@@ -131,6 +131,10 @@
     transition: all 0.2s;
 }
 
+.discussion-card__reply {
+    text-decoration: none;
+}
+
 .discussion-card__vote:hover {
     background: #e0e0e0;
 }

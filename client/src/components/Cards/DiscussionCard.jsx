@@ -6,7 +6,13 @@ import VoteControls from "../VoteControls/VoteControls.jsx";
 import defaultProfile from "../../assets/profile.svg";
 import "./DiscussionCard.css";
 
-export default function DiscussionCard({ data, isReply = false, depth = 0 }) {
+export default function DiscussionCard({
+  data,
+  isReply = false,
+  depth = 0,
+  showTitle = true,
+  onReplyClick,
+}) {
   const [user, setUser] = useState(null);
 
   const discussionId = data?._id || data?.id;
@@ -27,6 +33,8 @@ export default function DiscussionCard({ data, isReply = false, depth = 0 }) {
     data?.courseId?.coursecode ||
     "";
   const hasImage = Boolean(data?.hasImage || data?.image?.contentType);
+  const replyHref =
+    discussionId && courseId ? `/courses/${courseId}/discussions/${discussionId}` : null;
 
   const createdAt = data?.createdAt || data?.updatedAt;
   const timeStr = useMemo(() => {
@@ -100,7 +108,7 @@ export default function DiscussionCard({ data, isReply = false, depth = 0 }) {
         </div>
       </div>
 
-      {data.title && <h3 className="discussion-card__title">{data.title}</h3>}
+      {showTitle && data.title && <h3 className="discussion-card__title">{data.title}</h3>}
       <p className="discussion-card__content">{data.content || data.comment}</p>
 
       {hasImage && discussionId && (
@@ -122,10 +130,27 @@ export default function DiscussionCard({ data, isReply = false, depth = 0 }) {
           buttonClassName="discussion-card__vote"
           activeClassName="active"
         />
-        <button className="discussion-card__reply" title="Reply">
-          <i className="bi bi-chat"></i>
-          <span>{data.replies ?? 0}</span>
-        </button>
+        {typeof onReplyClick === "function" ? (
+          <button
+            className="discussion-card__reply"
+            title="Reply"
+            type="button"
+            onClick={() => onReplyClick(data)}
+          >
+            <i className="bi bi-chat"></i>
+            <span>{data.replies ?? 0}</span>
+          </button>
+        ) : replyHref ? (
+          <Link className="discussion-card__reply" title="Reply" to={replyHref}>
+            <i className="bi bi-chat"></i>
+            <span>{data.replies ?? 0}</span>
+          </Link>
+        ) : (
+          <button className="discussion-card__reply" title="Reply" type="button" disabled>
+            <i className="bi bi-chat"></i>
+            <span>{data.replies ?? 0}</span>
+          </button>
+        )}
       </div>
     </article>
   );

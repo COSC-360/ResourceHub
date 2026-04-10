@@ -5,6 +5,7 @@ import "./App.css";
 import Header from "./components/Header/Header.jsx";
 import SearchResults from "./components/SearchResults/SearchResults.jsx";
 import CoursePage from "./components/CoursePage/CoursePage.jsx";
+import DiscussionPage from "./components/DiscussionPage/DiscussionPage.jsx";
 import Feed from "./pages/Feed.jsx";
 import Sidebar from "./components/Sidebar/Sidebar.jsx";
 import LoginForm from "./components/AuthForms/LoginForm.jsx";
@@ -57,6 +58,7 @@ function App() {
           <Route path="/" element={<HybridFeed />} />
           <Route path="/search" element={<SearchResults />} />
           <Route path="/courses/:courseId" element={<CoursePage />} />
+          <Route path="/courses/:courseId/discussions/:discussionId" element={<DiscussionPage />} />
           <Route path="/create" element={<CreatePost />} />
           <Route path="/my-courses" element={<MyCoursesPage />} />
           <Route path="/my-courses/add" element={<AddMyCoursePage />} />
