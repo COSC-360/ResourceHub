@@ -27,7 +27,9 @@ export function issueAccessToken(userDoc) {
       enabled: u.enabled ?? true,
     },
     process.env.ACCESS_TOKEN_SECRET_KEY,
-    { expiresIn: "60m" },
+    {
+      expiresIn: "120m",
+    },
   );
 }
 
@@ -51,7 +53,7 @@ export async function userSignin(email, password) {
       },
       process.env.ACCESS_TOKEN_SECRET_KEY,
       {
-        expiresIn: "60m",
+        expiresIn: "120m",
       },
     );
     return accessToken;
