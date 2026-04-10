@@ -101,10 +101,6 @@ export default function CoursePage() {
       <HybridFeed
         key={feedVersion}
         courseId={courseId}
-        courseIds={[courseId]}
-        showDiscussions={true}
-        showResources={true}
-        showCourses={false}
         sort="newest"
         limit={20}
       />

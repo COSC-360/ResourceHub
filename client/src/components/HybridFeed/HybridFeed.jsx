@@ -1,84 +1,221 @@
 import { useEffect, useMemo, useState } from 'react';
 import './HybridFeed.css';
-import CourseCard from '../Cards/CourseCard.jsx';
 import DiscussionCard from '../Cards/DiscussionCard.jsx';
-import ResourceCard from '../Cards/ResourceCard.jsx';
+import DiscussionFeedControls from './DiscussionFeedControls.jsx';
+import DiscussionFeedPagination from './DiscussionFeedPagination.jsx';
 import { apiClient } from "../../lib/api-client";
+import { buildDiscussionFeedQuery } from "../../lib/discussion-feed.js";
 
 function HybridFeed({
     courseId,
-    courseIds = [],
-    showDiscussions = true,
-    showResources = true,
-    showCourses = true,
+    courseIds,
     sort = 'newest',
     limit = 20,
+    maxItemsPerPage,
+    initialFilters = {},
 }) {
+    const hasToken = Boolean(localStorage.getItem("access_token"));
     const [items, setItems] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(false);
+    const [courseScope, setCourseScope] = useState('any');
+    const [courseScopeHint, setCourseScopeHint] = useState('');
+    const [myCourseIds, setMyCourseIds] = useState([]);
+    const [myCourseIdsLoaded, setMyCourseIdsLoaded] = useState(false);
+    const resolvedPageSize = Number(maxItemsPerPage ?? limit ?? 20);
+    const pageSize = Number.isFinite(resolvedPageSize) && resolvedPageSize > 0
+        ? Math.min(Math.floor(resolvedPageSize), 200)
+        : 20;
+    const normalizedCourseIds = useMemo(
+        () => (Array.isArray(courseIds) ? courseIds.filter(Boolean) : []),
+        [courseIds],
+    );
 
-    const courseIdsKey = useMemo(() => courseIds.join(','), [courseIds]);
+    const baseFilters = useMemo(() => ({
+        deleted: undefined,
+        edited: undefined,
+        hasReplies: undefined,
+        topLevelOnly: true,
+        sortBy: 'createdAt',
+        sortOrder: sort === 'oldest' ? 'asc' : 'desc',
+    }), [sort]);
 
-    async function fetchFeedItems() {
-        const types = [
-            showDiscussions && 'discussion',
-            showResources && 'resource',
-            showCourses && 'course',
-        ].filter(Boolean);
+    const [filters, setFilters] = useState(() => ({
+        ...baseFilters,
+        ...initialFilters,
+        sortBy: initialFilters.sortBy ?? baseFilters.sortBy,
+        sortOrder: initialFilters.sortOrder ?? baseFilters.sortOrder,
+    }));
 
-        if (types.length === 0) {
-            setItems([]);
+    useEffect(() => {
+        if (courseId || courseScope !== 'my') return;
+
+        let cancelled = false;
+
+        async function loadMyCourseIds() {
+            const token = localStorage.getItem("access_token");
+            if (!token) {
+                if (!cancelled) {
+                    setMyCourseIds([]);
+                    setMyCourseIdsLoaded(true);
+                }
+                return;
+            }
+
+            try {
+                const json = await apiClient('/api/memberships/me/course-ids', {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+
+                if (!cancelled) {
+                    const ids = Array.isArray(json?.data) ? json.data : [];
+                    setMyCourseIds(ids);
+                    setMyCourseIdsLoaded(true);
+                }
+            } catch {
+                if (!cancelled) {
+                    setMyCourseIds([]);
+                    setMyCourseIdsLoaded(true);
+                }
+            }
+        }
+
+        loadMyCourseIds();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [courseId, courseScope]);
+
+    const resolvedCourseIds = useMemo(() => {
+        if (courseId) return [courseId];
+        if (courseScope === 'my') return myCourseIds;
+        return normalizedCourseIds;
+    }, [courseId, courseScope, myCourseIds, normalizedCourseIds]);
+
+    function updateFilters(next) {
+        setFilters((prev) => ({ ...prev, ...next }));
+        setPage(1);
+    }
+
+    function resetFilters() {
+        setFilters({
+            deleted: undefined,
+            edited: undefined,
+            hasReplies: undefined,
+            topLevelOnly: true,
+            sortBy: 'createdAt',
+            sortOrder: sort === 'oldest' ? 'asc' : 'desc',
+        });
+        setPage(1);
+    }
+
+    function handleCourseScopeChange(nextScope) {
+        if (nextScope === 'my' && !hasToken) {
+            setCourseScopeHint('Log in to use the My courses filter.');
+            setCourseScope('any');
             return;
+        }
+
+        setCourseScopeHint('');
+        setCourseScope(nextScope);
+        setPage(1);
+    }
+
+    const queryInput = useMemo(
+        () => ({
+            ...filters,
+            courseIds: resolvedCourseIds,
+            page,
+            limit: Math.min(pageSize + 1, 200),
+        }),
+        [filters, resolvedCourseIds, page, pageSize],
+    );
+
+    useEffect(() => {
+        let cancelled = false;
+
+        if (!courseId && courseScope === 'my' && !myCourseIdsLoaded) {
+            return () => {
+                cancelled = true;
+            };
         }
 
         setIsLoading(true);
         setError(null);
 
-        try {
-            const params = new URLSearchParams();
-            params.set('types', types.join(','));
-            params.set('sort', sort);
-            params.set('limit', String(limit));
+        async function fetchFeedItems() {
+            try {
+                const params = buildDiscussionFeedQuery(queryInput);
 
-            if (courseId) params.set('courseId', courseId);
-            else if (courseIds.length) params.set('courseIds', courseIds.join(','));
+                const token = localStorage.getItem("access_token");
+                const json = await apiClient(`/api/discussion?${params.toString()}`, {
+                    headers: token ? { Authorization: `Bearer ${token}` } : {},
+                });
 
-            const token = localStorage.getItem("access_token");
-            const json = await apiClient(`/api/common/feed?${params.toString()}`, {
-                headers: token ? { Authorization: `Bearer ${token}` } : {},
-            });
-
-            setItems(json.data ?? []);
-        } catch (err) {
-            setError(err.message || "Failed to fetch feed");
-        } finally {
-            setIsLoading(false);
+                if (!cancelled) {
+                    const rows = Array.isArray(json) ? json : (json.data ?? []);
+                    const more = rows.length > pageSize;
+                    setHasMore(more);
+                    setItems(more ? rows.slice(0, pageSize) : rows);
+                }
+            } catch (err) {
+                if (!cancelled) {
+                    setError(err.message || "Failed to fetch feed");
+                    setHasMore(false);
+                }
+            } finally {
+                if (!cancelled) {
+                    setIsLoading(false);
+                }
+            }
         }
-    }
 
-    useEffect(() => {
         fetchFeedItems();
-    }, [courseId, courseIdsKey, showDiscussions, showResources, showCourses, sort, limit]);
 
-    if (isLoading) return <div className="hybrid-feed__loading">Loading...</div>;
-    if (error) return <div className="hybrid-feed__error">Error: {error}</div>;
-    if (!items.length) return <div className="hybrid-feed__empty">No items found</div>;
+        return () => {
+            cancelled = true;
+        };
+    }, [queryInput, pageSize, courseId, courseScope, myCourseIdsLoaded]);
 
     return (
         <div className="hybrid-feed">
+            <DiscussionFeedControls
+                filters={filters}
+                onChange={updateFilters}
+                onReset={resetFilters}
+                courseScope={courseScope}
+                onCourseScopeChange={handleCourseScopeChange}
+                disableMyCourses={!hasToken}
+                hintMessage={courseScopeHint || (!hasToken ? 'Log in to enable My courses.' : '')}
+            />
+
+            <DiscussionFeedPagination
+                page={page}
+                canGoPrevious={page > 1}
+                canGoNext={hasMore}
+                onPrevious={() => setPage((prev) => Math.max(1, prev - 1))}
+                onNext={() => setPage((prev) => prev + 1)}
+            />
+
+            {isLoading && <div className="hybrid-feed__loading">Loading...</div>}
+            {error && <div className="hybrid-feed__error">Error: {error}</div>}
+            {!isLoading && !error && !items.length && <div className="hybrid-feed__empty">No discussions found</div>}
+
             {items.map((item) => {
-                switch (item.type) {
-                    case 'discussion':
-                        return <DiscussionCard key={`${item.type}-${item.id}`} data={item.data} />;
-                    case 'resource':
-                        return <ResourceCard key={`${item.type}-${item.id}`} data={item.data} />;
-                    case 'course':
-                        return <CourseCard key={`${item.type}-${item.id}`} data={item.data} />;
-                    default:
-                        return null;
-                }
+                const discussionId = item._id || item.id;
+                return <DiscussionCard key={discussionId} data={item} />;
             })}
+
+            <DiscussionFeedPagination
+                page={page}
+                canGoPrevious={page > 1}
+                canGoNext={hasMore}
+                onPrevious={() => setPage((prev) => Math.max(1, prev - 1))}
+                onNext={() => setPage((prev) => prev + 1)}
+            />
         </div>
     );
 }

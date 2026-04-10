@@ -4,7 +4,7 @@ import "./Comment.css";
 import { apiClient } from "../../lib/api-client";
 import { useNavigate } from "react-router-dom";
 
-const Comment = ({ onSubmit, parentid, parentUsername }) => {
+const Comment = ({ onSubmit, parentid, parentUsername, courseId }) => {
   const [formData, setFormData] = useState({ content: "" });
   const [file, setFile] = useState(null);
   const [error, setError] = useState("");
@@ -19,7 +19,7 @@ const Comment = ({ onSubmit, parentid, parentUsername }) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
@@ -36,7 +36,7 @@ const Comment = ({ onSubmit, parentid, parentUsername }) => {
           throw new Error("Cannot post comment without reference.");
         data.append("parentid", parentid);
         if (file) data.append("file", file);
-        await apiClient("/api/discussion", {
+        await apiClient(`/api/discussion`, {
           method: "POST",
           body: data,
           headers: {
@@ -46,7 +46,7 @@ const Comment = ({ onSubmit, parentid, parentUsername }) => {
         onSubmit();
       })();
     } catch (err) {
-      setError(err);
+      setError(err?.message || "Failed to post comment");
     } finally {
       setLoading(false);
     }

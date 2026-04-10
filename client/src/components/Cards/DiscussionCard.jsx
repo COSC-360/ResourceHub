@@ -10,7 +10,22 @@ export default function DiscussionCard({ data, isReply = false, depth = 0 }) {
   const [user, setUser] = useState(null);
 
   const discussionId = data?._id || data?.id;
-  const courseCode = data?.courseCode || data?.coursecode || data?.course?.code || "";
+  const authorId =
+    typeof data?.authorId === "object"
+      ? data?.authorId?._id || data?.authorId?.id
+      : data?.authorId;
+  const populatedAuthor = typeof data?.authorId === "object" ? data.authorId : null;
+  const courseId =
+    typeof data?.courseId === "object"
+      ? data?.courseId?._id || data?.courseId?.id
+      : data?.courseId;
+  const courseCode =
+    data?.courseCode ||
+    data?.coursecode ||
+    data?.course?.code ||
+    data?.courseId?.code ||
+    data?.courseId?.coursecode ||
+    "";
   const hasImage = Boolean(data?.hasImage || data?.image?.contentType);
 
   const createdAt = data?.createdAt || data?.updatedAt;
@@ -22,13 +37,21 @@ export default function DiscussionCard({ data, isReply = false, depth = 0 }) {
     let cancelled = false;
 
     async function loadUser() {
-      if (!data?.authorId) {
+      if (populatedAuthor) {
+        setUser({
+          username: populatedAuthor.username || "Unknown User",
+          faculty: populatedAuthor.faculty || "",
+        });
+        return;
+      }
+
+      if (!authorId) {
         setUser(null);
         return;
       }
 
       try {
-        const fetchedUser = await fetchUserById(data.authorId);
+        const fetchedUser = await fetchUserById(authorId);
         if (!cancelled) setUser(fetchedUser);
       } catch {
         if (!cancelled) setUser(null);
@@ -40,10 +63,10 @@ export default function DiscussionCard({ data, isReply = false, depth = 0 }) {
     return () => {
       cancelled = true;
     };
-  }, [data?.authorId]);
+  }, [authorId, populatedAuthor]);
 
-  const username = user?.username || "Unknown User";
-  const faculty = user?.faculty || "";
+  const username = user?.username || populatedAuthor?.username || "Unknown User";
+  const faculty = user?.faculty || populatedAuthor?.faculty || "";
 
   if (!data) return null;
 
@@ -54,7 +77,7 @@ export default function DiscussionCard({ data, isReply = false, depth = 0 }) {
     <article className={`${classPrefix} ${depthClass}`}>
       <div className="discussion-card__header">
         <img
-          src={data?.authorId ? `/api/user/getProfilePhoto/${data.authorId}` : defaultProfile}
+          src={authorId ? `/api/user/getProfilePhoto/${authorId}` : defaultProfile}
           alt={username}
           className="discussion-card__avatar"
           onError={(e) => {
@@ -64,8 +87,8 @@ export default function DiscussionCard({ data, isReply = false, depth = 0 }) {
 
         <div className="discussion-card__meta">
           <div className="discussion-card__user-info">
-            {!isReply && data?.courseId && (
-              <Link to={`/courses/${data.courseId}`} className="discussion-card__forum">
+            {!isReply && courseId && (
+              <Link to={`/courses/${courseId}`} className="discussion-card__forum">
                 c/{courseCode || "course"}
               </Link>
             )}

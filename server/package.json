@@ -21,9 +21,11 @@
     "express": "^5.2.1",
     "jest": "^30.3.0",
     "jsonwebtoken": "^9.0.3",
-    "mongodb": "^7.1.0",
+    "mongodb": "^7.1.1",
     "mongoose": "^9.1.5",
     "multer": "^2.1.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "uuid": "^13.0.0"
   },
   "devDependencies": {

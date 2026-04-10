@@ -66,7 +66,7 @@ const CreateDiscussion = ({
       if (file) data.append("file", file);
 
       const token = localStorage.getItem("access_token");
-      const result = await apiClient(`/api/discussion/course/${courseId}`, {
+      const result = await apiClient(`/api/courses/${courseId}/discussions`, {
         method: "POST",
         body: data,
         headers: { Authorization: `Bearer ${token}` },
