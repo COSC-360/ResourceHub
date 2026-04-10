@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { apiClient } from "../../lib/api-client";
 import CourseCard from "../Cards/CourseCard.jsx";
 import CreateCourse from "../CreateCourse/CreateCourse.jsx";
@@ -9,6 +10,7 @@ function isLoggedIn() {
 }
 
 export default function AddMyCoursePage({showAll = false}) {
+  const navigate = useNavigate();
   const [availableCourses, setAvailableCourses] = useState([]);
   const [error, setError] = useState("");
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -29,18 +31,12 @@ export default function AddMyCoursePage({showAll = false}) {
         navigate("/login");
         return;
       }
-
-      const allCoursesRes = await apiClient("/api/courses");
       const allCourses = allCoursesRes.data || [];
 
       if (showAll) {
         setAvailableCourses(allCourses);
         return;
       }
-
-      const myIdsRes = await apiClient("/api/memberships/me/course-ids", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
       const myIds = new Set((myIdsRes.data || []).map(String));
 
       const filtered = allCourses.filter((course) => {

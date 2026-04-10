@@ -44,6 +44,9 @@ const DiscussionSchema = new mongoose.Schema(
   { timestamps: true },
 ); // Automatically adds createdAt and updatedAt fields
 
+DiscussionSchema.index({ parentId: 1, createdAt: -1, _id: -1 });
+DiscussionSchema.index({ deleted: 1, createdAt: -1 });
+
 DiscussionSchema.set("toJSON", {
   transform: function (doc, ret) {
     delete ret.image;
