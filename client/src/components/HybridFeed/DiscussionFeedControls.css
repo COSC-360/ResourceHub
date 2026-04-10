@@ -14,9 +14,9 @@
 }
 
 .discussion-feed-controls__button {
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.06);
-  color: inherit;
+  border: 1px solid #d9d3e6;
+  background: #f7f4fb;
+  color: var(--rh-text);
   border-radius: 0.75rem;
   padding: 0.65rem 0.9rem;
   display: inline-flex;
@@ -48,9 +48,9 @@
 .discussion-feed-controls__field input {
   min-width: 12rem;
   border-radius: 0.65rem;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.05);
-  color: inherit;
+  border: 1px solid #ccc;
+  background: #fff;
+  color: var(--rh-text);
   padding: 0.6rem 0.75rem;
 }
 
@@ -59,14 +59,14 @@
   gap: 0.9rem;
   padding: 1rem;
   border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #f7f4fb;
+  border: 1px solid #e8e0ef;
 }
 
 .discussion-feed-controls__hint {
   margin: 0;
   font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.8);
+  color: #5c5666;
 }
 
 .discussion-feed-controls__toggles {
