@@ -2,7 +2,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import AuthContext from "../../AuthContext.jsx";
 import { apiClient } from "../../lib/api-client";
-import defaultAvatar from "../../assets/profile.svg";
+import ProfileAvatar from "../ProfileAvatar/ProfileAvatar.jsx";
 import "./ProfilePage.css";
 import {
   courseDiscussionPath,
@@ -251,10 +251,6 @@ export function ProfilePage() {
     }
   };
 
-  const profilePhotoSrc = effectiveUserId
-    ? `http://localhost:3000/api/user/getProfilePhoto/${effectiveUserId}?v=${encodeURIComponent(photoVersion)}`
-    : defaultAvatar;
-
   const yourDiscussions = activity.filter((d) => !d.parentId);
   const yourComments = activity.filter((d) => Boolean(d.parentId));
 
@@ -269,17 +265,14 @@ export function ProfilePage() {
       <section className="profile-card">
         <div className="profile-photo-row">
           {/* Placeholder until image storage is decided */}
-          <img
+          <ProfileAvatar
             className="profile-avatar"
-            src={
-              editing && file
-                ? URL.createObjectURL(file)
-                : profilePhotoSrc
-            }
+            userId={editing && file ? null : effectiveUserId}
+            version={editing && file ? undefined : photoVersion}
+            file={editing ? file : null}
             alt=""
             width={96}
             height={96}
-            onError={(e) => (e.target.src = defaultAvatar)}
           />
         </div>
 

@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import "./AuthForms.css";
-import defaultAvatar from "../../assets/profile.svg";
 import { useNavigate } from "react-router-dom";
 import { apiClient } from "../../lib/api-client";
 import { HOMEROUTE, REGISTER_ROUTE } from "../../constants/RouteConstants.jsx";
 import { validateProfileTextFields } from "../../lib/formValidation.js";
+import ProfileAvatar from "../ProfileAvatar/ProfileAvatar.jsx";
 
 const InformationForm = () => {
   const [file, setFile] = useState(null);
@@ -100,10 +100,7 @@ const InformationForm = () => {
           </p>
         ) : null}
         <div className="avatar_wrapper">
-          <img
-            src={file ? URL.createObjectURL(file) : defaultAvatar}
-            className="avatar_preview"
-          />
+          <ProfileAvatar file={file} className="avatar_preview" />
           <input
             type="file"
             className="file_upload"

@@ -5,7 +5,7 @@ import { timeAgo } from "../../lib/dateUtils";
 import { apiClient } from "../../lib/api-client";
 import AuthContext from "../../AuthContext.jsx";
 import VoteControls from "../VoteControls/VoteControls.jsx";
-import defaultProfile from "../../assets/profile.svg";
+import ProfileAvatar from "../ProfileAvatar/ProfileAvatar.jsx";
 import {
   courseDiscussionPath,
   coursePath,
@@ -268,13 +268,10 @@ export default function DiscussionCard({
       tabIndex={replyHref ? 0 : undefined}
     >
       <div className="discussion-card__header">
-        <img
-          src={authorId ? `/api/user/getProfilePhoto/${authorId}` : defaultProfile}
+        <ProfileAvatar
+          userId={authorId}
           alt={username}
           className="discussion-card__avatar"
-          onError={(e) => {
-            e.currentTarget.src = defaultProfile;
-          }}
         />
 
         <div className="discussion-card__meta">

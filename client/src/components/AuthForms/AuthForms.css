@@ -21,8 +21,8 @@
 
 .avatar_wrapper {
   position: relative;
-  width: 50%;
-  height: 50%;
+  width: 128px;
+  height: 128px;
   margin: 0 auto;
 }
 
@@ -32,7 +32,6 @@
   border-radius: 50%;
   border: 2px solid #b646eb;
   display: block;
-  object-fit: contain;
 }
 
 .file_upload {
