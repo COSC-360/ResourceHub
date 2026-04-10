@@ -66,6 +66,8 @@ export async function deleteVoteById(id) {
 
 export async function deleteVote(data) {
   const result = await VoteRepository.deleteByFields(data);
+  if (!result) return null;
+
   if (data.targetType === "Discussion") {
     const discussion = await DiscussionRepository.findById(data.targetId);
     let discussion_votes = Number(

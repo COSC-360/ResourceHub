@@ -97,6 +97,12 @@ export async function removeVote(req, res) {
       userId,
     });
 
+    if (!result) {
+      return res
+        .status(200)
+        .json({ message: "No vote existed for this target." });
+    }
+
     if (targetType === "Discussion") {
       await emitDiscussionVoteUpdated(targetId);
     }

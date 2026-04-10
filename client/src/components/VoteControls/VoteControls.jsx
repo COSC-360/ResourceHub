@@ -28,17 +28,21 @@ export default function VoteControls({
   const [voteBusy, setVoteBusy] = useState(false);
 
   const sameTarget = String(voteState.targetId) === String(targetId);
-  const propsChangedForSameTarget =
-    sameTarget &&
-    (voteState.upvotes !== propsState.upvotes ||
-      voteState.downvotes !== propsState.downvotes ||
-      voteState.hasUpvote !== propsState.hasUpvote ||
-      voteState.hasDownvote !== propsState.hasDownvote);
-
-  const current =
-    !sameTarget || (!voteBusy && propsChangedForSameTarget)
-      ? propsState
-      : voteState;
+  const current = !sameTarget
+    ? propsState
+    : {
+        targetId,
+        upvotes:
+          !voteBusy && voteState.upvotes !== propsState.upvotes
+            ? propsState.upvotes
+            : voteState.upvotes,
+        downvotes:
+          !voteBusy && voteState.downvotes !== propsState.downvotes
+            ? propsState.downvotes
+            : voteState.downvotes,
+        hasUpvote: voteState.hasUpvote,
+        hasDownvote: voteState.hasDownvote,
+      };
 
   const updateCurrentState = (next) => {
     setVoteState({
@@ -50,21 +54,71 @@ export default function VoteControls({
     });
   };
 
+  const computeOptimisticUpvoteState = (state) => {
+    if (state.hasUpvote) {
+      return {
+        ...state,
+        upvotes: Math.max(0, state.upvotes - 1),
+        hasUpvote: false,
+      };
+    }
+
+    if (state.hasDownvote) {
+      return {
+        ...state,
+        upvotes: state.upvotes + 1,
+        downvotes: Math.max(0, state.downvotes - 1),
+        hasUpvote: true,
+        hasDownvote: false,
+      };
+    }
+
+    return {
+      ...state,
+      upvotes: state.upvotes + 1,
+      hasUpvote: true,
+    };
+  };
+
+  const computeOptimisticDownvoteState = (state) => {
+    if (state.hasDownvote) {
+      return {
+        ...state,
+        downvotes: Math.max(0, state.downvotes - 1),
+        hasDownvote: false,
+      };
+    }
+
+    if (state.hasUpvote) {
+      return {
+        ...state,
+        upvotes: Math.max(0, state.upvotes - 1),
+        downvotes: state.downvotes + 1,
+        hasUpvote: false,
+        hasDownvote: true,
+      };
+    }
+
+    return {
+      ...state,
+      downvotes: state.downvotes + 1,
+      hasDownvote: true,
+    };
+  };
+
   const handleUpvote = async () => {
     if (voteBusy) return;
     try {
       const token = localStorage.getItem("access_token");
       if (!token) return navigate(LOGIN_ROUTE);
+
+      const previous = { ...current };
+      const optimistic = computeOptimisticUpvoteState(previous);
+      updateCurrentState(optimistic);
       setVoteBusy(true);
 
-      const wasUp = current.hasUpvote;
-      const wasDown = current.hasDownvote;
-      const next = {
-        upvotes: current.upvotes,
-        downvotes: current.downvotes,
-        hasUpvote: current.hasUpvote,
-        hasDownvote: current.hasDownvote,
-      };
+      const wasUp = previous.hasUpvote;
+      const wasDown = previous.hasDownvote;
 
       if (wasUp || wasDown) {
         await apiClient("/api/vote/remove", {
@@ -72,15 +126,6 @@ export default function VoteControls({
           body: { targetType, targetId },
           headers: { Authorization: `Bearer ${token}` },
         });
-
-        if (wasDown) {
-          next.downvotes = Math.max(0, next.downvotes - 1);
-          next.hasDownvote = false;
-        }
-        if (wasUp) {
-          next.upvotes = Math.max(0, next.upvotes - 1);
-          next.hasUpvote = false;
-        }
       }
 
       if (!wasUp) {
@@ -89,12 +134,9 @@ export default function VoteControls({
           body: { targetType, targetId },
           headers: { Authorization: `Bearer ${token}` },
         });
-        next.upvotes += 1;
-        next.hasUpvote = true;
       }
-
-      updateCurrentState(next);
     } catch (err) {
+      updateCurrentState(current);
       console.error("Upvote failed:", err);
     } finally {
       setVoteBusy(false);
@@ -106,16 +148,14 @@ export default function VoteControls({
     try {
       const token = localStorage.getItem("access_token");
       if (!token) return navigate(LOGIN_ROUTE);
+
+      const previous = { ...current };
+      const optimistic = computeOptimisticDownvoteState(previous);
+      updateCurrentState(optimistic);
       setVoteBusy(true);
 
-      const wasUp = current.hasUpvote;
-      const wasDown = current.hasDownvote;
-      const next = {
-        upvotes: current.upvotes,
-        downvotes: current.downvotes,
-        hasUpvote: current.hasUpvote,
-        hasDownvote: current.hasDownvote,
-      };
+      const wasUp = previous.hasUpvote;
+      const wasDown = previous.hasDownvote;
 
       if (wasUp || wasDown) {
         await apiClient("/api/vote/remove", {
@@ -123,15 +163,6 @@ export default function VoteControls({
           body: { targetType, targetId },
           headers: { Authorization: `Bearer ${token}` },
         });
-
-        if (wasUp) {
-          next.upvotes = Math.max(0, next.upvotes - 1);
-          next.hasUpvote = false;
-        }
-        if (wasDown) {
-          next.downvotes = Math.max(0, next.downvotes - 1);
-          next.hasDownvote = false;
-        }
       }
 
       if (!wasDown) {
@@ -140,12 +171,9 @@ export default function VoteControls({
           body: { targetType, targetId },
           headers: { Authorization: `Bearer ${token}` },
         });
-        next.downvotes += 1;
-        next.hasDownvote = true;
       }
-
-      updateCurrentState(next);
     } catch (err) {
+      updateCurrentState(current);
       console.error("Downvote failed:", err);
     } finally {
       setVoteBusy(false);
