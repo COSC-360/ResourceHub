@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { apiClient } from "../../lib/api-client";
 import CourseForm from "../CourseForm/CourseForm.jsx";
