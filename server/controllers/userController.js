@@ -150,11 +150,6 @@ export function verifyToken(req, res) {
   return res.status(403).json({ error: "Invalid access token." });
 }
 
-export async function getAdmins(req, res) {
-  const admins = await userService.getAdmins();
-  res.status(200).json({ data: admins });
-}
-
 export async function searchUsers(req, res) {
   const name = req.query.name;
   const email = req.query.email;
