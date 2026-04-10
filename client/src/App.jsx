@@ -91,9 +91,6 @@ function App() {
               </AdminRoute>
             }
           />
-
-          {/* redirect /courses to home */}
-          <Route path="/courses" element={<Navigate to="/" replace />} />
         </Route>
 
         <Route

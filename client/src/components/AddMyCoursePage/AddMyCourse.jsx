@@ -26,11 +26,6 @@ export default function AddMyCoursePage({showAll = false}) {
         : Promise.resolve({ data: [] });
 
       const [allCoursesRes, myIdsRes] = await Promise.all([allCoursesPromise, myIdsPromise]);
-
-      if (!token) {
-        navigate("/login");
-        return;
-      }
       const allCourses = allCoursesRes.data || [];
 
       if (showAll) {
