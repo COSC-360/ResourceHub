@@ -9,6 +9,12 @@ await jest.unstable_mockModule("mongoose", () => ({
         isValid: mockIsValid,
       },
     },
+    Schema: {
+      Types: {
+        Mixed: "Mixed",
+      },
+    },
+    model: jest.fn(),
   },
 }));
 
