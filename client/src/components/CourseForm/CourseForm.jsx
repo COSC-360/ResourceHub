@@ -43,7 +43,7 @@ export default function CourseForm({
     <div className={asModal ? "course-form course-form--modal" : "course-form"}>
       <form className={asModal ? "course-form__body course-form__body--modal" : "course-form__body"} onSubmit={onSubmit}>
         <div className="course-form__top">
-          <legend className="course-form__legend">{title}</legend>
+          <h2 className="course-form__legend">{title}</h2>
           {asModal && onClose ? (
             <button
               type="button"
