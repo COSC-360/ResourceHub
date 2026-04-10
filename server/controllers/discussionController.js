@@ -1,12 +1,14 @@
 import * as discussionService from "../services/discussionService.js";
 import * as voteService from "../services/voteService.js";
+import mongoose from "mongoose";
+import { getIO } from "../socket.js";
+
 import {
   hasInvalidObjectId,
   parseBoolean,
   parseCsv,
   parsePositiveInt,
 } from "../utils/inputParsers.js";
-import { escapeRegex } from "../utils/regex.js";
 
 function parsePopulate(value) {
   const allowed = new Set(["courseId", "authorId"]);
@@ -204,6 +206,26 @@ export async function create(req, res) {
       parentId: parentid || null,
     });
 
+    const io = getIO();
+
+    if (parentid) {
+  io.to(`discussion:${parentid}`).emit("reply:created", {
+    reply: discussion,
+    parentId: parentid,
+    courseId,
+  });
+  } else {
+    io.to(`course:${courseId}`).emit("post:created", {
+      post: discussion,
+      courseId,
+    });
+
+    io.to("discussions:lobby").emit("post:created", {
+      post: discussion,
+      courseId,
+    });
+  }
+
     return res.status(201).json({ data: discussion });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
@@ -254,8 +276,25 @@ export async function update(req, res) {
         content: content,
         authorId: req.userId,
         isAdmin: Boolean(req.admin),
+        hasImage: req.file ? true : false,
       });
     }
+
+    const io = getIO();
+
+    if (discussion.parentId) {
+      io.to(`discussion:${discussion.parentId}`).emit("reply:updated", {
+        reply: discussion,
+        parentId: discussion.parentId,
+        courseId: discussion.courseId,
+      });
+    } else {
+      io.to(`course:${discussion.courseId}`).emit("post:updated", {
+        post: discussion,
+        courseId: discussion.courseId,
+      });
+    }
+
     res.status(200).json({ data: discussion });
   } catch (err) {
     console.log(err);
@@ -271,6 +310,27 @@ export async function remove(req, res) {
     const result = await discussionService.remove(id, req.userId, {
       isAdmin: Boolean(req.admin),
     });
+
+    const io = getIO();
+
+    if (result.parentId) {
+      io.to(`discussion:${result.parentId}`).emit("reply:deleted", {
+        replyId: result._id,
+        parentId: result.parentId,
+        courseId: result.courseId,
+      });
+    } else {
+  io.to(`course:${result.courseId}`).emit("post:deleted", {
+    postId: result._id,
+    courseId: result.courseId,
+  });
+
+  io.to("discussions:lobby").emit("post:deleted", {
+    postId: result._id,
+    courseId: result.courseId,
+  });
+}
+
     res.status(200).json({ data: result });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";

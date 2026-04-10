@@ -3,6 +3,7 @@ import { apiClient } from "../../lib/api-client";
 import CourseCard from "../Cards/CourseCard.jsx";
 import CreateCourse from "../CreateCourse/CreateCourse.jsx";
 import "./AddMyCourse.css";
+import { socket } from "../../socket";
 
 function isLoggedIn() {
   return Boolean(localStorage.getItem("access_token"));
@@ -44,11 +45,20 @@ export default function AddMyCoursePage({showAll = false}) {
   }, [showAll]);
 
   useEffect(() => {
-    const id = setTimeout(() => {
-      void loadAvailableCourses();
-    }, 0);
+  console.log("Joining courses lobby");
+  socket.emit("joinCoursesLobby");
 
-    return () => clearTimeout(id);
+  async function handleCourseCreatedSocket(payload) {
+    console.log("course:created received", payload);
+    await loadAvailableCourses();
+  }
+
+  socket.on("course:created", handleCourseCreatedSocket);
+
+  return () => {
+    socket.emit("leaveCoursesLobby");
+    socket.off("course:created", handleCourseCreatedSocket);
+  };
   }, [loadAvailableCourses]);
 
   function openCreateModal() {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiClient } from "../../lib/api-client";
 import { LOGIN_ROUTE } from "../../constants/RouteConstants.jsx";
@@ -18,6 +18,22 @@ export default function VoteControls({
   const [downvotes, setDownvotes] = useState(initialDownvotes);
   const [hasUpvote, setHasUpvote] = useState(initialHasUpvote);
   const [hasDownvote, setHasDownvote] = useState(initialHasDownvote);
+
+  useEffect(() => {
+    setUpvotes(initialUpvotes);
+  }, [initialUpvotes]);
+
+  useEffect(() => {
+    setDownvotes(initialDownvotes);
+  }, [initialDownvotes]);
+
+  useEffect(() => {
+    setHasUpvote(initialHasUpvote);
+  }, [initialHasUpvote]);
+
+  useEffect(() => {
+    setHasDownvote(initialHasDownvote);
+  }, [initialHasDownvote]);
 
   const handleUpvote = async () => {
     try {
