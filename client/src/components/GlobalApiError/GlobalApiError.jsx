@@ -6,7 +6,10 @@ export default function GlobalApiError() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    return subscribeApiError((e) => setError(e));
+    return subscribeApiError((e) => {
+      if (e.payload?.code === "ACCOUNT_DISABLED") return;
+      setError(e);
+    });
   }, []);
 
   useEffect(() => {

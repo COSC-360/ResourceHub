@@ -5,6 +5,9 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+/** Returned by userSignin when credentials match but the account is disabled. */
+export const USER_SIGNIN_ACCOUNT_DISABLED = "USER_SIGNIN_ACCOUNT_DISABLED";
+
 export async function createUser(user) {
   const salt = await bcrypt.genSalt();
   const passwordHashed = await bcrypt.hash(user.password, salt);
@@ -35,6 +38,9 @@ export async function userSignin(email, password) {
 
   const match = await bcrypt.compare(password, found.password);
   if (match) {
+    if (found.enabled === false) {
+      return USER_SIGNIN_ACCOUNT_DISABLED;
+    }
     const accessToken = jwt.sign(
       {
         id: found._id,

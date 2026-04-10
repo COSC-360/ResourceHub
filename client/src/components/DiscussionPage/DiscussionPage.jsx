@@ -4,6 +4,7 @@ import DiscussionCard from "../Cards/DiscussionCard.jsx";
 import Replies from "./Replies.jsx";
 import Reply from "./Reply.jsx";
 import { apiClient } from "../../lib/api-client";
+import { socket } from "../../socket";
 
 export default function DiscussionPage({ discussionId: discussionIdProp }) {
   const params = useParams();
@@ -47,6 +48,100 @@ export default function DiscussionPage({ discussionId: discussionIdProp }) {
 
     return () => {
       active = false;
+    };
+  }, [discussionId]);
+
+  useEffect(() => {
+    if (!discussionId) return;
+
+    socket.emit("joinDiscussion", discussionId);
+
+    async function refreshRootDiscussion() {
+      try {
+        const token = localStorage.getItem("access_token");
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        const discussionJson = await apiClient(`/api/discussion/${discussionId}`, { headers });
+        setDiscussion(discussionJson?.data ?? discussionJson);
+      } catch {
+        /* keep existing discussion on transient errors */
+      }
+    }
+
+    function handleReplyCreated(payload) {
+      if (String(payload?.parentId) !== String(discussionId)) return;
+      void refreshRootDiscussion();
+    }
+
+    function handleReplyDeleted(payload) {
+      if (String(payload?.parentId) !== String(discussionId)) return;
+      void refreshRootDiscussion();
+    }
+
+    function handleVoteUpdated(payload) {
+      const tid = payload?.targetId?._id ?? payload?.targetId;
+      if (String(tid) !== String(discussionId)) return;
+      setDiscussion((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          upvotes: payload.upvotes,
+          downvotes: payload.downvotes,
+          score: payload.score,
+        };
+      });
+    }
+
+    function handlePostUpdated(payload) {
+      const post = payload?.post;
+      if (!post) return;
+      const pid = post._id ?? post.id;
+      if (String(pid) !== String(discussionId)) return;
+      setDiscussion((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          title: post.title ?? prev.title,
+          content: post.content ?? prev.content,
+          edited: post.edited ?? prev.edited,
+          hasImage: post.hasImage ?? prev.hasImage,
+          deleted: post.deleted ?? prev.deleted,
+        };
+      });
+    }
+
+    function handlePostDeleted(payload) {
+      const pid = payload?.postId?._id ?? payload?.postId;
+      if (String(pid) !== String(discussionId)) return;
+      if (payload.softDeleted) {
+        setDiscussion((prev) =>
+          prev
+            ? {
+                ...prev,
+                deleted: true,
+                title: "[deleted]",
+                content: "[deleted]",
+              }
+            : prev,
+        );
+      } else {
+        setDiscussion(null);
+        setError("This discussion was removed.");
+      }
+    }
+
+    socket.on("reply:created", handleReplyCreated);
+    socket.on("reply:deleted", handleReplyDeleted);
+    socket.on("vote:updated", handleVoteUpdated);
+    socket.on("post:updated", handlePostUpdated);
+    socket.on("post:deleted", handlePostDeleted);
+
+    return () => {
+      socket.emit("leaveDiscussion", discussionId);
+      socket.off("reply:created", handleReplyCreated);
+      socket.off("reply:deleted", handleReplyDeleted);
+      socket.off("vote:updated", handleVoteUpdated);
+      socket.off("post:updated", handlePostUpdated);
+      socket.off("post:deleted", handlePostDeleted);
     };
   }, [discussionId]);
 

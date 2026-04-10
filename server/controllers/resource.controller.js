@@ -1,4 +1,5 @@
 import * as resourceService from "../services/resource.service.js";
+import { pushNewResourceNotification } from "../services/notificationPush.js";
 
 export async function get(req, res) {
     try {
@@ -36,6 +37,7 @@ export async function create(req, res) {
     try {
         const data = req.body;
         const newResource = await resourceService.create(data);
+        void pushNewResourceNotification(newResource);
         return res.status(201).json(newResource);
     } catch (error) {
         return res.status(500).json({ error: error.message });

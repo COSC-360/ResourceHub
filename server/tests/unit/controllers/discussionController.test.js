@@ -43,6 +43,10 @@ await jest.unstable_mockModule("../../../socket.js", () => ({
   }),
 }));
 
+await jest.unstable_mockModule("../../../services/notificationPush.js", () => ({
+  pushNewDiscussionNotification: jest.fn().mockResolvedValue(undefined),
+}));
+
 const controller = await import("../../../controllers/discussionController.js");
 
 describe("discussion controller", () => {

@@ -1,15 +1,22 @@
 "use client";
-import { createContext, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { createContext, useState, useEffect, useRef, useCallback } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { apiClient } from "./lib/api-client";
+import { subscribeApiError } from "./lib/api-error-bus";
+import { socket } from "./socket";
 import { HOMEROUTE, INFORMATION_ROUTE } from "./constants/RouteConstants.jsx";
 
 const AuthContext = createContext();
 
+const VERIFY_URL = "http://localhost:3000/api/user/verifytoken/";
+
 const decodeTokenPayload = (token) => {
   const payload = JSON.parse(atob(token.split(".")[1]));
+  const rawId = payload.id ?? payload._id ?? payload.sub;
+  const id = rawId != null ? String(rawId) : undefined;
   return {
     ...payload,
+    id,
     admin: payload.admin ?? payload.isadmin ?? payload.isAdmin ?? false,
     isadmin: payload.isadmin ?? payload.admin ?? payload.isAdmin ?? false,
     enabled: payload.enabled ?? true,
@@ -19,6 +26,108 @@ const decodeTokenPayload = (token) => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const router = useNavigate();
+  const location = useLocation();
+  const disabledLogoutHandledRef = useRef(false);
+
+  const forceLogoutDisabled = useCallback(
+    (message) => {
+      if (disabledLogoutHandledRef.current) return;
+      disabledLogoutHandledRef.current = true;
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("userid");
+      setUser(null);
+      window.alert(
+        message ||
+          "Your account has been disabled. Contact an admin to reactivate your account.",
+      );
+      router(HOMEROUTE);
+      window.setTimeout(() => {
+        disabledLogoutHandledRef.current = false;
+      }, 500);
+    },
+    [router],
+  );
+
+  const forceLogoutDisabledRef = useRef(forceLogoutDisabled);
+  forceLogoutDisabledRef.current = forceLogoutDisabled;
+
+  useEffect(() => {
+    return subscribeApiError((e) => {
+      if (e.payload?.code !== "ACCOUNT_DISABLED") return;
+      forceLogoutDisabledRef.current(e.message);
+    });
+  }, []);
+
+  useEffect(() => {
+    function onAccountDisabled() {
+      forceLogoutDisabledRef.current();
+    }
+    socket.on("account:disabled", onAccountDisabled);
+    return () => socket.off("account:disabled", onAccountDisabled);
+  }, []);
+
+  useEffect(() => {
+    const uid = user?.id != null ? String(user.id) : null;
+    if (!uid) return;
+
+    function joinUserRoom() {
+      if (socket.connected) {
+        socket.emit("joinUserSession", uid);
+      }
+    }
+
+    joinUserRoom();
+    socket.on("connect", joinUserRoom);
+
+    return () => {
+      socket.off("connect", joinUserRoom);
+      socket.emit("leaveUserSession", uid);
+    };
+  }, [user?.id]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("access_token");
+    if (!token || user?.id == null) return;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        await apiClient(VERIFY_URL, {
+          method: "GET",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      } catch (e) {
+        if (cancelled) return;
+        if (e?.payload?.code === "ACCOUNT_DISABLED") {
+          forceLogoutDisabledRef.current(e.message);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [location.pathname, user?.id]);
+
+  useEffect(() => {
+    if (user?.id == null) return;
+
+    const intervalMs = 30_000;
+    const id = window.setInterval(() => {
+      const token = localStorage.getItem("access_token");
+      if (!token) return;
+      void apiClient(VERIFY_URL, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      }).catch((e) => {
+        if (e?.payload?.code === "ACCOUNT_DISABLED") {
+          forceLogoutDisabledRef.current(e.message);
+        }
+      });
+    }, intervalMs);
+
+    return () => window.clearInterval(id);
+  }, [user?.id]);
 
   useEffect(() => {
     const verifytoken = async () => {
@@ -26,15 +135,12 @@ export const AuthProvider = ({ children }) => {
       if (!token) return;
 
       try {
-        await apiClient(
-          `http://localhost:3000/api/user/verifytoken/`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+        await apiClient(VERIFY_URL, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
-        );
+        });
 
         const payload = decodeTokenPayload(token);
         setUser({
@@ -42,6 +148,10 @@ export const AuthProvider = ({ children }) => {
           access_token: token,
         });
       } catch (e) {
+        if (e?.payload?.code === "ACCOUNT_DISABLED") {
+          forceLogoutDisabledRef.current(e.message);
+          return;
+        }
         console.log(e);
         localStorage.removeItem("access_token");
       }
@@ -70,16 +180,18 @@ export const AuthProvider = ({ children }) => {
       console.log("Token payload:", payload);
 
       if (payload.enabled === false) {
-        setTimeout(() => {
-          window.alert("Your account is disabled. Contact an admin to reactivate your account.");
-          setUser(null);
-          localStorage.removeItem("access_token");
-          localStorage.removeItem("userid");
-        }, 0);
-      } else{
-        router(HOMEROUTE);
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("userid");
+        window.alert(
+          "Your account has been disabled. Contact an admin to reactivate your account.",
+        );
+        return;
       }
+      router(HOMEROUTE);
     } catch (error) {
+      if (error?.payload?.code === "ACCOUNT_DISABLED") {
+        return;
+      }
       console.error("Login failed:", error);
       throw error;
     }

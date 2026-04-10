@@ -60,7 +60,9 @@ export const DiscussionRepository = {
     if (authorId) queryList.authorId = authorId;
     if (authorIds?.length) queryList.authorId = { $in: authorIds };
     if (parentId !== undefined) queryList.parentId = parentId;
-    if (typeof deleted === "boolean") queryList.deleted = deleted;
+    if (typeof deleted === "boolean") {
+      queryList.deleted = deleted ? true : { $ne: true };
+    }
     if (typeof edited === "boolean") queryList.edited = edited;
 
     if (typeof hasReplies === "boolean") {
@@ -110,7 +112,10 @@ export const DiscussionRepository = {
   },
 
   async findByParentId(parentid) {
-    return await Discussion.find({ parentId: parentid }).sort({
+    return await Discussion.find({
+      parentId: parentid,
+      deleted: { $ne: true },
+    }).sort({
       timestamp: -1,
     });
   },
@@ -161,14 +166,16 @@ export const DiscussionRepository = {
   async search(searchTerm) {
     return await Discussion.find({
       title: { $regex: searchTerm, $options: "i" },
+      deleted: { $ne: true },
     }).sort({ timestamp: -1 });
   },
 
   async findRecent({ scopedCourseIds = null, limit = 20 } = {}) {
-    const query =
+    const scope =
       Array.isArray(scopedCourseIds) && scopedCourseIds.length
         ? { courseId: { $in: scopedCourseIds }, parentId: null }
         : { parentId: null };
+    const query = { ...scope, deleted: { $ne: true } };
 
     return Discussion.find(query).sort({ createdAt: -1, _id: -1 }).limit(limit);
   },

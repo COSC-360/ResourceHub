@@ -12,6 +12,7 @@ const mockUserService = {
   hideUserCourses: jest.fn(),
   searchUsers: jest.fn(),
   setUserEnabled: jest.fn(),
+  USER_SIGNIN_ACCOUNT_DISABLED: "USER_SIGNIN_ACCOUNT_DISABLED",
 };
 
 await jest.unstable_mockModule(
@@ -28,6 +29,12 @@ await jest.unstable_mockModule(
   "../../../repositories/userRepository.js",
   () => mockUserRepo,
 );
+
+await jest.unstable_mockModule("../../../socket.js", () => ({
+  getIO: () => ({
+    to: jest.fn().mockReturnValue({ emit: jest.fn() }),
+  }),
+}));
 
 const controller = await import("../../../controllers/userController.js");
 
@@ -114,6 +121,18 @@ describe("user controller", () => {
     await controller.authenticateUser(req, res);
 
     expect(res.status).toHaveBeenCalledWith(200);
+  });
+
+  test("authenticateUser - disabled account", async () => {
+    req.body = { email: "a@test.com", password: "p" };
+    mockUserService.userSignin.mockResolvedValue("USER_SIGNIN_ACCOUNT_DISABLED");
+
+    await controller.authenticateUser(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({ code: "ACCOUNT_DISABLED" }),
+    );
   });
 
   test("getUserById - invalid id", async () => {

@@ -14,6 +14,10 @@ await jest.unstable_mockModule(
   () => mockResourceService,
 );
 
+await jest.unstable_mockModule("../../../services/notificationPush.js", () => ({
+  pushNewResourceNotification: jest.fn().mockResolvedValue(undefined),
+}));
+
 const controller = await import("../../../controllers/resource.controller");
 
 describe("resource controller", () => {

@@ -7,6 +7,21 @@ import { apiClient } from "../../lib/api-client";
 import { buildDiscussionFeedQuery } from "../../lib/discussion-feed.js";
 import { socket } from "../../socket";
 
+function applyPostPatchFromSocket(item, post) {
+  const postId = post._id ?? post.id;
+  const itemId = item._id ?? item.id;
+  if (String(itemId) !== String(postId)) return item;
+  return {
+    ...item,
+    title: post.title ?? item.title,
+    content: post.content ?? item.content,
+    edited: post.edited ?? item.edited,
+    hasImage: post.hasImage ?? item.hasImage,
+    deleted: post.deleted ?? item.deleted,
+    replies: post.replies ?? item.replies,
+  };
+}
+
 function HybridFeed({
     courseId,
     courseIds,
@@ -178,7 +193,44 @@ useEffect(() => {
   };
   }, []);
 
+useEffect(() => {
+  function handlePostUpdated(payload) {
+    const post = payload?.post;
+    if (!post) return;
+    setItems((prev) => prev.map((item) => applyPostPatchFromSocket(item, post)));
+  }
 
+  function handlePostDeleted(payload) {
+    const postId = payload?.postId?._id ?? payload?.postId;
+    if (postId == null) return;
+    if (payload.softDeleted) {
+      setItems((prev) =>
+        prev.map((item) => {
+          const itemId = item._id ?? item.id;
+          if (String(itemId) !== String(postId)) return item;
+          return {
+            ...item,
+            deleted: true,
+            title: "[deleted]",
+            content: "[deleted]",
+          };
+        }),
+      );
+    } else {
+      setItems((prev) =>
+        prev.filter((item) => String(item._id ?? item.id) !== String(postId)),
+      );
+    }
+  }
+
+  socket.on("post:updated", handlePostUpdated);
+  socket.on("post:deleted", handlePostDeleted);
+
+  return () => {
+    socket.off("post:updated", handlePostUpdated);
+    socket.off("post:deleted", handlePostDeleted);
+  };
+}, []);
 
     function updateFilters(next) {
         setFilters((prev) => ({ ...prev, ...next }));

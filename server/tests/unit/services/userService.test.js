@@ -139,6 +139,26 @@ describe("User Service (unstable_mockModule)", () => {
       const result = await UserService.userSignin(email, password);
       expect(result).toBeUndefined();
     });
+
+    it("should return USER_SIGNIN_ACCOUNT_DISABLED if account is disabled", async () => {
+      const mockUser = {
+        _id: "123",
+        password: "hashed_in_db",
+        toJSON: () => ({
+          _id: "123",
+          password: "hashed_in_db",
+          enabled: false,
+        }),
+      };
+
+      userRepository.getUserByEmail.mockResolvedValue(mockUser);
+      bcrypt.compare.mockResolvedValue(true);
+
+      const result = await UserService.userSignin(email, password);
+
+      expect(result).toBe(UserService.USER_SIGNIN_ACCOUNT_DISABLED);
+      expect(jwt.sign).not.toHaveBeenCalled();
+    });
   });
 
   describe("Repository Wrappers", () => {

@@ -25,6 +25,12 @@ export async function findCourseIdsByUser(userId) {
   return rows.map((r) => String(r.courseId));
 }
 
+export async function findUserIdsByCourse(courseId) {
+  if (!courseId) return [];
+  const rows = await Membership.find({ courseId }).select("userId -_id").lean();
+  return rows.map((r) => String(r.userId));
+}
+
 export async function upsertMembershipRole(userId, courseId, role) {
   return Membership.findOneAndUpdate(
     { userId, courseId },

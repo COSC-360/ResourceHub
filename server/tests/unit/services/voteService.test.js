@@ -33,7 +33,7 @@ const VoteRepository = (await import("../../../repositories/voteRepository.js"))
 const DiscussionRepository = (
   await import("../../../repositories/discussionRepository.js")
 ).default;
-const { Vote } = await import("../../../models/vote.js");
+await import("../../../models/vote.js");
 const VoteService = await import("../../../services/voteService.js");
 
 describe("Vote Service (unstable_mockModule)", () => {

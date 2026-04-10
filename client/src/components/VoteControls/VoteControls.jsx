@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiClient } from "../../lib/api-client";
 import { LOGIN_ROUTE } from "../../constants/RouteConstants.jsx";
@@ -19,28 +19,39 @@ export default function VoteControls({
   const [hasUpvote, setHasUpvote] = useState(initialHasUpvote);
   const [hasDownvote, setHasDownvote] = useState(initialHasDownvote);
 
-  useEffect(() => {
+  const [prevFromProps, setPrevFromProps] = useState(() => ({
+    targetId,
+    initialUpvotes,
+    initialDownvotes,
+    initialHasUpvote,
+    initialHasDownvote,
+  }));
+
+  if (
+    prevFromProps.targetId !== targetId ||
+    prevFromProps.initialUpvotes !== initialUpvotes ||
+    prevFromProps.initialDownvotes !== initialDownvotes ||
+    prevFromProps.initialHasUpvote !== initialHasUpvote ||
+    prevFromProps.initialHasDownvote !== initialHasDownvote
+  ) {
+    setPrevFromProps({
+      targetId,
+      initialUpvotes,
+      initialDownvotes,
+      initialHasUpvote,
+      initialHasDownvote,
+    });
     setUpvotes(initialUpvotes);
-  }, [initialUpvotes]);
-
-  useEffect(() => {
     setDownvotes(initialDownvotes);
-  }, [initialDownvotes]);
-
-  useEffect(() => {
     setHasUpvote(initialHasUpvote);
-  }, [initialHasUpvote]);
-
-  useEffect(() => {
     setHasDownvote(initialHasDownvote);
-  }, [initialHasDownvote]);
+  }
 
   const handleUpvote = async () => {
     try {
       const token = localStorage.getItem("access_token");
       if (!token) return navigate(LOGIN_ROUTE);
 
-      // FeedPost behavior
       if (hasUpvote || hasDownvote) {
         await apiClient("/api/vote/remove", {
           method: "DELETE",
@@ -49,7 +60,6 @@ export default function VoteControls({
         });
 
         if (hasDownvote) {
-          setDownvotes((v) => v - 1);
           setHasDownvote(false);
         }
       }
@@ -60,10 +70,8 @@ export default function VoteControls({
           body: { targetType, targetId },
           headers: { Authorization: `Bearer ${token}` },
         });
-        setUpvotes((v) => v + 1);
         setHasUpvote(true);
       } else {
-        setUpvotes((v) => v - 1);
         setHasUpvote(false);
       }
     } catch (err) {
@@ -76,7 +84,6 @@ export default function VoteControls({
       const token = localStorage.getItem("access_token");
       if (!token) return navigate(LOGIN_ROUTE);
 
-      // FeedPost behavior
       if (hasUpvote || hasDownvote) {
         await apiClient("/api/vote/remove", {
           method: "DELETE",
@@ -85,7 +92,6 @@ export default function VoteControls({
         });
 
         if (hasUpvote) {
-          setUpvotes((v) => v - 1);
           setHasUpvote(false);
         }
       }
@@ -96,10 +102,8 @@ export default function VoteControls({
           body: { targetType, targetId },
           headers: { Authorization: `Bearer ${token}` },
         });
-        setDownvotes((v) => v + 1);
         setHasDownvote(true);
       } else {
-        setDownvotes((v) => v - 1);
         setHasDownvote(false);
       }
     } catch (err) {
