@@ -2,6 +2,7 @@ import { Router } from "express";
 import * as userController from "../controllers/userController.js";
 import { verifyAccessToken } from "../middleware/authMiddleware.js";
 import upload from "../middleware/fileUploads.js";
+import { requireAdmin } from "../middleware/adminMiddleware.js";
 
 export const userRoutes = Router();
 
@@ -196,3 +197,7 @@ userRoutes.post("/save", verifyAccessToken, userController.saveUserCourses);
 userRoutes.put("/update", verifyAccessToken, userController.updateUserCourses);
 userRoutes.delete("/hide", verifyAccessToken, userController.hideUserCourses);
 userRoutes.get("/verifytoken", verifyAccessToken, userController.verifyToken);
+
+//Everything past this point requires admin privileges
+userRoutes.get("/admin/admins", requireAdmin, userController.getAdmins);
+userRoutes.get("/admin/users", requireAdmin, userController.searchUsers);
