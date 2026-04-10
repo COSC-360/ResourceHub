@@ -28,7 +28,7 @@ export function Header(){
                 </div>
                  <div className="buttonDiv">
                     <div className="headerRightSection">
-                        <Notifications />
+                        {user ? <Notifications /> : null}
                         <ProfileHeader
                             userType={admin ? "admin" : user ? "user" : undefined}
                         />

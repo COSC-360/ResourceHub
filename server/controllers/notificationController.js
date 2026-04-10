@@ -4,7 +4,10 @@ export async function getNotifications(req, res) {
   try {
     const since = req.query.since || new Date(0).toISOString();
 
-    const notifications = await notificationService.getNotifications(since);
+    const notifications = await notificationService.getNotifications(since, {
+      userId: req.userId,
+      isAdmin: Boolean(req.admin),
+    });
 
     res.status(200).json(notifications);
   } catch (error) {
