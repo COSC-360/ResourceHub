@@ -21,6 +21,11 @@ export async function search(searchParams) {
             ? { ...defaults, term: searchParams }
             : { ...defaults, ...(searchParams ?? {}) };
 
+    const normalizedTerm = String(input.term ?? "").trim().slice(0, 120);
+    if (!normalizedTerm) {
+        return { discussions: [], courses: [] };
+    }
+
     const types = Array.isArray(input.types) ? input.types : defaults.types;
     const includeDiscussions = types.includes("discussion");
     const includeCourses = types.includes("course");
@@ -36,7 +41,7 @@ export async function search(searchParams) {
               edited: input.edited,
               hasReplies: input.hasReplies,
               parentId: input.topLevelOnly === false ? undefined : null,
-              term: input.term,
+              term: normalizedTerm,
               sortBy: "createdAt",
               sortOrder: input.sortOrder,
               page: input.page,
@@ -46,7 +51,7 @@ export async function search(searchParams) {
 
     const courses = includeCourses
         ? await courseRepository.search({
-              term: input.term,
+              term: normalizedTerm,
               scopedCourseIds,
               page: input.page,
               limit: input.limit,

@@ -1,65 +1,16 @@
 import * as discussionService from "../services/discussionService.js";
 import * as voteService from "../services/voteService.js";
-import mongoose from "mongoose";
-
-function parseCsv(value) {
-  if (!value) return [];
-
-  if (Array.isArray(value)) {
-    return value
-      .map((item) => String(item).trim())
-      .map((item) => item.replace(/^['"]+|['"]+$/g, ""))
-      .filter(Boolean);
-  }
-
-  if (typeof value !== "string") return [];
-
-  const raw = value.trim();
-  if (!raw) return [];
-
-  if (raw.startsWith("[") && raw.endsWith("]")) {
-    try {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) {
-        return parsed
-          .map((item) => String(item).trim())
-          .map((item) => item.replace(/^['"]+|['"]+$/g, ""))
-          .filter(Boolean);
-      }
-    } catch {
-      // fall through to CSV-style parsing
-    }
-  }
-
-  return raw
-    .split(/[\n,]/)
-    .map((item) => item.trim())
-    .map((item) => item.replace(/^['"]+|['"]+$/g, ""))
-    .filter(Boolean);
-}
-
-function parseBoolean(value) {
-  if (typeof value === "boolean") return value;
-  if (typeof value !== "string") return undefined;
-  const normalized = value.trim().toLowerCase();
-  if (["1", "true", "yes"].includes(normalized)) return true;
-  if (["0", "false", "no"].includes(normalized)) return false;
-  return undefined;
-}
-
-function parsePositiveInt(value, fallback) {
-  const parsed = Number.parseInt(value, 10);
-  if (!Number.isFinite(parsed) || parsed <= 0) return fallback;
-  return parsed;
-}
+import {
+  hasInvalidObjectId,
+  parseBoolean,
+  parseCsv,
+  parsePositiveInt,
+} from "../utils/inputParsers.js";
+import { escapeRegex } from "../utils/regex.js";
 
 function parsePopulate(value) {
   const allowed = new Set(["courseId", "authorId"]);
   return parseCsv(value).filter((entry) => allowed.has(entry));
-}
-
-function hasInvalidObjectId(ids = []) {
-  return ids.some((id) => !mongoose.Types.ObjectId.isValid(id));
 }
 
 function discussionHasImage(image) {

@@ -1,8 +1,5 @@
 import { Discussion } from "../models/discussion.js";
-
-function escapeRegex(value) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
+import { escapeRegex } from "../utils/regex.js";
 
 export const DiscussionRepository = {
   async save(discussion) {
@@ -174,6 +171,8 @@ export const DiscussionRepository = {
   //This is currently searching by the title field.
   async search(searchTerm) {
     const normalizedTerm = String(searchTerm ?? "").trim().slice(0, 120);
+    if (!normalizedTerm) return [];
+
     const escapedTerm = escapeRegex(normalizedTerm);
     return await Discussion.find({
       title: { $regex: escapedTerm, $options: "i" },
