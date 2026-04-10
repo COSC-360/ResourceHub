@@ -1,6 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { apiClient } from "../../lib/api-client";
+import AuthContext from "../../AuthContext.jsx";
 import { DEFAULT_COURSE_COVER, resolveCourseImageSrc } from "../../lib/course-cover.js";
+import CreateCourse from "../CreateCourse/CreateCourse.jsx";
 import CourseMembershipButton from "../CourseMembershipButton/CourseMembershipButton.jsx";
 import MemberCount from "../MemberCount/MemberCount.jsx";
 import UpdateCourseInfo from "../UpdateCourseInfo/UpdateCourseInfo.jsx";
@@ -21,11 +23,15 @@ function PeopleIcon() {
     );
 }
 
-export function CourseHeader({ course, onMembershipChanged, onCourseUpdated }) {
+export function CourseHeader({ course, onMembershipChanged, onCourseUpdated, onCourseDeleted }) {
+    const { user: sessionUser } = useContext(AuthContext);
     const courseId = course._id || course.id;
 
     const [isInstructor, setIsInstructor] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
+
+    const isAdmin = Boolean(sessionUser?.admin);
+    const canManageCourse = isInstructor || isAdmin;
 
     useEffect(() => {
         let active = true;
@@ -76,7 +82,7 @@ export function CourseHeader({ course, onMembershipChanged, onCourseUpdated }) {
                         onMembershipChanged={onMembershipChanged}
                     />
 
-                    {isInstructor && (
+                    {canManageCourse && (
                         <button
                             type="button"
                             className="course-header__edit-link"
@@ -101,19 +107,33 @@ export function CourseHeader({ course, onMembershipChanged, onCourseUpdated }) {
                 {showEditModal && (
                     <div
                         className="course-header__modal-backdrop"
-                        onClick={() => setShowEditModal(false)}
                     >
                         <div
                             className="course-header__modal-panel"
                             onClick={(e) => e.stopPropagation()}
                         >
-                            <UpdateCourseInfo
-                                asModal
-                                courseId={courseId}
-                                initialCourse={course}
-                                onClose={() => setShowEditModal(false)}
-                                onUpdated={(updated) => onCourseUpdated?.(updated)}
-                            />
+                            {isInstructor ? (
+                                <UpdateCourseInfo
+                                    asModal
+                                    courseId={courseId}
+                                    initialCourse={course}
+                                    onClose={() => setShowEditModal(false)}
+                                    onUpdated={(updated) => onCourseUpdated?.(updated)}
+                                />
+                            ) : isAdmin ? (
+                                <CreateCourse
+                                    asModal
+                                    mode="edit"
+                                    courseId={courseId}
+                                    initialCourse={course}
+                                    onClose={() => setShowEditModal(false)}
+                                    onUpdated={(updated) => onCourseUpdated?.(updated)}
+                                    onDeleted={() => {
+                                        setShowEditModal(false);
+                                        onCourseDeleted?.();
+                                    }}
+                                />
+                            ) : null}
                         </div>
                     </div>
                 )}

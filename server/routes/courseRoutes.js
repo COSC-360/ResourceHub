@@ -3,6 +3,7 @@ import * as courseController from "../controllers/courseController.js";
 import * as discussionController from "../controllers/discussionController.js";
 import upload from "../middleware/upload.js"; // use your multer middleware export
 import { verifyAccessToken } from "../middleware/authMiddleware.js";
+import { requireAdmin } from "../middleware/adminMiddleware.js";
 import { requireCourseMembership } from "../middleware/courseMembershipMiddleware.js";
 import discussionUpload from "../middleware/fileUploads.js";
 
@@ -14,12 +15,15 @@ courseRoutes.get("/:id", courseController.getById); // get one course by id
 // TODO: when course is created, also need to create a course membership for the creator (probably want to do this in the service layer)
 courseRoutes.post("/create", verifyAccessToken, courseController.create); // create a new course
 
-// TODO: add auth middleware to these routes, also need to check if user is an instructor for the course when updating or deleting
-courseRoutes.patch("/:id/update", verifyAccessToken, courseController.update); // update a course by id
-courseRoutes.patch("/:id/updateimage", verifyAccessToken, upload.single("image"), courseController.updateImage); // update a course's image by id
+courseRoutes.patch("/:id/update", requireAdmin, courseController.update);
+courseRoutes.patch(
+  "/:id/updateimage",
+  requireAdmin,
+  upload.single("image"),
+  courseController.updateImage,
+);
 
-// TODO: delete a course by id, probably want auth also check membership and role (only allow instructors to delete courses)
-courseRoutes.delete("/:id", verifyAccessToken, courseController.deleteCourse); // delete a course by id
+courseRoutes.delete("/:id", requireAdmin, courseController.deleteCourse);
 
 // additional routes for discussions, resources, and members specific pages
 courseRoutes.get("/:id/discussions", courseController.getDiscussions); // get all discussions for a course by id
