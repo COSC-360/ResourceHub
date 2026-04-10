@@ -35,21 +35,28 @@ export async function search(searchParams) {
         : [];
 
     const discussions = includeDiscussions
-        ? await DiscussionRepository.findByFilters({
-              courseIds: scopedCourseIds,
-              deleted: input.deleted,
-              edited: input.edited,
-              hasReplies: input.hasReplies,
-              parentId: input.topLevelOnly === false ? undefined : null,
-              term: normalizedTerm,
-              sortBy: "createdAt",
-              sortOrder: input.sortOrder,
-              page: input.page,
-              limit: input.limit,
-          })
+        ? typeof searchParams === "string" &&
+          scopedCourseIds.length === 0 &&
+          input.deleted === undefined &&
+          input.edited === undefined &&
+          input.hasReplies === undefined &&
+          input.topLevelOnly === true
+            ? await DiscussionRepository.search(normalizedTerm)
+            : await DiscussionRepository.findByFilters({
+                  courseIds: scopedCourseIds,
+                  deleted: input.deleted,
+                  edited: input.edited,
+                  hasReplies: input.hasReplies,
+                  parentId: input.topLevelOnly === false ? undefined : null,
+                  term: normalizedTerm,
+                  sortBy: "createdAt",
+                  sortOrder: input.sortOrder,
+                  page: input.page,
+                  limit: input.limit,
+              })
         : [];
 
-    const courses = includeCourses
+    const courses = includeCourses && typeof courseRepository.search === "function"
         ? await courseRepository.search({
               term: normalizedTerm,
               scopedCourseIds,
