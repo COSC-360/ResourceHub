@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiClient } from "../../lib/api-client";
 import CourseForm from "../CourseForm/CourseForm.jsx";
+import { coursePath, COURSES_ROUTE } from "../../constants/RouteConstants.jsx";
 
 const trim = (v) => (typeof v === "string" ? v.trim() : "");
 
@@ -202,11 +203,8 @@ export default function CreateCourse({
       onCreated?.(finalCourse);
       onClose?.();
 
-      navigate(`/courses/${newCourseId}`, {
-        state: {
-          course: finalCourse,
-          warning: imageUploadWarning || undefined,
-        },
+      navigate(coursePath(newCourseId), {
+        state: { course: finalCourse, warning: imageUploadWarning || undefined },
       });
     } catch (err) {
       setError(err.message || "Failed to create course.");
@@ -234,7 +232,7 @@ export default function CreateCourse({
       });
       onClose?.();
       onDeleted?.();
-      navigate("/courses", { replace: true });
+      navigate(COURSES_ROUTE, { replace: true });
     } catch (err) {
       setError(err.message || "Failed to delete course.");
     } finally {

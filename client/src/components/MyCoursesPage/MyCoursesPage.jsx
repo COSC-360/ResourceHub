@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { apiClient } from "../../lib/api-client";
 import CourseCard from "../Cards/CourseCard.jsx";
 import "./MyCoursesPage.css";
+import { LOGIN_ROUTE } from "../../constants/RouteConstants.jsx";
 
 export default function MyCoursesPage() {
   const [myCourses, setMyCourses] = useState([]);
@@ -13,7 +14,7 @@ export default function MyCoursesPage() {
     async function loadMyCourses() {
       try {
         const token = localStorage.getItem("access_token");
-        if (!token) return navigate("/login");
+        if (!token) return navigate(LOGIN_ROUTE);
 
         const response = await apiClient("/api/memberships/me/courses", {
           headers: { Authorization: `Bearer ${token}` },

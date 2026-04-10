@@ -10,6 +10,7 @@ import "./Feed.css";
 import defaultProfile from "../../assets/profile.svg";
 import Comment from "../Comment/Comment";
 import { useNavigate } from "react-router-dom";
+import { LOGIN_ROUTE } from "../../constants/RouteConstants.jsx";
 
 export const FeedPost = ({ post_props, depth, expandDown }) => {
   const [edit, setEdit] = useState(false);
@@ -131,7 +132,7 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
       (async () => {
         const token = localStorage.getItem("access_token");
         if (!token) {
-          router("login");
+          router(LOGIN_ROUTE);
           return;
         }
         let result = null;
@@ -170,7 +171,7 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
       (async () => {
         const token = localStorage.getItem("access_token");
         if (!token) {
-          router("/login");
+          router(LOGIN_ROUTE);
           return;
         }
         let result = null;

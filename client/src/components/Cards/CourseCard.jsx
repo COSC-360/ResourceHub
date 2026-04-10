@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { DEFAULT_COURSE_COVER, resolveCourseImageSrc } from '../../lib/course-cover.js';
 import MemberCount from '../MemberCount/MemberCount.jsx';
 import './CourseCard.css';
+import { coursePath } from '../../constants/RouteConstants.jsx';
 
 export default function CourseCard({ data }) {
     if (!data) return null;
@@ -15,7 +16,7 @@ export default function CourseCard({ data }) {
 
     return (
         <Link
-            to={`/courses/${id}`}
+            to={coursePath(id)}
             state={{ course: data }}
             className="course-card"
         >

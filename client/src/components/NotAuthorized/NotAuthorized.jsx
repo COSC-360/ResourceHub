@@ -1,5 +1,6 @@
 import './NotAuthorized.css';
 import { Link } from 'react-router-dom';
+import { HOMEROUTE } from '../../constants/RouteConstants.jsx';
 
 export default function NotAuthorized() {
     return (
@@ -7,7 +8,7 @@ export default function NotAuthorized() {
             <div className="not-authorized-container">
                 <h1 className="not-authorized-title">403 - Not Authorized</h1>
                 <p className="not-authorized-message">You are not authorized to access this route.</p>
-                <Link to="/" className="not-authorized-link">Go to Home</Link>
+                <Link to={HOMEROUTE} className="not-authorized-link">Go to Home</Link>
             </div>
         </>
     );
