@@ -1,5 +1,6 @@
 .profile-page {
   max-width: 640px;
+  color: var(--rh-text);
 }
 
 .profile-page h1 {
@@ -57,6 +58,8 @@
   padding: 0.4rem 0.5rem;
   border: 1px solid #ccc;
   border-radius: 6px;
+  background: #fff;
+  color: var(--rh-text);
 }
 
 .profile-actions {
@@ -72,6 +75,7 @@
   border-radius: 6px;
   border: 1px solid #888;
   background: #f4f4f4;
+  color: var(--rh-text);
   cursor: pointer;
 }
 
@@ -145,7 +149,7 @@
   padding: 0;
   border-radius: 0;
   font-weight: 600;
-  color: inherit;
+  color: #5b21a6;
   text-decoration: none;
 }
 
