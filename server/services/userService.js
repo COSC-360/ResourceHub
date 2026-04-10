@@ -21,6 +21,7 @@ export function issueAccessToken(userDoc) {
       faculty: u.faculty,
       pfp: u.pfp,
       admin: u.isAdmin,
+      enabled: u.enabled ?? true,
     },
     process.env.ACCESS_TOKEN_SECRET_KEY,
     { expiresIn: "60m" },
@@ -40,6 +41,7 @@ export async function userSignin(email, password) {
         username: found.username,
         faculty: found.faculty,
         admin: found.isAdmin,
+        enabled: found.enabled ?? true,
       },
       process.env.ACCESS_TOKEN_SECRET_KEY,
       {

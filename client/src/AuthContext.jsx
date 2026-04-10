@@ -11,6 +11,7 @@ const decodeTokenPayload = (token) => {
     ...payload,
     admin: payload.admin ?? payload.isadmin ?? payload.isAdmin ?? false,
     isadmin: payload.isadmin ?? payload.admin ?? payload.isAdmin ?? false,
+    enabled: payload.enabled ?? true,
   };
 };
 
@@ -67,7 +68,16 @@ export const AuthProvider = ({ children }) => {
 
       console.log("Token payload:", payload);
 
-      router("/"); //change this if homepage route changes
+      if (payload.enabled === false) {
+        setTimeout(() => {
+          window.alert("Your account is disabled. Contact an admin to reactivate your account.");
+          setUser(null);
+          localStorage.removeItem("access_token");
+          localStorage.removeItem("userid");
+        }, 0);
+      } else{
+        router("/");
+      }
     } catch (error) {
       console.error("Login failed:", error);
       throw error;
@@ -110,6 +120,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setUser(null);
     localStorage.removeItem("access_token");
+    localStorage.removeItem("userid");
     router("/");
   };
 
