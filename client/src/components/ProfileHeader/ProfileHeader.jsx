@@ -8,6 +8,7 @@ import {
   PROFILE_ROUTE,
   REGISTER_ROUTE,
 } from "../../constants/RouteConstants.jsx";
+import ProfileAvatar from "../ProfileAvatar/ProfileAvatar.jsx";
 
 export function ProfileHeader({ userType }) {
   const navigate = useNavigate();
@@ -56,10 +57,6 @@ export function ProfileHeader({ userType }) {
     };
   }, []);
 
-  const profilePhotoSrc = userid
-    ? `http://localhost:3000/api/user/getProfilePhoto/${userid}?v=${encodeURIComponent(photoVersion)}`
-    : "/src/assets/profile.svg";
-
   return (
     <>
       <div className="profileContainer">
@@ -78,11 +75,11 @@ export function ProfileHeader({ userType }) {
               aria-controls="profile-dropdown-menu"
               onClick={() => setMenuOpen((o) => !o)}
             >
-              <img
-                src={profilePhotoSrc}
+              <ProfileAvatar
+                userId={userid}
+                version={photoVersion}
                 alt="profile"
                 className="icon"
-                onError={(e) => (e.target.src = "/src/assets/profile.svg")}
               />
             </button>
             {menuOpen && (

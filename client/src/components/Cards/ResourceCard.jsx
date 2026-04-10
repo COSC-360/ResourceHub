@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { timeAgo } from "../../lib/dateUtils";
 import VoteControls from "../VoteControls/VoteControls.jsx";
+import ProfileAvatar from "../ProfileAvatar/ProfileAvatar.jsx";
 import "./ResourceCard.css";
 
 const userCache = new Map();
@@ -69,13 +70,10 @@ export default function ResourceCard({ data }) {
   return (
     <article className="resource-card">
       <header className="resource-card__header">
-        <img
+        <ProfileAvatar
           className="resource-card__avatar"
-          src={`/api/user/getProfilePhoto/${data.authorId}`}
+          userId={data.authorId}
           alt={authorName}
-          onError={(e) => {
-            e.currentTarget.style.display = "none";
-          }}
         />
         <div className="resource-card__meta">
           <div className="resource-card__line">

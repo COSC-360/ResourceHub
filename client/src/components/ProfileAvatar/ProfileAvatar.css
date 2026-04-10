@@ -1,0 +1,26 @@
+.rh-profile-avatar {
+  display: block;
+  object-position: center;
+  background: #f0f0f0;
+  flex-shrink: 0;
+}
+
+.rh-profile-avatar--fit-cover {
+  object-fit: cover;
+}
+
+.rh-profile-avatar--fit-contain {
+  object-fit: contain;
+}
+
+.rh-profile-avatar--circle {
+  border-radius: 50%;
+}
+
+.rh-profile-avatar--rounded {
+  border-radius: 12px;
+}
+
+.rh-profile-avatar--pill {
+  border-radius: 999px;
+}

@@ -7,8 +7,8 @@ import {
 } from "react";
 import { apiClient } from "../../lib/api-client";
 import "./Feed.css";
-import defaultProfile from "../../assets/profile.svg";
 import Comment from "../Comment/Comment";
+import ProfileAvatar from "../ProfileAvatar/ProfileAvatar.jsx";
 import { useNavigate } from "react-router-dom";
 import { LOGIN_ROUTE } from "../../constants/RouteConstants.jsx";
 import {
@@ -376,13 +376,10 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
       }
     >
       <div className="post">
-        <img
-          src={`http://localhost:3000/api/user/getProfilePhoto/${post_props.authorid}`}
+        <ProfileAvatar
+          userId={post_props.authorid}
           alt="profile photo"
           className="pfp"
-          onError={(e) => {
-            e.target.src = defaultProfile;
-          }}
         />
 
         <div className="post-container">
