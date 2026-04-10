@@ -69,7 +69,7 @@ or
 docker compose exec server npm install
 ~~~
 
-While the docker container is running in a different terminal window. Client or server keyword dependent on where the package needs to be installed.
+While the Docker containers are running in a different terminal window, use the `client` or `server` keyword depending on where the package needs to be installed.
 
 ### Running from a Tarball Release
 
