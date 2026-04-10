@@ -29,7 +29,7 @@ export async function getProfilePhoto(req, res) {
   let found = null;
   try {
     found = await userService.getUserById(id);
-  } catch (err) {
+  } catch {
     return res.status(404).json({ message: "user not found" });
   }
   res.set("Content-Type", found.pfp.contentType);

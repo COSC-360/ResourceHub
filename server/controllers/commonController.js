@@ -59,7 +59,7 @@ export async function feed(req, res) {
                     doc ??
                     {};
 
-                const { image, ...raw } = base;
+                const { image: _image, ...raw } = base;
                 const id = (raw?._id && String(raw._id)) || raw?.id;
 
                 if (item.type === "discussion") {
