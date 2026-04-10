@@ -20,3 +20,14 @@ export function timeAgo(date, currentDate = new Date()) {
     const years = Math.floor(months / 12);
     return `${years}y ago`;
 }
+
+export function createdAtFromObjectId(value) {
+    if (!value) return null;
+    const id = String(value);
+    if (!/^[a-f\d]{24}$/i.test(id)) return null;
+
+    const seconds = parseInt(id.slice(0, 8), 16);
+    if (!Number.isFinite(seconds)) return null;
+
+    return new Date(seconds * 1000).toISOString();
+}

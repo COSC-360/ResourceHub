@@ -11,6 +11,7 @@ import Comment from "../Comment/Comment";
 import ProfileAvatar from "../ProfileAvatar/ProfileAvatar.jsx";
 import { useNavigate } from "react-router-dom";
 import { LOGIN_ROUTE } from "../../constants/RouteConstants.jsx";
+import { createdAtFromObjectId } from "../../lib/dateUtils";
 import {
   LIMITS,
   trimStr,
@@ -42,6 +43,13 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
   const router = useNavigate();
   const seenReplyIdsRef = useRef(new Set());
   const showCommentsRef = useRef(showComments);
+  const [postedAt] = useState(
+    () =>
+      post_props.createdAt ||
+      createdAtFromObjectId(post_props._id || post_props.id) ||
+      post_props.timeline ||
+      null,
+  );
 
   useEffect(() => {
     showCommentsRef.current = showComments;
@@ -60,7 +68,9 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
       const transformedData = rows.map((discussion) => ({
         username: discussion.username,
         title: discussion.title,
-        timeline: discussion.createdAt || discussion.updatedAt,
+        timeline:
+          discussion.createdAt ||
+          createdAtFromObjectId(discussion._id || discussion.id),
         createdAt: discussion.createdAt,
         updatedAt: discussion.updatedAt,
         faculty: discussion.faculty,
@@ -293,7 +303,6 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
     return `${years} year${years !== 1 ? "s" : ""} ago`;
   };
 
-  const postedAt = post_props.createdAt || post_props.timeline || post_props.updatedAt;
   const date = useMemo(
     () => (postedAt ? timeAgo(new Date(postedAt), new Date()) : "Undefined"),
     [postedAt],

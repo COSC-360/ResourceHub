@@ -1,7 +1,7 @@
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { fetchUserById } from "../../lib/userUtils";
-import { timeAgo } from "../../lib/dateUtils";
+import { createdAtFromObjectId, timeAgo } from "../../lib/dateUtils";
 import { apiClient } from "../../lib/api-client";
 import AuthContext from "../../AuthContext.jsx";
 import VoteControls from "../VoteControls/VoteControls.jsx";
@@ -69,8 +69,7 @@ export default function DiscussionCard({
   const postedAt =
     merged?.createdAt ||
     data?.createdAt ||
-    merged?.updatedAt ||
-    data?.updatedAt;
+    createdAtFromObjectId(discussionId);
   const timeStr = useMemo(() => {
     return postedAt ? timeAgo(new Date(postedAt)) : "";
   }, [postedAt]);

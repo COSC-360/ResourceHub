@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import FeedPost from "../components/Feed/FeedPost";
 import { apiClient } from "../lib/api-client";
+import { createdAtFromObjectId } from "../lib/dateUtils";
 import "./css/FeedPage.css";
 import { CREATE_POST_ROUTE } from "../constants/RouteConstants.jsx";
 
@@ -22,7 +23,11 @@ const Feed = () => {
         const transformedData = discussions.map((discussion) => ({
           username: discussion.username,
           title: discussion.title,
-          timeline: discussion.updatedAt,
+          timeline:
+            discussion.createdAt ||
+            createdAtFromObjectId(discussion._id || discussion.id),
+          createdAt: discussion.createdAt,
+          updatedAt: discussion.updatedAt,
           faculty: discussion.faculty,
           comment: discussion.content,
           up_votes: discussion.upvotes,
