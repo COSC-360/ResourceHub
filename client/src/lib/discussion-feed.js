@@ -32,6 +32,7 @@ export function buildDiscussionFeedQuery(filters = {}) {
 
   if (filters.sortBy) params.set("sortBy", String(filters.sortBy));
   if (filters.sortOrder) params.set("sortOrder", String(filters.sortOrder));
+  if (filters.term) params.set("term", String(filters.term));
   if (filters.page) params.set("page", String(filters.page));
   if (filters.limit) params.set("limit", String(filters.limit));
 

@@ -1,4 +1,5 @@
 import { Discussion } from "../models/discussion.js";
+import { escapeRegex } from "../utils/regex.js";
 
 export const DiscussionRepository = {
   async save(discussion) {
@@ -46,6 +47,7 @@ export const DiscussionRepository = {
       deleted,
       edited,
       hasReplies,
+      term,
       sortBy = "createdAt",
       sortOrder = "desc",
       limit = 100,
@@ -67,6 +69,15 @@ export const DiscussionRepository = {
 
     if (typeof hasReplies === "boolean") {
       queryList.replies = hasReplies ? { $gt: 0 } : { $lte: 0 };
+    }
+
+    if (typeof term === "string" && term.trim()) {
+      const normalizedTerm = term.trim().slice(0, 120);
+      const escapedTerm = escapeRegex(normalizedTerm);
+      queryList.$or = [
+        { title: { $regex: escapedTerm, $options: "i" } },
+        { content: { $regex: escapedTerm, $options: "i" } },
+      ];
     }
 
     const direction = sortOrder === "asc" ? 1 : -1;
@@ -164,8 +175,12 @@ export const DiscussionRepository = {
 
   //This is currently searching by the title field.
   async search(searchTerm) {
+    const normalizedTerm = String(searchTerm ?? "").trim().slice(0, 120);
+    if (!normalizedTerm) return [];
+
+    const escapedTerm = escapeRegex(normalizedTerm);
     return await Discussion.find({
-      title: { $regex: searchTerm, $options: "i" },
+      title: { $regex: escapedTerm, $options: "i" },
       deleted: { $ne: true },
     }).sort({ timestamp: -1 });
   },

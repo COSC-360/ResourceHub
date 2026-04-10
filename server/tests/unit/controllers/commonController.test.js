@@ -51,10 +51,51 @@ describe("common controller", () => {
 
     await controller.search(req, res);
 
-    expect(mockCommonService.search).toHaveBeenCalledWith("test");
+    expect(mockCommonService.search).toHaveBeenCalledWith({
+      term: "test",
+      courseIds: [],
+      types: ["discussion", "course"],
+      sortOrder: "desc",
+      page: 1,
+      limit: 20,
+      deleted: undefined,
+      edited: undefined,
+      hasReplies: undefined,
+      topLevelOnly: true,
+    });
     expect(res.json).toHaveBeenCalledWith({
       searchResults: ["result"],
     });
+  });
+
+  test("search - invalid courseIds", async () => {
+    req.query.term = "test";
+    req.query.courseIds = "not-an-object-id";
+
+    await controller.search(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(mockCommonService.search).not.toHaveBeenCalled();
+  });
+
+  test("search - invalid types", async () => {
+    req.query.term = "test";
+    req.query.types = "resource";
+
+    await controller.search(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(mockCommonService.search).not.toHaveBeenCalled();
+  });
+
+  test("search - service error", async () => {
+    req.query.term = "test";
+    mockCommonService.search.mockRejectedValue(new Error("boom"));
+
+    await controller.search(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ error: "boom" });
   });
 
   test("feed - invalid types", async () => {
