@@ -102,3 +102,10 @@ export async function searchUsers(name, email, faculty, isAdmin) {
   if (typeof isAdmin === "boolean") query.isAdmin = isAdmin;
   return await User.find(query).select("-password").lean();
 }
+
+export async function setUserEnabled(userId, enabled) {
+  if (!userId || typeof enabled !== "boolean") return null;
+
+  await User.updateOne({ _id: userId }, { $set: { enabled } });
+  return User.findById(userId).select("-password").lean();
+}

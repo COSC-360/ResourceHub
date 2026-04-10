@@ -82,3 +82,7 @@ export async function hideUserCourses(userId, courseId) {
 export async function searchUsers(name, email, faculty, isAdmin) {
   return await userRepository.searchUsers(name, email, faculty, isAdmin);
 }
+
+export async function setUserEnabled(userId, enabled) {
+  return await userRepository.setUserEnabled(userId, enabled);
+}
