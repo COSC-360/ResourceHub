@@ -146,6 +146,6 @@ export async function hideUserCourses(req, res) {
 }
 
 export function verifyToken(req, res) {
-  if (req.user) return res.status(200).json("Valid access token.");
-  return res.status(403).json("Invalid access token.");
+  if (req.user) return res.status(200).json(req.user);
+  return res.status(403).json({ error: "Invalid access token." });
 }

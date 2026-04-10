@@ -5,7 +5,7 @@ import CourseCard from "../Cards/CourseCard.jsx";
 import CreateCourse from "../CreateCourse/CreateCourse.jsx";
 import "./AddMyCourse.css";
 
-export default function AddMyCoursePage() {
+export default function AddMyCoursePage({showAll = false}) {
   const [availableCourses, setAvailableCourses] = useState([]);
   const [error, setError] = useState("");
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -19,14 +19,17 @@ export default function AddMyCoursePage() {
         return;
       }
 
-      const [allCoursesRes, myIdsRes] = await Promise.all([
-        apiClient("/api/courses"),
-        apiClient("/api/memberships/me/course-ids", {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-      ]);
-
+      const allCoursesRes = await apiClient("/api/courses");
       const allCourses = allCoursesRes.data || [];
+
+      if (showAll) {
+        setAvailableCourses(allCourses);
+        return;
+      }
+
+      const myIdsRes = await apiClient("/api/memberships/me/course-ids", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const myIds = new Set((myIdsRes.data || []).map(String));
 
       const filtered = allCourses.filter((course) => {
@@ -38,7 +41,7 @@ export default function AddMyCoursePage() {
     } catch (err) {
       setError(err.message || "Failed to load courses.");
     }
-  }, [navigate]);
+  }, [navigate, showAll]);
 
   useEffect(() => {
     const id = setTimeout(() => {
