@@ -28,7 +28,7 @@ cp server/.env.example server/.env
 
 ##### Database
 ```
-MONGO_URI=your_mongodb_connection_string
+MONGO_URI=mongodb://mongo:27017/resourcehub
 ```
 
 ##### JWT
@@ -40,7 +40,9 @@ ACCESS_TOKEN_SECRET_KEY=your_access_token_secret
 
 From the project root directory, run:
 
+~~~
 docker compose up --build
+~~~
 
 #### Access the application
 
@@ -49,7 +51,9 @@ docker compose up --build
 
 #### Stop the application
 
+~~~
 docker compose down
+~~~
 
 #### Install npm packages
 
