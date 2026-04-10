@@ -116,7 +116,6 @@ export default function Replies({
 									data={reply}
 									isReply
 									depth={Math.min(depth, 4)}
-									showTitle={false}
 									onReplyClick={handleReplyClick}
 								/>
 

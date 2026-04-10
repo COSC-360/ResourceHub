@@ -60,8 +60,8 @@ function App() {
           <Route path="/courses/:courseId" element={<CoursePage />} />
           <Route path="/courses/:courseId/discussions/:discussionId" element={<DiscussionPage />} />
           <Route path="/create" element={<CreatePost />} />
-          <Route path="/my-courses" element={<MyCoursesPage />} />
-          <Route path="/my-courses/add" element={<AddMyCoursePage />} />
+          <Route path="/courses" element={<MyCoursesPage />} />
+          <Route path="/courses/add" element={<AddMyCoursePage />} />
           <Route path="/login" element={<LoginForm />} />
           <Route path="/register" element={<SignupForm />} />
           <Route path="/information" element={<InformationForm />} />
@@ -74,9 +74,6 @@ function App() {
               </AdminRoute>
             }
           />
-
-          {/* redirect /courses to home */}
-          <Route path="/courses" element={<Navigate to="/" replace />} />
         </Route>
 
         <Route path="/courses/create" element={<CreateCourse />} />

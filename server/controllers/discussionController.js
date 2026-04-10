@@ -295,13 +295,14 @@ export async function getReplies(req, res) {
   const { id } = req.params;
 
   const discussions = await discussionService.findReplies(id);
-  const discussionsWithAuthor = discussions.map((discussion) => {
+  const discussionsWithAuthor = await Promise.all(discussions.map(async (discussion) => {
+    await discussion.populate({ path: "courseId", select: "code" });
     const obj = discussion.toJSON();
 
     return {
       ...obj,
       isAuthor: discussion.authorId?.toString() === req.user?.id,
     };
-  });
+  }));
   res.status(200).json(discussionsWithAuthor);
 }

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { fetchUserById } from "../../lib/userUtils";
 import { timeAgo } from "../../lib/dateUtils";
 import VoteControls from "../VoteControls/VoteControls.jsx";
@@ -10,10 +10,10 @@ export default function DiscussionCard({
   data,
   isReply = false,
   depth = 0,
-  showTitle = true,
   onReplyClick,
 }) {
   const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   const discussionId = data?._id || data?.id;
   const authorId =
@@ -81,8 +81,27 @@ export default function DiscussionCard({
   const classPrefix = isReply ? "discussion-card--reply" : "discussion-card";
   const depthClass = depth > 0 ? `discussion-card--depth-${Math.min(depth, 4)}` : "";
 
+  function handleCardClick(event) {
+    if (event.target.closest("a, button, input, textarea, select, label")) return;
+    if (replyHref) navigate(replyHref);
+  }
+
+  function handleKeyDown(event) {
+    if (event.target !== event.currentTarget) return;
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      if (replyHref) navigate(replyHref);
+    }
+  }
+
   return (
-    <article className={`${classPrefix} ${depthClass}`}>
+    <article
+      className={`${classPrefix} ${depthClass}`}
+      onClick={handleCardClick}
+      onKeyDown={handleKeyDown}
+      role={replyHref ? "link" : undefined}
+      tabIndex={replyHref ? 0 : undefined}
+    >
       <div className="discussion-card__header">
         <img
           src={authorId ? `/api/user/getProfilePhoto/${authorId}` : defaultProfile}
@@ -108,7 +127,7 @@ export default function DiscussionCard({
         </div>
       </div>
 
-      {showTitle && data.title && <h3 className="discussion-card__title">{data.title}</h3>}
+      {data.title && <h3 className="discussion-card__title">{data.title}</h3>}
       <p className="discussion-card__content">{data.content || data.comment}</p>
 
       {hasImage && discussionId && (
@@ -135,18 +154,32 @@ export default function DiscussionCard({
             className="discussion-card__reply"
             title="Reply"
             type="button"
-            onClick={() => onReplyClick(data)}
+            onClick={(event) => {
+              event.stopPropagation();
+              onReplyClick(data);
+            }}
           >
             <i className="bi bi-chat"></i>
             <span>{data.replies ?? 0}</span>
           </button>
         ) : replyHref ? (
-          <Link className="discussion-card__reply" title="Reply" to={replyHref}>
+          <Link
+            className="discussion-card__reply"
+            title="Reply"
+            to={replyHref}
+            onClick={(event) => event.stopPropagation()}
+          >
             <i className="bi bi-chat"></i>
             <span>{data.replies ?? 0}</span>
           </Link>
         ) : (
-          <button className="discussion-card__reply" title="Reply" type="button" disabled>
+          <button
+            className="discussion-card__reply"
+            title="Reply"
+            type="button"
+            disabled
+            onClick={(event) => event.stopPropagation()}
+          >
             <i className="bi bi-chat"></i>
             <span>{data.replies ?? 0}</span>
           </button>
