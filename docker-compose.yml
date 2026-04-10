@@ -1,0 +1,35 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: resourcehub-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  server:
+    build:
+      context: ./server
+    container_name: resourcehub-server
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./server/.env
+    depends_on:
+      - mongo
+    volumes:
+      - ./server/uploads:/app/uploads
+
+  client:
+    build:
+      context: ./client
+    container_name: resourcehub-client
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_BASE_URL=http://server:3000
+    depends_on:
+      - server
+
+volumes:
+  mongo_data:
