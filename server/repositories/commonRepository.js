@@ -2,10 +2,71 @@ import { DiscussionRepository } from "./discussionRepository.js";
 import * as ResourceRepository from "./resource.repository.js";
 import courseRepository from "./courseRepository.js";
 
-export async function search(searchTerm) {
-    const discussions = await DiscussionRepository.search(searchTerm);
-    // const courses = await courseRepository.search(searchTerm); // if/when added
-    return { discussions };
+export async function search(searchParams) {
+    const defaults = {
+        term: "",
+        courseIds: [],
+        types: ["discussion", "course"],
+        sortOrder: "desc",
+        page: 1,
+        limit: 20,
+        deleted: undefined,
+        edited: undefined,
+        hasReplies: undefined,
+        topLevelOnly: true,
+    };
+
+    const input =
+        typeof searchParams === "string"
+            ? { ...defaults, term: searchParams }
+            : { ...defaults, ...(searchParams ?? {}) };
+
+    const normalizedTerm = String(input.term ?? "").trim().slice(0, 120);
+    if (!normalizedTerm) {
+        return { discussions: [], courses: [] };
+    }
+
+    const types = Array.isArray(input.types) ? input.types : defaults.types;
+    const includeDiscussions = types.includes("discussion");
+    const includeCourses = types.includes("course");
+
+    const scopedCourseIds = Array.isArray(input.courseIds)
+        ? input.courseIds.filter(Boolean)
+        : [];
+
+    const discussions = includeDiscussions
+        ? typeof searchParams === "string" &&
+          scopedCourseIds.length === 0 &&
+          input.deleted === undefined &&
+          input.edited === undefined &&
+          input.hasReplies === undefined &&
+          input.topLevelOnly === true
+            ? await DiscussionRepository.search(normalizedTerm)
+            : await DiscussionRepository.findByFilters({
+                  courseIds: scopedCourseIds,
+                  deleted: input.deleted,
+                  edited: input.edited,
+                  hasReplies: input.hasReplies,
+                  parentId: input.topLevelOnly === false ? undefined : null,
+                  term: normalizedTerm,
+                  sortBy: "createdAt",
+                  sortOrder: input.sortOrder,
+                  page: input.page,
+                  limit: input.limit,
+              })
+        : [];
+
+    const courses = includeCourses && typeof courseRepository.search === "function"
+        ? await courseRepository.search({
+              term: normalizedTerm,
+              scopedCourseIds,
+              page: input.page,
+              limit: input.limit,
+              sortOrder: input.sortOrder,
+          })
+        : [];
+
+    return { discussions, courses };
 }
 
 function toFeedItem(type, doc) {

@@ -1,60 +1,84 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { FeedPost } from "../Feed/FeedPost";
 import { apiClient } from "../../lib/api-client";
+import CourseCard from "../Cards/CourseCard.jsx";
+import HybridFeed from "../HybridFeed/HybridFeed.jsx";
+import "./SearchResults.css";
 
 export function SearchResults() {
   const location = useLocation();
-  const [results, setResults] = useState([]);
+  const [courses, setCourses] = useState([]);
+  const [isLoadingCourses, setIsLoadingCourses] = useState(false);
+
+  const term = useMemo(
+    () => new URLSearchParams(location.search).get("term")?.trim() ?? "",
+    [location.search],
+  );
 
   useEffect(() => {
     const fetchResults = async () => {
-      const term = new URLSearchParams(location.search).get("term");
       if (!term || !term.trim()) {
-        setResults([]);
+        setCourses([]);
         return;
       }
 
+      setIsLoadingCourses(true);
+
       try {
         const data = await apiClient(
-          `/api/common/search?term=${encodeURIComponent(term)}`,
+          `/api/common/search?term=${encodeURIComponent(term)}&types=course`,
           {
             method: "GET",
           },
         );
 
-        const discussions =
-          data?.searchResults?.discussions || data?.discussions || [];
+        const courseResults =
+          data?.searchResults?.courses || data?.courses || [];
 
-        const transformedData = discussions.map((discussion) => ({
-          username: discussion.username,
-          title: discussion.title,
-          timeline: discussion.timestamp,
-          faculty: discussion.faculty,
-          comment: discussion.content,
-          up_votes: discussion.upvotes,
-          down_votes: discussion.downvotes,
-          replies: discussion.replies,
-          _id: discussion._id,
-          isAuthor: discussion.isAuthor,
-          edited: discussion.edited,
-        }));
-
-        setResults(transformedData);
+        setCourses(courseResults);
       } catch (error) {
         console.error("Search API error", error);
-        setResults([]);
+        setCourses([]);
+      } finally {
+        setIsLoadingCourses(false);
       }
     };
+
     fetchResults();
-  }, [location.search]);
+  }, [term]);
+
+  if (!term) {
+    return (
+      <div className="search-results">
+        <h1>Search Results</h1>
+        <p className="search-results__empty">Enter a search term to see results.</p>
+      </div>
+    );
+  }
 
   return (
-    <div>
+    <div className="search-results">
       <h1>Search Results</h1>
-      {results.map((obj) => (
-        <FeedPost post_props={obj} key={obj._id} />
-      ))}
+
+      <section className="search-results__section">
+        <h2>Courses</h2>
+        {isLoadingCourses ? (
+          <div className="search-results__status">Loading courses...</div>
+        ) : courses.length ? (
+          <div className="search-results__course-grid">
+            {courses.map((course) => (
+              <CourseCard key={course._id ?? course.id} data={course} />
+            ))}
+          </div>
+        ) : (
+          <div className="search-results__status">No courses match this search.</div>
+        )}
+      </section>
+
+      <section className="search-results__section">
+        <h2>Discussions</h2>
+        <HybridFeed searchTerm={term} showCourseScope={true} />
+      </section>
     </div>
   );
 }

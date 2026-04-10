@@ -3,64 +3,16 @@ import * as voteService from "../services/voteService.js";
 import mongoose from "mongoose";
 import { getIO } from "../socket.js";
 
-function parseCsv(value) {
-  if (!value) return [];
-
-  if (Array.isArray(value)) {
-    return value
-      .map((item) => String(item).trim())
-      .map((item) => item.replace(/^['"]+|['"]+$/g, ""))
-      .filter(Boolean);
-  }
-
-  if (typeof value !== "string") return [];
-
-  const raw = value.trim();
-  if (!raw) return [];
-
-  if (raw.startsWith("[") && raw.endsWith("]")) {
-    try {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) {
-        return parsed
-          .map((item) => String(item).trim())
-          .map((item) => item.replace(/^['"]+|['"]+$/g, ""))
-          .filter(Boolean);
-      }
-    } catch {
-      // fall through to CSV-style parsing
-    }
-  }
-
-  return raw
-    .split(/[\n,]/)
-    .map((item) => item.trim())
-    .map((item) => item.replace(/^['"]+|['"]+$/g, ""))
-    .filter(Boolean);
-}
-
-function parseBoolean(value) {
-  if (typeof value === "boolean") return value;
-  if (typeof value !== "string") return undefined;
-  const normalized = value.trim().toLowerCase();
-  if (["1", "true", "yes"].includes(normalized)) return true;
-  if (["0", "false", "no"].includes(normalized)) return false;
-  return undefined;
-}
-
-function parsePositiveInt(value, fallback) {
-  const parsed = Number.parseInt(value, 10);
-  if (!Number.isFinite(parsed) || parsed <= 0) return fallback;
-  return parsed;
-}
+import {
+  hasInvalidObjectId,
+  parseBoolean,
+  parseCsv,
+  parsePositiveInt,
+} from "../utils/inputParsers.js";
 
 function parsePopulate(value) {
   const allowed = new Set(["courseId", "authorId"]);
   return parseCsv(value).filter((entry) => allowed.has(entry));
-}
-
-function hasInvalidObjectId(ids = []) {
-  return ids.some((id) => !mongoose.Types.ObjectId.isValid(id));
 }
 
 function discussionHasImage(image) {
@@ -79,6 +31,7 @@ export async function getAll(req, res) {
   const topLevelOnly = parseBoolean(req.query.topLevelOnly);
   const sortBy = typeof req.query.sortBy === "string" ? req.query.sortBy : "createdAt";
   const sortOrder = req.query.sortOrder === "asc" ? "asc" : "desc";
+  const term = typeof req.query.term === "string" ? req.query.term.trim() : "";
   const page = parsePositiveInt(req.query.page, 1);
   const limit = Math.min(parsePositiveInt(req.query.limit, 100), 200);
 
@@ -139,6 +92,7 @@ export async function getAll(req, res) {
       populate,
       sortBy,
       sortOrder,
+      term,
       page,
       limit,
     });
