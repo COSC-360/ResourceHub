@@ -25,6 +25,7 @@ import GlobalApiError from "./components/GlobalApiError/GlobalApiError";
 import ViewUsers from "./components/AdminPanel/ViewUsers/ViewUsers.jsx";
 import ViewCourses from "./components/AdminPanel/ViewCourses/ViewCourses.jsx";
 import HybridFeed from "./components/HybridFeed/HybridFeed.jsx";
+import AdminAnalytics from "./components/AdminPanel/AdminAnalytics/AdminAnalytics.jsx";
 
 // Main layout component that includes the header and sidebar,
 // and an Outlet for rendering the main content based on the route
@@ -107,6 +108,7 @@ function App() {
           <Route index element={<AdminDashboard />} />
           <Route path="/admin/users" element={<ViewUsers />} />
           <Route path="/admin/courses" element={<ViewCourses />} />
+          <Route path="/admin/analytics" element={<AdminAnalytics />} />
         </Route>
 
         <Route path="/courses/create" element={<CreateCourse />} />
