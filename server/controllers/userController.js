@@ -1,8 +1,14 @@
 import mongoose from "mongoose";
+import path from "path";
+import { fileURLToPath } from "url";
 import * as userService from "../services/userService.js";
 import * as userRepository from "../repositories/userRepository.js";
 import { getIO } from "../socket.js";
 import { ACCOUNT_DISABLED_MESSAGE } from "../middleware/authMiddleware.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const uploadsDir = path.resolve(__dirname, "..", "uploads");
 
 const DEFAULT_PROFILE_AVATAR_SVG = `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Default profile avatar">
@@ -15,6 +21,21 @@ const DEFAULT_PROFILE_AVATAR_SVG = `
 function sendDefaultProfilePhoto(res) {
   res.set("Content-Type", "image/svg+xml; charset=utf-8");
   return res.status(200).send(DEFAULT_PROFILE_AVATAR_SVG.trim());
+}
+
+function resolveLocalUploadPath(rawPath) {
+  if (typeof rawPath !== "string") return null;
+  const value = rawPath.trim();
+  if (!value) return null;
+  if (/^https?:\/\//i.test(value)) return null;
+
+  const normalized = value.replace(/^\/+/, "");
+  if (!normalized.startsWith("uploads/")) return null;
+
+  const relativeUploadPath = normalized.slice("uploads/".length);
+  const absolutePath = path.resolve(uploadsDir, relativeUploadPath);
+  if (!absolutePath.startsWith(uploadsDir)) return null;
+  return absolutePath;
 }
 
 export async function createUser(req, res) {
@@ -63,7 +84,18 @@ export async function getProfilePhoto(req, res) {
   }
 
   if (typeof found.pfp === "string") {
-    return res.redirect(found.pfp);
+    const localUploadPath = resolveLocalUploadPath(found.pfp);
+    if (localUploadPath) {
+      return res.sendFile(localUploadPath, (err) => {
+        if (err && !res.headersSent) sendDefaultProfilePhoto(res);
+      });
+    }
+
+    if (/^https?:\/\//i.test(found.pfp)) {
+      return res.redirect(found.pfp);
+    }
+
+    return sendDefaultProfilePhoto(res);
   }
 
   if (found.pfp?.data && found.pfp?.contentType) {
