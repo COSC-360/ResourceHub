@@ -84,6 +84,45 @@ While the docker container is running in a different terminal window. Client or 
 
 ## Project Structure
 
+```
+ResourceHub/
+├── client/                    # Frontend (React + Vite)
+│   ├── src/
+│   │   ├── components/       # React components (AddMyCoursePage, AdminPanel, AuthForms, Cards, etc.)
+│   │   ├── pages/           # Page components
+│   │   ├── constants/       # Constants and configurations
+│   │   ├── lib/             # Utility libraries
+│   │   ├── assets/          # Static assets
+│   │   ├── App.jsx
+│   │   ├── main.jsx
+│   │   └── AuthContext.jsx
+│   ├── public/              # Public static files
+│   ├── package.json
+│   ├── vite.config.js
+│   └── Dockerfile
+│
+├── server/                   # Backend (Node.js + Express)
+│   ├── controllers/         # Request handlers
+│   ├── services/           # Business logic
+│   ├── repositories/       # Data access layer
+│   ├── models/             # Database schemas
+│   ├── routes/             # API routes
+│   ├── middleware/         # Custom middleware
+│   ├── utils/              # Utility functions
+│   ├── errors/             # Error definitions
+│   ├── tests/              # Test files
+│   ├── uploads/            # File uploads directory
+│   ├── assets/             # Static assets
+│   ├── app.js
+│   ├── server.js
+│   ├── package.json
+│   └── Dockerfile
+│
+├── docker-compose.yml       # Docker Compose configuration
+├── README.md
+└── LICENSE
+```
+
 ## Tech Stack
 
 ## Troubleshooting
