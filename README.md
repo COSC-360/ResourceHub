@@ -79,3 +79,11 @@ docker compose up --build
 ### Stop the application
 
 docker compose down
+
+### Install npm packages
+
+If there are issues with npm packages not resolving while the docker container is up, run:
+
+docker compose exec client npm install
+
+While the docker container is running in a different terminal window.

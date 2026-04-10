@@ -2,6 +2,12 @@ import "./ProfileHeader.css";
 import { useContext, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthContext from "../../AuthContext.jsx";
+import {
+  ADMIN_ROUTE,
+  LOGIN_ROUTE,
+  PROFILE_ROUTE,
+  REGISTER_ROUTE,
+} from "../../constants/RouteConstants.jsx";
 
 export function ProfileHeader({ userType }) {
   const navigate = useNavigate();
@@ -14,7 +20,7 @@ export function ProfileHeader({ userType }) {
   const userid = localStorage.getItem("userid");
 
   const menuItems = [
-    { id: "profile", label: "Profile", onSelect: () => navigate("/profile") },
+    { id: "profile", label: "Profile", onSelect: () => navigate(PROFILE_ROUTE) },
     { id: "logout", label: "Logout", onSelect: () => logout() },
   ];
 
@@ -58,7 +64,7 @@ export function ProfileHeader({ userType }) {
     <>
       <div className="profileContainer">
         {userType === "admin" && (
-          <Link to="/admin">
+          <Link to={ADMIN_ROUTE}>
             <button className="adminPanel">Admin Panel</button>
           </Link>
         )}
@@ -106,10 +112,10 @@ export function ProfileHeader({ userType }) {
       </div>
       {!userType && (
         <div className="authButtons">
-          <Link to="/login">
+          <Link to={LOGIN_ROUTE}>
             <button className="signIn">Log In</button>
           </Link>
-          <Link to="/register">
+          <Link to={REGISTER_ROUTE}>
             <button className="register">Register</button>
           </Link>
         </div>

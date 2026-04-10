@@ -2,6 +2,13 @@ import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import "./AuthForms.css";
 import AuthContext from "../../AuthContext.jsx";
+import { LOGIN_ROUTE } from "../../constants/RouteConstants.jsx";
+import {
+  isValidEmail,
+  trimStr,
+  validateSignupPassword,
+  validateUsername,
+} from "../../lib/formValidation.js";
 
 export function SignupForm() {
   const { signup } = useContext(AuthContext);
@@ -15,16 +22,19 @@ export function SignupForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validate = () => {
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+[a-zA-Z]{2,}$/;
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*).{8,}$/;
-    if (!passwordRegex.test(password)) {
-      setError(
-        "Password must be at least 8 characters and include upper and lower case letters.",
-      );
+    const userErr = validateUsername(username);
+    if (userErr) {
+      setError(userErr);
       return false;
     }
-    if (!emailRegex.test(email)) {
+    const emailTrimmed = trimStr(email);
+    if (!isValidEmail(emailTrimmed)) {
       setError("Please enter a valid email address.");
+      return false;
+    }
+    const pwErr = validateSignupPassword(password);
+    if (pwErr) {
+      setError(pwErr);
       return false;
     }
     if (password !== repeatedPassword) {
@@ -38,9 +48,11 @@ export function SignupForm() {
     e.preventDefault();
     setError(null);
     if (!validate()) return;
+    const u = trimStr(username);
+    const em = trimStr(email);
     setIsSubmitting(true);
     try {
-      await signup(username, email, password);
+      await signup(u, em, password);
     } catch (err) {
       const message =
         err instanceof Error && err.message
@@ -70,17 +82,20 @@ export function SignupForm() {
             name="username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
+            maxLength={64}
+            autoComplete="username"
             required
           />
         </fieldset>
         <fieldset>
           <label htmlFor="email">Email:</label>
           <input
-            type="text"
+            type="email"
             id="email"
             name="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
             required
           />
         </fieldset>
@@ -92,6 +107,7 @@ export function SignupForm() {
             name="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            autoComplete="new-password"
             required
           />
         </fieldset>
@@ -103,6 +119,7 @@ export function SignupForm() {
             name="confirm_password"
             value={repeatedPassword}
             onChange={(e) => setRepeatedPassword(e.target.value)}
+            autoComplete="new-password"
             required
           />
         </fieldset>
@@ -110,7 +127,7 @@ export function SignupForm() {
           <button type="submit" disabled={isSubmitting}>
             {isSubmitting ? "Signing up…" : "Sign Up"}
           </button>
-          <Link to="/login">
+          <Link to={LOGIN_ROUTE}>
             <button type="button" className="redirect_button">
               Go to Login
             </button>

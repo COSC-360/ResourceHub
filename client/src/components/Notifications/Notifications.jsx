@@ -1,12 +1,17 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import AuthContext from "../../AuthContext.jsx";
 import "./Notifications.css";
 
 export function Notifications() {
+    const { user } = useContext(AuthContext);
     const [notifications, setNotifications] = useState([]);
     const [notificationCount, setNotificationCount] = useState(0);
     const [showNotifications, setShowNotifications] = useState(false);
 
     useEffect(() => {
+        const token = user?.access_token;
+        if (!token) return;
+
         const fetchNotifications = async () => {
             try {
                 const since =
@@ -14,8 +19,15 @@ export function Notifications() {
                     new Date(0).toISOString();
 
                 const response = await fetch(
-                    `http://localhost:3000/api/notifications?since=${encodeURIComponent(since)}`
+                    `http://localhost:3000/api/notifications?since=${encodeURIComponent(since)}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
                 );
+
+                if (!response.ok) return;
 
                 const data = await response.json();
 
@@ -27,7 +39,7 @@ export function Notifications() {
         };
 
         fetchNotifications();
-    }, []);
+    }, [user?.access_token]);
 
     const handleNotificationClick = () => {
         const opening = !showNotifications;

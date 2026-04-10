@@ -2,6 +2,7 @@
 import { createContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiClient } from "./lib/api-client";
+import { HOMEROUTE, INFORMATION_ROUTE } from "./constants/RouteConstants.jsx";
 
 const AuthContext = createContext();
 
@@ -76,7 +77,7 @@ export const AuthProvider = ({ children }) => {
           localStorage.removeItem("userid");
         }, 0);
       } else{
-        router("/");
+        router(HOMEROUTE);
       }
     } catch (error) {
       console.error("Login failed:", error);
@@ -108,7 +109,7 @@ export const AuthProvider = ({ children }) => {
         access_token: token,
       });
       localStorage.setItem("first_time", true);
-      router("/information");
+      router(INFORMATION_ROUTE);
 
       return true;
     } catch (error) {
@@ -121,7 +122,7 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     localStorage.removeItem("access_token");
     localStorage.removeItem("userid");
-    router("/");
+    router(HOMEROUTE);
   };
 
   return (

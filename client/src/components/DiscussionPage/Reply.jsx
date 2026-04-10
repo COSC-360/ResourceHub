@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { apiClient } from "../../lib/api-client";
 import "./Reply.css";
+import { LIMITS, validateReplyContent } from "../../lib/formValidation.js";
 
 function normalizeCourseId(courseId) {
   if (!courseId) return "";
@@ -18,11 +19,12 @@ export default function Reply({ courseId, parentId, onSubmitted, onCancel }) {
   async function handleSubmit(event) {
     event.preventDefault();
 
-    const trimmed = content.trim();
-    if (!trimmed) {
-      setError("Reply content is required.");
+    const replyErr = validateReplyContent(content);
+    if (replyErr) {
+      setError(replyErr);
       return;
     }
+    const trimmed = content.trim();
 
     const token = localStorage.getItem("access_token");
     if (!token) {
@@ -61,6 +63,7 @@ export default function Reply({ courseId, parentId, onSubmitted, onCancel }) {
         onChange={(event) => setContent(event.target.value)}
         placeholder="Write a reply..."
         rows={3}
+        maxLength={LIMITS.DISCUSSION_CONTENT_MAX}
       />
 
       {error && <p className="reply__error">{error}</p>}

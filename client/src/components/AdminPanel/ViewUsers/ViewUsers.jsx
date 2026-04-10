@@ -1,9 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { apiClient } from "../../../lib/api-client";
 import "../AdminDashboard/AdminDashboard.css";
 import "./ViewUsers.css";
+import { profileUserPath } from "../../../constants/RouteConstants.jsx";
 
 export function ViewUsers() {
+  const navigate = useNavigate();
   const [filters, setFilters] = useState({
     name: "",
     email: "",
@@ -179,7 +182,23 @@ export function ViewUsers() {
               </tr>
             ) : (
               filteredUsers.map((user) => (
-                <tr key={user._id || user.email}>
+                <tr
+                  key={user._id || user.email}
+                  className="admin-table-row-clickable"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => {
+                    const id = user._id ?? user.id;
+                    if (id) navigate(profileUserPath(id));
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      const id = user._id ?? user.id;
+                      if (id) navigate(profileUserPath(id));
+                    }
+                  }}
+                >
                   <td>{user.username || "—"}</td>
                   <td>{user.email || "—"}</td>
                   <td>{user.faculty || "—"}</td>
@@ -195,9 +214,10 @@ export function ViewUsers() {
                       className={buttonClass}
                       type="button"
                       disabled={Boolean(toggleInFlightByUser[user._id])}
-                      onClick={() =>
-                        handleToggleEnabled(user._id, user.username, !isEnabled)
-                      }
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggleEnabled(user._id, user.username, !isEnabled);
+                      }}
                     >
                       {isEnabled ? "Disable" : "Enable"}
                     </button>

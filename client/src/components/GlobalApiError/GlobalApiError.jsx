@@ -9,6 +9,12 @@ export default function GlobalApiError() {
     return subscribeApiError((e) => setError(e));
   }, []);
 
+  useEffect(() => {
+    if (!error) return;
+    const id = setTimeout(() => setError(null), 5000);
+    return () => clearTimeout(id);
+  }, [error]);
+
   if (!error) return null;
 
   return (

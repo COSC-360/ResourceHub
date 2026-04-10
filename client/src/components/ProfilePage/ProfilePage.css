@@ -1,5 +1,6 @@
 .profile-page {
-  max-width: 480px;
+  max-width: 640px;
+  color: var(--rh-text);
 }
 
 .profile-page h1 {
@@ -57,6 +58,8 @@
   padding: 0.4rem 0.5rem;
   border: 1px solid #ccc;
   border-radius: 6px;
+  background: #fff;
+  color: var(--rh-text);
 }
 
 .profile-actions {
@@ -72,6 +75,7 @@
   border-radius: 6px;
   border: 1px solid #888;
   background: #f4f4f4;
+  color: var(--rh-text);
   cursor: pointer;
 }
 
@@ -92,4 +96,98 @@
 .profile-page a:hover {
   background: var(--rh-redirect-hover-bg);
   color: var(--rh-redirect-hover-color);
+}
+
+.profile-activity {
+  margin-top: 1.5rem;
+}
+
+.profile-activity h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.15rem;
+}
+
+.profile-activity-subheading {
+  margin: 1rem 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.profile-activity-status {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.profile-activity-empty {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.profile-activity-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.profile-activity-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.65rem 0.75rem;
+  background: #fff;
+  border: 1px solid #e8e0ef;
+  border-radius: 8px;
+}
+
+.profile-activity-link {
+  display: inline;
+  padding: 0;
+  border-radius: 0;
+  font-weight: 600;
+  color: #5b21a6;
+  text-decoration: none;
+}
+
+.profile-activity-link:hover {
+  color: #7b2cbf;
+  background: transparent;
+}
+
+.profile-activity-title,
+.profile-activity-preview {
+  display: inline;
+}
+
+.profile-activity-title--muted,
+.profile-activity-preview--muted {
+  color: #666;
+}
+
+.profile-activity-preview {
+  font-weight: 500;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.profile-activity-meta {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.profile-activity-badge {
+  display: inline-block;
+  margin-left: 0.35rem;
+  padding: 0.1rem 0.35rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  border-radius: 4px;
+  background: #f0e6f6;
+  color: #5a2d82;
 }

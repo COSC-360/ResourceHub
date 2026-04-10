@@ -4,11 +4,13 @@ import { apiClient } from "../../lib/api-client";
 import { CourseHeader } from "../CourseHeader/CourseHeader.jsx";
 import HybridFeed from "../HybridFeed/HybridFeed.jsx";
 import CreateDiscussion from "../CreateDiscussion/CreateDiscussion.jsx";
+import { COURSES_ROUTE, HOMEROUTE } from "../../constants/RouteConstants.jsx";
 
 export default function CoursePage() {
   const location = useLocation();
   const navigate = useNavigate();
   const { courseId } = useParams();
+  const warning = location.state?.warning || "";
 
   // keep state as initial skeleton only
   const [course, setCourse] = useState(location.state?.course ?? null);
@@ -81,18 +83,19 @@ export default function CoursePage() {
         <h2>Course Page</h2>
         <p>{error || "No details found for this course."}</p>
         <p><strong>Course ID:</strong> {courseId}</p>
-        <Link to="/">Back to create course</Link>
+        <Link to={HOMEROUTE}>Back to create course</Link>
       </div>
     );
   }
 
   return (
     <div className="course-page">
+      {warning ? <p className="course-page__notice" role="status">{warning}</p> : null}
       <CourseHeader
         course={course}
         onMembershipChanged={handleMembershipChanged}
         onCourseUpdated={handleCourseUpdated}
-        onCourseDeleted={() => navigate("/courses", { replace: true })}
+        onCourseDeleted={() => navigate(COURSES_ROUTE, { replace: true })}
       />
       <CreateDiscussion
         courseId={courseId}

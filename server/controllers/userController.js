@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import * as userService from "../services/userService.js";
 import * as userRepository from "../repositories/userRepository.js";
 
@@ -92,11 +93,11 @@ export async function getUserById(req, res) {
 
   try {
     const user = await userService.getUserById(String(id));
-    delete user.pfp;
     if (!user) {
       res.status(404).json({ error: "User not found" });
       return;
     }
+    delete user.pfp;
     res.json({ data: user });
   } catch (err) {
     console.log(err);
@@ -105,14 +106,29 @@ export async function getUserById(req, res) {
 }
 
 export async function updateProfile(req, res) {
-  const id = req.user?.id;
-  if (id == null || String(id).trim() === "") {
+  const rawTarget = req.body?.targetUserId;
+  let targetId = req.user?.id;
+
+  if (rawTarget != null && String(rawTarget).trim() !== "") {
+    if (!req.user?.admin) {
+      res.status(403).json({ error: "Not authorized to update this profile" });
+      return;
+    }
+    const tid = String(rawTarget).trim();
+    if (!mongoose.Types.ObjectId.isValid(tid)) {
+      res.status(400).json({ error: "Invalid target user ID" });
+      return;
+    }
+    targetId = tid;
+  }
+
+  if (targetId == null || String(targetId).trim() === "") {
     res.status(400).json({ error: "Invalid user ID" });
     return;
   }
 
   try {
-    const updated = await userService.updateProfile(String(id), {
+    const updated = await userService.updateProfile(String(targetId), {
       ...req.body,
       file: req.file,
     });

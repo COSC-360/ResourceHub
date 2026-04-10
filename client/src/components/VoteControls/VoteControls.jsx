@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiClient } from "../../lib/api-client";
+import { LOGIN_ROUTE } from "../../constants/RouteConstants.jsx";
 
 export default function VoteControls({
   targetId,
@@ -37,7 +38,7 @@ export default function VoteControls({
   const handleUpvote = async () => {
     try {
       const token = localStorage.getItem("access_token");
-      if (!token) return navigate("/login");
+      if (!token) return navigate(LOGIN_ROUTE);
 
       // FeedPost behavior
       if (hasUpvote || hasDownvote) {
@@ -73,7 +74,7 @@ export default function VoteControls({
   const handleDownvote = async () => {
     try {
       const token = localStorage.getItem("access_token");
-      if (!token) return navigate("/login");
+      if (!token) return navigate(LOGIN_ROUTE);
 
       // FeedPost behavior
       if (hasUpvote || hasDownvote) {

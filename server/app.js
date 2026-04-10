@@ -3,6 +3,7 @@ import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
 import { userRoutes } from "./routes/userRoutes.js";
+import { adminAnalyticsRoutes } from "./routes/adminAnalyticsRoutes.js";
 import { courseRoutes } from "./routes/courseRoutes.js";
 import { discussionRoutes } from "./routes/discussionRoutes.js";
 import { commonRoutes } from "./routes/commonRoutes.js";
@@ -41,6 +42,7 @@ app.get("/api/health", (_req, res) => {
   res.status(200).json({ status: "ok" });
 });
 
+app.use("/api/analytics", adminAnalyticsRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/discussion", discussionRoutes);

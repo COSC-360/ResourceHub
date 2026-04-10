@@ -1,4 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
+import { HOMEROUTE } from "../../constants/RouteConstants.jsx";
 import "./Breadcrumbs.css";
 
 function formatLabel(segment) {
@@ -19,7 +20,7 @@ export default function Breadcrumbs() {
         <span className="current">Home</span>
       ) : (
         <>
-          <Link to="/">Home</Link>
+          <Link to={HOMEROUTE}>Home</Link>
           {pathnames.map((segment, index) => {
             const routeTo = "/" + pathnames.slice(0, index + 1).join("/");
             const isLast = index === pathnames.length - 1;

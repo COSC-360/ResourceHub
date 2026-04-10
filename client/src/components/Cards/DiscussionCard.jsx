@@ -6,7 +6,17 @@ import { apiClient } from "../../lib/api-client";
 import AuthContext from "../../AuthContext.jsx";
 import VoteControls from "../VoteControls/VoteControls.jsx";
 import defaultProfile from "../../assets/profile.svg";
+import {
+  courseDiscussionPath,
+  coursePath,
+  LOGIN_ROUTE,
+} from "../../constants/RouteConstants.jsx";
 import "./DiscussionCard.css";
+import {
+  LIMITS,
+  trimStr,
+  validateDiscussionEdit,
+} from "../../lib/formValidation.js";
 
 export default function DiscussionCard({
   data,
@@ -54,7 +64,7 @@ export default function DiscussionCard({
     merged && (merged.hasImage || merged.image?.contentType),
   );
   const replyHref =
-    discussionId && courseId ? `/courses/${courseId}/discussions/${discussionId}` : null;
+    discussionId && courseId ? courseDiscussionPath(courseId, discussionId) : null;
 
   const createdAt = merged?.updatedAt || merged?.createdAt || data?.createdAt || data?.updatedAt;
   const timeStr = useMemo(() => {
@@ -155,7 +165,7 @@ export default function DiscussionCard({
       try {
         const token = localStorage.getItem("access_token");
         if (!token) {
-          navigate("/login");
+          navigate(LOGIN_ROUTE);
           return;
         }
         await apiClient(`/api/discussion/${discussionId}`, {
@@ -179,16 +189,30 @@ export default function DiscussionCard({
   function handleSubmit(e) {
     e.preventDefault();
     e.stopPropagation();
+    const editErr = validateDiscussionEdit({
+      isReply,
+      hadTitle: Boolean(titleText),
+      draftTitle: draft.title,
+      originalTitle: titleText,
+      draftContent: draft.content,
+      originalContent: bodyText,
+    });
+    if (editErr) {
+      setError(editErr);
+      return;
+    }
+    const nextTitle = trimStr(draft.title) || trimStr(titleText);
+    const nextContent = trimStr(draft.content) || trimStr(bodyText);
     (async () => {
       try {
         const token = localStorage.getItem("access_token");
         if (!token) {
-          navigate("/login");
+          navigate(LOGIN_ROUTE);
           return;
         }
         const fd = new FormData();
-        fd.append("title", draft.title ? draft.title : titleText);
-        fd.append("content", draft.content ? draft.content : bodyText);
+        fd.append("title", nextTitle);
+        fd.append("content", nextContent);
         fd.append("updatedImage", file ? true : removeImage);
         if (file || removeImage) fd.append("file", file);
 
@@ -257,7 +281,7 @@ export default function DiscussionCard({
           <div className="discussion-card__user-info">
             {!isReply && courseId && (
               <Link
-                to={`/courses/${courseId}`}
+                to={coursePath(courseId)}
                 className="discussion-card__forum"
                 onClick={(event) => event.stopPropagation()}
               >
@@ -316,6 +340,7 @@ export default function DiscussionCard({
                 type="text"
                 value={draft.title}
                 onChange={handleDraftChange}
+                maxLength={LIMITS.DISCUSSION_TITLE_MAX}
               />
             </div>
           )}
@@ -327,6 +352,7 @@ export default function DiscussionCard({
               rows={4}
               value={draft.content}
               onChange={handleDraftChange}
+              maxLength={LIMITS.DISCUSSION_CONTENT_MAX}
             />
           </div>
           <div className="discussion-card__field">

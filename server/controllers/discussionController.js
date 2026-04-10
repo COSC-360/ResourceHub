@@ -101,6 +101,25 @@ export async function getAll(req, res) {
     });
   }
 
+  if (authorIds.length > 0) {
+    if (!req.user?.id) {
+      return res.status(401).json({
+        error: "Authentication required to filter discussions by author",
+      });
+    }
+    const isAdmin = Boolean(req.user.admin);
+    if (!isAdmin) {
+      const viewerId = String(req.user.id);
+      const allowed =
+        authorIds.length === 1 && authorIds[0] === viewerId;
+      if (!allowed) {
+        return res.status(403).json({
+          error: "Not allowed to view other users' discussions",
+        });
+      }
+    }
+  }
+
   if (
     typeof parentId === "string" &&
     parentId.trim() !== "" &&
