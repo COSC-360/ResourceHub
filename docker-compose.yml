@@ -15,9 +15,12 @@ services:
       - "3000:3000"
     env_file:
       - ./server/.env
+    command: npm run dev
     depends_on:
       - mongo
     volumes:
+      - ./server:/app
+      - /app/node_modules
       - ./server/uploads:/app/uploads
 
   client:
@@ -28,8 +31,13 @@ services:
       - "5173:5173"
     environment:
       - VITE_API_BASE_URL=http://server:3000
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
     depends_on:
       - server
+    volumes:
+      - ./client:/app
+      - /app/node_modules
 
 volumes:
   mongo_data:

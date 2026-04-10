@@ -149,3 +149,17 @@ export function verifyToken(req, res) {
   if (req.user) return res.status(200).json(req.user);
   return res.status(403).json({ error: "Invalid access token." });
 }
+
+export async function getAdmins(req, res) {
+  const admins = await userService.getAdmins();
+  res.status(200).json({ data: admins });
+}
+
+export async function searchUsers(req, res) {
+  const name = req.query.name;
+  const email = req.query.email;
+  const faculty = req.query.faculty;
+  const isAdmin = Boolean(req.query.isAdmin);
+  const users = await userService.searchUsers(name, email, faculty, isAdmin);
+  res.status(200).json({ data: users });
+}

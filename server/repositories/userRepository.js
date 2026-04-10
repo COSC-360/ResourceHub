@@ -87,3 +87,12 @@ export async function hideUserCourses(userId, courseId) {
 
   return await getUserCourses(userId);
 }
+
+export async function searchUsers(name, email, faculty, isAdmin) {
+  const query = {};
+  if (name) query.name = { $regex: name, $options: "i" };
+  if (email) query.email = { $regex: email, $options: "i" };
+  if (faculty) query.faculty = { $regex: faculty, $options: "i" };
+  if (typeof isAdmin === "boolean") query.isAdmin = isAdmin;
+  return await User.find(query).select("-password").lean();
+}
