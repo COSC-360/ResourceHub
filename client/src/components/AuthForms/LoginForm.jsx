@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import "./AuthForms.css";
 import AuthContext from "../../AuthContext.jsx";
 import { REGISTER_ROUTE } from "../../constants/RouteConstants.jsx";
+import { isValidEmail, trimStr } from "../../lib/formValidation.js";
 
 export function LoginForm() {
   const { login } = useContext(AuthContext);
@@ -13,11 +14,23 @@ export function LoginForm() {
     e.preventDefault();
     setError(null);
     const formData = new FormData(e.target);
-    const email = formData.get("email");
+    const email = trimStr(String(formData.get("email") ?? ""));
     const password = formData.get("password");
+    if (!email) {
+      setError("Please enter your email address.");
+      return;
+    }
+    if (!isValidEmail(email)) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+    if (password == null || String(password).length === 0) {
+      setError("Please enter your password.");
+      return;
+    }
     setIsSubmitting(true);
     try {
-      await login(email, password);
+      await login(email, String(password));
     } catch (err) {
       const message =
         err instanceof Error && err.message
@@ -42,9 +55,10 @@ export function LoginForm() {
         <fieldset>
           <label htmlFor="email">Email:</label>
           <input
-            type="text"
+            type="email"
             id="email"
             name="email"
+            autoComplete="email"
             required
           />
         </fieldset>

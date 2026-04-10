@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { apiClient } from "../../lib/api-client";
 import CourseForm from "../CourseForm/CourseForm.jsx";
 import { coursePath, COURSES_ROUTE } from "../../constants/RouteConstants.jsx";
+import { validateCourseFields } from "../../lib/formValidation.js";
 
 const trim = (v) => (typeof v === "string" ? v.trim() : "");
 
@@ -104,6 +105,16 @@ export default function CreateCourse({
 
     if (!course.name || !course.code) {
       setError("Course name and code are required.");
+      return;
+    }
+
+    const fieldErr = validateCourseFields(
+      course.name,
+      course.code,
+      course.description,
+    );
+    if (fieldErr) {
+      setError(fieldErr);
       return;
     }
 

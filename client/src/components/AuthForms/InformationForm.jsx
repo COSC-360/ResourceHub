@@ -4,11 +4,13 @@ import defaultAvatar from "../../assets/profile.svg";
 import { useNavigate } from "react-router-dom";
 import { apiClient } from "../../lib/api-client";
 import { HOMEROUTE, REGISTER_ROUTE } from "../../constants/RouteConstants.jsx";
+import { validateProfileTextFields } from "../../lib/formValidation.js";
 
 const InformationForm = () => {
   const [file, setFile] = useState(null);
-  const [formData, setFormData] = useState({ bio: "" });
-  const present = file || formData.bio;
+  const [formData, setFormData] = useState({ bio: "", faculty: "" });
+  const [error, setError] = useState(null);
+  const present = file || formData.bio.trim() || formData.faculty.trim();
   const fileCurrentRef = useRef(null);
 
   const router = useNavigate();
@@ -21,15 +23,17 @@ const InformationForm = () => {
     }
     if (!selectedFile.type?.startsWith("image/")) {
       e.target.value = "";
-      alert("Only image files are allowed.");
+      setError("Only image files are allowed.");
       setFile(null);
       return;
     }
+    setError(null);
     setFile(selectedFile);
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    setError(null);
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -42,27 +46,42 @@ const InformationForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!present) router(HOMEROUTE);
+    setError(null);
+    if (!present) {
+      router(HOMEROUTE);
+      return;
+    }
+    const textErr = validateProfileTextFields(formData.faculty, formData.bio);
+    if (textErr) {
+      setError(textErr);
+      return;
+    }
     (async () => {
       try {
         const token = localStorage.getItem("access_token");
-        if (!token) router(REGISTER_ROUTE);
+        if (!token) {
+          router(REGISTER_ROUTE);
+          return;
+        }
         const data = new FormData();
         data.append("bio", formData.bio);
-        data.append("file", file);
+        if (file) data.append("file", file);
         data.append("faculty", formData.faculty);
-        const response = await apiClient("/api/user/updateProfile", {
+        await apiClient("/api/user/updateProfile", {
           method: "PATCH",
           body: data,
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log(response);
         localStorage.removeItem("first_time");
         router(HOMEROUTE);
       } catch (err) {
-        console.log(err);
+        setError(
+          err instanceof Error && err.message
+            ? err.message
+            : "Could not save your profile.",
+        );
       }
     })();
   };
@@ -74,7 +93,12 @@ const InformationForm = () => {
 
   return (
     <div className="auth-form-page">
-      <form className="auth-form-card" onSubmit={handleSubmit}>
+      <form className="auth-form-card information-form" onSubmit={handleSubmit}>
+        {error ? (
+          <p className="auth-form-error" role="alert">
+            {error}
+          </p>
+        ) : null}
         <div className="avatar_wrapper">
           <img
             src={file ? URL.createObjectURL(file) : defaultAvatar}
@@ -96,20 +120,43 @@ const InformationForm = () => {
             Remove Photo
           </button>
         )}
-        <label htmlFor="bio">Bio:</label>
-        <textarea
-          className="text"
-          name="bio"
-          onChange={handleChange}
-          value={formData.bio}
-        />
-        <label htmlFor="bio">Faculty:</label>
-        <textarea
-          className="text"
-          name="faculty"
-          onChange={handleChange}
-          value={formData.faculty}
-        />
+
+        <section
+          className="information-form__text-section"
+          aria-labelledby="information-form-text-heading"
+        >
+          <h2 className="information-form__section-title" id="information-form-text-heading">
+            Profile details
+          </h2>
+
+          <div className="information-form__field">
+            <label htmlFor="bio">Bio</label>
+            <textarea
+              className="information-form__textarea"
+              id="bio"
+              name="bio"
+              onChange={handleChange}
+              value={formData.bio}
+              maxLength={2000}
+              rows={4}
+              placeholder="A few words about you, your interests, or how you use ResourceHub…"
+            />
+          </div>
+
+          <div className="information-form__field">
+            <label htmlFor="faculty">Faculty</label>
+            <textarea
+              className="information-form__textarea information-form__textarea--short"
+              id="faculty"
+              name="faculty"
+              onChange={handleChange}
+              value={formData.faculty}
+              maxLength={200}
+              rows={2}
+              placeholder="e.g. Computer Science, Engineering…"
+            />
+          </div>
+        </section>
         <input
           type="submit"
           className="submit"

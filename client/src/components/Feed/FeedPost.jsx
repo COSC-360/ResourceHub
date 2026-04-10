@@ -11,6 +11,11 @@ import defaultProfile from "../../assets/profile.svg";
 import Comment from "../Comment/Comment";
 import { useNavigate } from "react-router-dom";
 import { LOGIN_ROUTE } from "../../constants/RouteConstants.jsx";
+import {
+  LIMITS,
+  trimStr,
+  validateDiscussionEdit,
+} from "../../lib/formValidation.js";
 
 export const FeedPost = ({ post_props, depth, expandDown }) => {
   const [edit, setEdit] = useState(false);
@@ -207,18 +212,28 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const editErr = validateDiscussionEdit({
+      isReply: Boolean(post_props.parentid),
+      hadTitle: Boolean(post_props.title),
+      draftTitle: formData.title,
+      originalTitle: post_props.title,
+      draftContent: formData.content,
+      originalContent: post_props.comment,
+    });
+    if (editErr) {
+      setError(editErr);
+      return;
+    }
+    const nextTitle =
+      trimStr(formData.title) || trimStr(post_props.title);
+    const nextContent =
+      trimStr(formData.content) || trimStr(post_props.comment);
     (async () => {
       try {
         const token = localStorage.getItem("access_token");
         const data = new FormData();
-        data.append(
-          "title",
-          formData.title ? formData.title : post_props.title,
-        );
-        data.append(
-          "content",
-          formData.content ? formData.content : post_props.comment,
-        );
+        data.append("title", nextTitle);
+        data.append("content", nextContent);
         data.append("updatedImage", file ? true : removeImage);
         if (file || removeImage) data.append("file", file);
 
@@ -360,6 +375,7 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
                       defaultValue={post_props.title}
                       name="title"
                       onChange={handleChange}
+                      maxLength={LIMITS.DISCUSSION_TITLE_MAX}
                     />
                   </div>
                 ) : (
@@ -374,6 +390,7 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
                       defaultValue={post_props.comment}
                       name="content"
                       onChange={handleChange}
+                      maxLength={LIMITS.DISCUSSION_CONTENT_MAX}
                     />
                   </div>
                 ) : (
