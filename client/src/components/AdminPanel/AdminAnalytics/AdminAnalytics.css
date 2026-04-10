@@ -20,6 +20,51 @@
   color: #a8373c;
 }
 
+.admin-analytics-leaders {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.25rem;
+}
+
+.admin-analytics-stat-card .admin-analytics-muted.admin-analytics-stat-empty {
+  padding: 1rem 0 0.25rem;
+  text-align: left;
+}
+
+.admin-analytics-stat-main {
+  margin: 0 0 0.2rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+.admin-analytics-stat-sub {
+  margin: 0 0 0.65rem;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.admin-analytics-stat-metric {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #444;
+}
+
+.admin-analytics-stat-value {
+  font-weight: 700;
+  color: #111;
+}
+
+.admin-analytics-metric-hero {
+  margin: 0 0 0.35rem;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.15;
+  color: #111;
+  font-variant-numeric: tabular-nums;
+}
+
 .admin-analytics-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));

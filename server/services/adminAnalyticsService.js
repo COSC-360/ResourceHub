@@ -1,6 +1,7 @@
 import { User } from "../models/user.js";
 import { Course } from "../models/course.js";
 import { Discussion } from "../models/discussion.js";
+import * as adminAnalyticsRepository from "../repositories/adminAnalyticsRepository.js";
 
 const DAY_MS = 86400000;
 
@@ -17,35 +18,72 @@ function utcLastSevenDayRange() {
   return { start, endExclusive, labels };
 }
 
-async function countByUtcDay(model, matchExtra, start, endExclusive) {
-  const pipeline = [
-    {
-      $match: {
-        createdAt: { $gte: start, $lt: endExclusive },
-        ...matchExtra,
-      },
-    },
-    {
-      $group: {
-        _id: {
-          $dateToString: { format: "%Y-%m-%d", date: "$createdAt", timezone: "UTC" },
-        },
-        count: { $sum: 1 },
-      },
-    },
-  ];
-  return model.aggregate(pipeline);
+function mapActivityLeaders(userTop, courseTop) {
+  const u = userTop[0];
+  const c = courseTop[0];
+
+  return {
+    mostActiveUser:
+      u && u.postsAndComments > 0
+        ? {
+            userId: String(u.userId),
+            username: u.username,
+            postsAndComments: u.postsAndComments,
+          }
+        : null,
+    mostActiveCourse:
+      c && c.postsAndComments > 0
+        ? {
+            courseId: String(c.courseId),
+            name: c.name,
+            code: c.code,
+            postsAndComments: c.postsAndComments,
+          }
+        : null,
+  };
+}
+
+function mapWeekDiscussionEngagement(facetRows) {
+  const facet = facetRows[0] || { users: [], courses: [] };
+  return {
+    distinctUsers: facet.users[0]?.count ?? 0,
+    distinctCourses: facet.courses[0]?.count ?? 0,
+  };
 }
 
 export async function getLastWeekDailyCounts() {
   const { start, endExclusive, labels } = utcLastSevenDayRange();
 
-  const [usersAgg, coursesAgg, postsAgg, commentsAgg] = await Promise.all([
-    countByUtcDay(User, {}, start, endExclusive),
-    countByUtcDay(Course, {}, start, endExclusive),
-    countByUtcDay(Discussion, { parentId: null, deleted: false }, start, endExclusive),
-    countByUtcDay(Discussion, { parentId: { $ne: null }, deleted: false }, start, endExclusive),
+  const [
+    usersAgg,
+    coursesAgg,
+    postsAgg,
+    commentsAgg,
+    userLeaderRows,
+    courseLeaderRows,
+    engagementFacetRows,
+  ] = await Promise.all([
+    adminAnalyticsRepository.aggregateCountByUtcDay(User, {}, start, endExclusive),
+    adminAnalyticsRepository.aggregateCountByUtcDay(Course, {}, start, endExclusive),
+    adminAnalyticsRepository.aggregateCountByUtcDay(
+      Discussion,
+      { parentId: null, deleted: false },
+      start,
+      endExclusive,
+    ),
+    adminAnalyticsRepository.aggregateCountByUtcDay(
+      Discussion,
+      { parentId: { $ne: null }, deleted: false },
+      start,
+      endExclusive,
+    ),
+    adminAnalyticsRepository.aggregateTopDiscussionUser(),
+    adminAnalyticsRepository.aggregateTopDiscussionCourse(),
+    adminAnalyticsRepository.aggregateWeekDiscussionEngagement(start, endExclusive),
   ]);
+
+  const leaders = mapActivityLeaders(userLeaderRows, courseLeaderRows);
+  const weekDiscussionEngagement = mapWeekDiscussionEngagement(engagementFacetRows);
 
   const toMap = (rows) => new Map(rows.map((r) => [r._id, r.count]));
 
@@ -66,5 +104,7 @@ export async function getLastWeekDailyCounts() {
     timezone: "UTC",
     range: { start: start.toISOString(), endExclusive: endExclusive.toISOString() },
     days,
+    weekDiscussionEngagement,
+    leaders,
   };
 }

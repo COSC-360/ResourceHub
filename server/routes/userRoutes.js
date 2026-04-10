@@ -3,7 +3,6 @@ import * as userController from "../controllers/userController.js";
 import { verifyAccessToken } from "../middleware/authMiddleware.js";
 import multerUpload from "../middleware/upload.js";
 import { requireAdmin } from "../middleware/adminMiddleware.js";
-import * as adminAnalyticsController from "../controllers/adminAnalyticsController.js";
 
 export const userRoutes = Router();
 
@@ -201,7 +200,6 @@ userRoutes.get("/verifytoken", verifyAccessToken, userController.verifyToken);
 
 //Everything past this point requires admin privileges
 userRoutes.get("/admin/users", requireAdmin, userController.searchUsers);
-userRoutes.get("/admin/analytics/week", requireAdmin, adminAnalyticsController.getLastWeek);
 userRoutes.patch(
   "/admin/users/:id/enabled",
   requireAdmin,
