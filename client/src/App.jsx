@@ -83,6 +83,14 @@ function App() {
           <Route path="/register" element={<SignupForm />} />
           <Route path="/information" element={<InformationForm />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route
+            path="/profile/:userId"
+            element={
+              <AdminRoute>
+                <ProfilePage />
+              </AdminRoute>
+            }
+          />
 
           {/* redirect /courses to home */}
           <Route path="/courses" element={<Navigate to="/" replace />} />
