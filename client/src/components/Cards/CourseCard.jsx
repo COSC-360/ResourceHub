@@ -22,7 +22,15 @@ export default function CourseCard({ data }) {
         >
             <div className="course-card__image-wrap">
                 {imageSrc ? (
-                    <img className="course-card__image" src={imageSrc} alt={`${name} cover`} />
+                    <img
+                        className="course-card__image"
+                        src={imageSrc}
+                        alt={`${name} cover`}
+                        onError={(event) => {
+                            event.currentTarget.onerror = null;
+                            event.currentTarget.src = DEFAULT_COURSE_COVER;
+                        }}
+                    />
                 ) : (
                     <img className="course-card__image" src={DEFAULT_COURSE_COVER} alt="" />
                 )}

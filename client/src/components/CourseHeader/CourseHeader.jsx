@@ -74,7 +74,15 @@ export function CourseHeader({ course, onMembershipChanged, onCourseUpdated, onC
     return (
         <section className="course-header">
             <div className="course-header__image-wrap">
-                <img className="course-header__image" src={coverSrc} alt={coverAlt} />
+                <img
+                    className="course-header__image"
+                    src={coverSrc}
+                    alt={coverAlt}
+                    onError={(event) => {
+                        event.currentTarget.onerror = null;
+                        event.currentTarget.src = DEFAULT_COURSE_COVER;
+                    }}
+                />
                 {canManageCourse && (
                     <CourseImageMenu
                         courseId={courseId}
