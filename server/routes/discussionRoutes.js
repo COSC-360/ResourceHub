@@ -72,9 +72,9 @@ export const discussionRoutes = Router();
  *         hasImage:
  *           type: boolean
  *           example: true
- *        score:
- *          type: integer
- *          example: 3
+ *         score:
+ *           type: integer
+ *           example: 3
  *     DiscussionCreateResponse:
  *       type: object
  *       properties:
