@@ -28,9 +28,9 @@ describe("Breadcrumbs", () => {
   });
 
   it("shows breadcrumbs on non-home routes", () => {
-    renderWithRoute("/courses/123");
+    renderWithRoute("/courses/physics");
     expect(screen.getByText("Courses")).toBeInTheDocument();
-    expect(screen.getByText("123")).toBeInTheDocument();
+    expect(screen.getByText("Physics")).toBeInTheDocument();
   });
 
   it("has correct CSS class for breadcrumbs with content", () => {
@@ -60,27 +60,33 @@ describe("Breadcrumbs", () => {
   });
 
   it("renders last segment as non-clickable span", () => {
-    renderWithRoute("/courses/123");
-    // 123 should be the last segment and displayed as text, not a link
+    renderWithRoute("/courses/advanced-calculus");
     const links = screen.getAllByRole("link");
     const linkTexts = links.map((link) => link.textContent);
     expect(linkTexts).toContain("Home");
     expect(linkTexts).toContain("Courses");
-    // 123 should not be a link
-    expect(screen.getByText("123")).not.toHaveAttribute("href");
+    expect(screen.getByText("Advanced Calculus")).not.toHaveAttribute("href");
   });
 
   it("renders multiple levels correctly", () => {
-    renderWithRoute("/courses/123/discussions/456");
+    renderWithRoute("/courses/advanced-calculus/discussions/linear-algebra");
     const crumbTexts = [
       screen.getByText("Home"),
       screen.getByText("Courses"),
-      screen.getByText("123"),
+      screen.getByText("Advanced Calculus"),
       screen.getByText("Discussions"),
-      screen.getByText("456"),
+      screen.getByText("Linear Algebra"),
     ];
     crumbTexts.forEach((crumb) => {
       expect(crumb).toBeInTheDocument();
     });
+  });
+
+  it("hides numeric IDs in breadcrumbs", () => {
+    renderWithRoute("/courses/123/discussions/456");
+    expect(screen.getByText("Home")).toBeInTheDocument();
+    expect(screen.getByText("Courses")).toBeInTheDocument();
+    expect(screen.queryByText("123")).not.toBeInTheDocument();
+    expect(screen.queryByText("456")).not.toBeInTheDocument();
   });
 });
