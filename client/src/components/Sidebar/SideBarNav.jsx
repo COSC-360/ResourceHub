@@ -11,25 +11,7 @@ function SideBarNav() {
 
       <li>
         <NavLink
-          to="/course-discussions"
-          className={({ isActive }) => (isActive ? "active-link" : "")}
-        >
-          Course Discussions
-        </NavLink>
-      </li>
-
-      <li>
-        <NavLink
-          to="/course-resources"
-          className={({ isActive }) => (isActive ? "active-link" : "")}
-        >
-          Course Resources
-        </NavLink>
-      </li>
-
-      <li>
-        <NavLink
-          to="/my-courses"
+          to="/courses"
           end
           className={({ isActive }) => (isActive ? "active-link" : "")}
         >
@@ -39,19 +21,10 @@ function SideBarNav() {
 
       <li>
         <NavLink
-          to="/my-courses/add"
+          to="/courses/add"
           className={({ isActive }) => (isActive ? "active-link" : "")}
         >
           All Courses
-        </NavLink>
-      </li>
-
-      <li>
-        <NavLink
-          to="/start-discussion"
-          className={({ isActive }) => (isActive ? "active-link" : "")}
-        >
-          Start Discussion
         </NavLink>
       </li>
     </ul>
