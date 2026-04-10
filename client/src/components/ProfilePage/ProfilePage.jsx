@@ -13,6 +13,12 @@ import {
   validateProfileTextFields,
   validateUsername,
 } from "../../lib/formValidation.js";
+import {
+  CUSTOM_FACULTY_VALUE,
+  FACULTY_OPTIONS,
+  facultySelectionFromValue,
+  facultyValueFromSelection,
+} from "../../lib/facultyOptions.js";
 
 function token() {
   return localStorage.getItem("access_token");
@@ -58,9 +64,10 @@ export function ProfilePage() {
   const [draft, setDraft] = useState({
     username: "",
     email: "",
-    faculty: "",
     bio: "",
   });
+  const [selectedFaculty, setSelectedFaculty] = useState("");
+  const [customFaculty, setCustomFaculty] = useState("");
   const [saveErr, setSaveErr] = useState(null);
   const [file, setFile] = useState(null);
   /** Per-user cache-bust token after a successful save (avoids syncing photo version in an effect). */
@@ -181,15 +188,14 @@ export function ProfilePage() {
   if (!profile) return <div className="profile-page">No profile.</div>;
 
   const startEdit = () => {
-    const fac = profile.faculty;
-    const facultyDraft =
-      fac && fac !== "None" ? String(fac) : "";
+    const { selected, custom } = facultySelectionFromValue(profile.faculty);
     setDraft({
       username: profile.username ?? "",
       email: profile.email ?? "",
-      faculty: facultyDraft,
       bio: profile.bio ?? "",
     });
+    setSelectedFaculty(selected);
+    setCustomFaculty(custom);
     setSaveErr(null);
     setEditing(true);
   };
@@ -197,6 +203,7 @@ export function ProfilePage() {
   const save = async () => {
     const username = draft.username.trim();
     const email = draft.email.trim();
+    const facultyValue = facultyValueFromSelection(selectedFaculty, customFaculty);
     const userErr = validateUsername(username);
     if (userErr) {
       setSaveErr(userErr);
@@ -210,7 +217,7 @@ export function ProfilePage() {
       setSaveErr("Please enter a valid email address.");
       return;
     }
-    const textErr = validateProfileTextFields(draft.faculty, draft.bio);
+    const textErr = validateProfileTextFields(facultyValue, draft.bio);
     if (textErr) {
       setSaveErr(textErr);
       return;
@@ -220,7 +227,7 @@ export function ProfilePage() {
       const formData = new FormData();
       formData.append("username", username);
       formData.append("email", email);
-      formData.append("faculty", draft.faculty.trim());
+      formData.append("faculty", facultyValue);
       formData.append("bio", draft.bio);
       if (file) formData.append("file", file);
       if (authUser?.admin && routeUserId) {
@@ -310,15 +317,28 @@ export function ProfilePage() {
             </label>
             <label>
               Faculty:
-              <input
-                value={draft.faculty}
-                onChange={(e) =>
-                  setDraft((d) => ({ ...d, faculty: e.target.value }))
-                }
-                placeholder="e.g. Engineering"
-                maxLength={200}
-              />
+              <select
+                value={selectedFaculty}
+                onChange={(e) => setSelectedFaculty(e.target.value)}
+              >
+                <option value="">Select your faculty</option>
+                {FACULTY_OPTIONS.map((option) => (
+                  <option key={option} value={option}>{option}</option>
+                ))}
+                <option value={CUSTOM_FACULTY_VALUE}>Custom</option>
+              </select>
             </label>
+            {selectedFaculty === CUSTOM_FACULTY_VALUE && (
+              <label>
+                Custom Faculty:
+                <input
+                  value={customFaculty}
+                  onChange={(e) => setCustomFaculty(e.target.value)}
+                  placeholder="Enter your faculty"
+                  maxLength={200}
+                />
+              </label>
+            )}
             <label>
               Bio:
               <textarea

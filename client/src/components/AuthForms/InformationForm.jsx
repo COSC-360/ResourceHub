@@ -5,12 +5,20 @@ import { apiClient } from "../../lib/api-client";
 import { HOMEROUTE, REGISTER_ROUTE } from "../../constants/RouteConstants.jsx";
 import { validateProfileTextFields } from "../../lib/formValidation.js";
 import ProfileAvatar from "../ProfileAvatar/ProfileAvatar.jsx";
+import {
+  CUSTOM_FACULTY_VALUE,
+  FACULTY_OPTIONS,
+  facultyValueFromSelection,
+} from "../../lib/facultyOptions.js";
 
 const InformationForm = () => {
   const [file, setFile] = useState(null);
-  const [formData, setFormData] = useState({ bio: "", faculty: "" });
+  const [formData, setFormData] = useState({ bio: "" });
+  const [selectedFaculty, setSelectedFaculty] = useState("");
+  const [customFaculty, setCustomFaculty] = useState("");
   const [error, setError] = useState(null);
-  const present = file || formData.bio.trim() || formData.faculty.trim();
+  const facultyValue = facultyValueFromSelection(selectedFaculty, customFaculty);
+  const present = file || formData.bio.trim() || facultyValue;
   const fileCurrentRef = useRef(null);
 
   const router = useNavigate();
@@ -37,6 +45,16 @@ const InformationForm = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleFacultySelect = (e) => {
+    setError(null);
+    setSelectedFaculty(e.target.value);
+  };
+
+  const handleCustomFacultyChange = (e) => {
+    setError(null);
+    setCustomFaculty(e.target.value);
+  };
+
   const resetFile = () => {
     if (file && fileCurrentRef.current) {
       fileCurrentRef.current = "";
@@ -51,7 +69,7 @@ const InformationForm = () => {
       router(HOMEROUTE);
       return;
     }
-    const textErr = validateProfileTextFields(formData.faculty, formData.bio);
+    const textErr = validateProfileTextFields(facultyValue, formData.bio);
     if (textErr) {
       setError(textErr);
       return;
@@ -66,7 +84,7 @@ const InformationForm = () => {
         const data = new FormData();
         data.append("bio", formData.bio);
         if (file) data.append("file", file);
-        data.append("faculty", formData.faculty);
+        data.append("faculty", facultyValue);
         await apiClient("/api/user/updateProfile", {
           method: "PATCH",
           body: data,
@@ -142,16 +160,31 @@ const InformationForm = () => {
 
           <div className="information-form__field">
             <label htmlFor="faculty">Faculty</label>
-            <textarea
+            <select
               className="information-form__textarea information-form__textarea--short"
               id="faculty"
               name="faculty"
-              onChange={handleChange}
-              value={formData.faculty}
-              maxLength={200}
-              rows={2}
-              placeholder="e.g. Computer Science, Engineering…"
-            />
+              onChange={handleFacultySelect}
+              value={selectedFaculty}
+            >
+              <option value="">Select your faculty</option>
+              {FACULTY_OPTIONS.map((option) => (
+                <option key={option} value={option}>{option}</option>
+              ))}
+              <option value={CUSTOM_FACULTY_VALUE}>Custom</option>
+            </select>
+
+            {selectedFaculty === CUSTOM_FACULTY_VALUE && (
+              <input
+                className="information-form__textarea information-form__textarea--short"
+                id="faculty-custom"
+                name="facultyCustom"
+                onChange={handleCustomFacultyChange}
+                value={customFaculty}
+                maxLength={200}
+                placeholder="Enter your faculty"
+              />
+            )}
           </div>
         </section>
         <input
