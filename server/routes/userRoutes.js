@@ -199,5 +199,4 @@ userRoutes.delete("/hide", verifyAccessToken, userController.hideUserCourses);
 userRoutes.get("/verifytoken", verifyAccessToken, userController.verifyToken);
 
 //Everything past this point requires admin privileges
-userRoutes.get("/admin/admins", requireAdmin, userController.getAdmins);
 userRoutes.get("/admin/users", requireAdmin, userController.searchUsers);

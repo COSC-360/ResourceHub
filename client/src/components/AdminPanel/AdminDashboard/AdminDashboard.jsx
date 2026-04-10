@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { apiClient } from "../../../lib/api-client";
+import "./AdminDashboard.css";
 
 export function AdminDashboard() {
   const [admins, setAdmins] = useState([]);
@@ -10,7 +11,7 @@ export function AdminDashboard() {
     const accessToken = localStorage.getItem("access_token");
     let cancelled = false;
 
-    apiClient("/api/user/admin/admins", {
+    apiClient("/api/user/admin/users?isAdmin=true", {
       headers: { Authorization: `Bearer ${accessToken}` },
     })
       .then((response) => {
@@ -32,7 +33,7 @@ export function AdminDashboard() {
   }, []);
 
   return (
-    <div>
+    <div className="admin-dashboard">
       <h1>Admin Dashboard</h1>
       <h2>Site administrators</h2>
 
@@ -44,14 +45,24 @@ export function AdminDashboard() {
       )}
 
       {!loading && !error && admins.length > 0 && (
-        <ul>
-          {admins.map((admin) => (
-            <li key={admin._id || admin.email}>
-              <strong>{admin.username || "Unknown user"}</strong>
-              {admin.email ? ` (${admin.email})` : ""}
-            </li>
-          ))}
-        </ul>
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Faculty</th>
+            </tr>
+          </thead>
+          <tbody>
+            {admins.map((admin) => (
+              <tr key={admin._id || admin.email}>
+                <td>{admin.username || "Unknown user"}</td>
+                <td>{admin.email || "—"}</td>
+                <td>{admin.faculty || "—"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
     </div>
   );
