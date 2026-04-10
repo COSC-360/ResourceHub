@@ -60,7 +60,9 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
       const transformedData = rows.map((discussion) => ({
         username: discussion.username,
         title: discussion.title,
-        timeline: discussion.updatedAt,
+        timeline: discussion.createdAt || discussion.updatedAt,
+        createdAt: discussion.createdAt,
+        updatedAt: discussion.updatedAt,
         faculty: discussion.faculty,
         comment: discussion.content,
         up_votes: discussion.upvotes,
@@ -291,9 +293,10 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
     return `${years} year${years !== 1 ? "s" : ""} ago`;
   };
 
+  const postedAt = post_props.createdAt || post_props.timeline || post_props.updatedAt;
   const date = useMemo(
-    () => timeAgo(new Date(post_props.timeline), new Date()),
-    [post_props.timeline],
+    () => (postedAt ? timeAgo(new Date(postedAt), new Date()) : "Undefined"),
+    [postedAt],
   );
 
   useEffect(() => {

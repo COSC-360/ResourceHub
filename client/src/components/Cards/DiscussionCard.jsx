@@ -66,10 +66,14 @@ export default function DiscussionCard({
   const replyHref =
     discussionId && courseId ? courseDiscussionPath(courseId, discussionId) : null;
 
-  const createdAt = merged?.updatedAt || merged?.createdAt || data?.createdAt || data?.updatedAt;
+  const postedAt =
+    merged?.createdAt ||
+    data?.createdAt ||
+    merged?.updatedAt ||
+    data?.updatedAt;
   const timeStr = useMemo(() => {
-    return createdAt ? timeAgo(new Date(createdAt)) : "";
-  }, [createdAt]);
+    return postedAt ? timeAgo(new Date(postedAt)) : "";
+  }, [postedAt]);
 
   useEffect(() => {
     let cancelled = false;
