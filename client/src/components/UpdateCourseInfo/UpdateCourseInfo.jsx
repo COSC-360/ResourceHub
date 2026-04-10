@@ -99,6 +99,9 @@ export default function UpdateCourseInfo({ asModal = false, onClose, onUpdated, 
       const payload = await apiClient(`/api/courses/${courseId}/updateimage`, {
         method: "PATCH",
         body: fd,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
       });
 
       const updatedCourse = payload?.data;
