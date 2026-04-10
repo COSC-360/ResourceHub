@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import DiscussionCard from "../Cards/DiscussionCard.jsx";
 import { apiClient } from "../../lib/api-client";
 import Reply from "./Reply.jsx";
@@ -26,7 +26,7 @@ export default function Replies({
 		? Math.max(0, Number(expectedCount))
 		: undefined;
 
-	async function loadReplies() {
+	const loadReplies = useCallback(async () => {
 		if (!parentId) return;
 
 		try {
@@ -47,12 +47,12 @@ export default function Replies({
 		} finally {
 			setIsLoading(false);
 		}
-	}
+	}, [parentId]);
 
 	useEffect(() => {
 		if (!expanded || loaded) return;
 		loadReplies();
-	}, [expanded, loaded, parentId]);
+	}, [expanded, loaded, loadReplies]);
 
 	function toggleExpanded() {
 		setExpanded((prev) => !prev);

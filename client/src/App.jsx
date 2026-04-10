@@ -6,7 +6,6 @@ import Header from "./components/Header/Header.jsx";
 import SearchResults from "./components/SearchResults/SearchResults.jsx";
 import CoursePage from "./components/CoursePage/CoursePage.jsx";
 import DiscussionPage from "./components/DiscussionPage/DiscussionPage.jsx";
-import Feed from "./pages/Feed.jsx";
 import Sidebar from "./components/Sidebar/Sidebar.jsx";
 import AdminSidebar from "./components/AdminPanel/AdminSidebar/AdminSidebar.jsx";
 import LoginForm from "./components/AuthForms/LoginForm.jsx";

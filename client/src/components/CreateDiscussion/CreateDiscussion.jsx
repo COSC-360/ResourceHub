@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { apiClient } from "../../lib/api-client";
 import "../CreateDiscussion/CreateDiscussion.css";
 
@@ -18,7 +17,6 @@ const CreateDiscussion = ({
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   const [open, setOpen] = useState(embedded);
-  const router = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;

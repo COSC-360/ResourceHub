@@ -2,7 +2,6 @@ import { useContext } from "react";
 import { SearchBar } from "../SearchBar/SearchBar"
 import { ProfileHeader } from "../ProfileHeader/ProfileHeader"
 import { Logo } from "../Logo/Logo"
-import { useEffect, useState } from "react";
 import "./Header.css"
 import Breadcrumbs from "../Breadcrumbs/Breadcrumbs";
 import AuthContext from "../../AuthContext.jsx";

@@ -34,8 +34,8 @@ export async function getProfilePhoto(req, res) {
   let found = null;
   try {
     found = await userService.getUserById(id);
-  } catch (err) {
-    return res.status(404).json({ error: "User not found" });
+  } catch {
+    return res.status(404).json({ error: "user not found" });
   }
 
   if (!found) {

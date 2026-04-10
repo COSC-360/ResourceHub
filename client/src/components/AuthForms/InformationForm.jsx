@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import "./AuthForms.css";
 import defaultAvatar from "../../assets/profile.svg";
 import { useNavigate } from "react-router-dom";

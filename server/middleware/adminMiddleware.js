@@ -36,7 +36,7 @@ export async function requireAdmin(req, res, next) {
       };
 
       next();
-    } catch (error) {
+    } catch {
       res.status(500).json({ error: "Unable to verify admin permissions" });
     }
   });
