@@ -14,25 +14,31 @@ export default function VoteControls({
   activeClassName = "active",
 }) {
   const navigate = useNavigate();
-  const [voteState, setVoteState] = useState(() => ({
+  const propsState = {
     targetId,
     upvotes: Number(initialUpvotes) || 0,
     downvotes: Number(initialDownvotes) || 0,
     hasUpvote: Boolean(initialHasUpvote),
     hasDownvote: Boolean(initialHasDownvote),
+  };
+
+  const [voteState, setVoteState] = useState(() => ({
+    ...propsState,
   }));
   const [voteBusy, setVoteBusy] = useState(false);
 
+  const sameTarget = String(voteState.targetId) === String(targetId);
+  const propsChangedForSameTarget =
+    sameTarget &&
+    (voteState.upvotes !== propsState.upvotes ||
+      voteState.downvotes !== propsState.downvotes ||
+      voteState.hasUpvote !== propsState.hasUpvote ||
+      voteState.hasDownvote !== propsState.hasDownvote);
+
   const current =
-    String(voteState.targetId) === String(targetId)
-      ? voteState
-      : {
-          targetId,
-          upvotes: Number(initialUpvotes) || 0,
-          downvotes: Number(initialDownvotes) || 0,
-          hasUpvote: Boolean(initialHasUpvote),
-          hasDownvote: Boolean(initialHasDownvote),
-        };
+    !sameTarget || (!voteBusy && propsChangedForSameTarget)
+      ? propsState
+      : voteState;
 
   const updateCurrentState = (next) => {
     setVoteState({
