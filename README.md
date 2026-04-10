@@ -4,32 +4,6 @@
 
 ## How to Run
 
-You need to run both the front and backend. You will need two terminals for this.
-
-1. Running the frontend
-
-in one of the terminals, make sure your current directory is `.../client`, then run:
-~~~
-npm run dev
-~~~
-
-if you run into import/module issues, try running:
-~~~
-npm install
-~~~
-
-2. Running the backend
-
-in the other terminal, make sure your current directory is `.../server`, then run:
-~~~
-node server.js
-~~~
-
-if you run into import/module issues, try running:
-~~~
-npm install
-~~~
-
 ### Running with Docker (Recommended)
 
 This project can be run using Docker, which starts the frontend, backend, and MongoDB together.
@@ -79,6 +53,32 @@ docker compose exec server npm install
 
 
 While the docker container is running in a different terminal window. Client or server keyword dependent on where the package needs to be installed.
+
+### Running from a Tarball Release
+
+If you downloaded a release tarball instead of cloning the repository:
+
+1. Extract the archive:
+
+~~~
+tar -xzf ResourceHub-alpha-YYYY-MM-DD-HHMM.tar.gz
+~~~
+
+2. Move into the extracted folder.
+
+3. Create the backend environment file if needed:
+
+~~~
+cp server/.env.example server/.env
+~~~
+
+4. Fill in the required environment variables in `server/.env`.
+
+5. Start the app with Docker:
+
+~~~
+docker compose up --build
+~~~
 
 ## Environment Variables
 
