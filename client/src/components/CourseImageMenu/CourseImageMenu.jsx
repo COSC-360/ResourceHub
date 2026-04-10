@@ -43,6 +43,12 @@ export default function CourseImageMenu({ courseId, onUpdated, disabled = false 
   async function uploadImage(file) {
     if (!courseId || !file) return;
 
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      setError("You must be logged in to upload an image.");
+      return;
+    }
+
     const fd = new FormData();
     fd.append("image", file);
 
@@ -52,9 +58,7 @@ export default function CourseImageMenu({ courseId, onUpdated, disabled = false 
       const payload = await apiClient(`/api/courses/${courseId}/updateimage`, {
         method: "PATCH",
         body: fd,
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       onUpdated?.(payload?.data ?? null);

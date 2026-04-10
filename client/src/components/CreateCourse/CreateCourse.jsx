@@ -183,8 +183,10 @@ export default function CreateCourse({
             headers: token ? { Authorization: `Bearer ${token}` } : {},
           });
           finalCourse = imagePayload?.data ?? finalCourse;
-        } catch {
-          finalCourse = createdCourse.data;
+        } catch (uploadErr) {
+          setError(uploadErr.message || "Course created, but image upload failed. You can upload an image later.");
+          onCreated?.(createdCourse.data);
+          return;
         }
       }
 
