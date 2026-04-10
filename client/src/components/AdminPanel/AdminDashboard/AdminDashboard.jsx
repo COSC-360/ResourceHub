@@ -9,7 +9,6 @@ export function AdminDashboard() {
   useEffect(() => {
     const accessToken = localStorage.getItem("access_token");
     let cancelled = false;
-    setLoading(true);
 
     apiClient("/api/user/admin/admins", {
       headers: { Authorization: `Bearer ${accessToken}` },
