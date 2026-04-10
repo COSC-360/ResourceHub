@@ -1,5 +1,9 @@
 import { Discussion } from "../models/discussion.js";
 
+function escapeRegex(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 export const DiscussionRepository = {
   async save(discussion) {
     return discussion.save();
@@ -69,10 +73,11 @@ export const DiscussionRepository = {
     }
 
     if (typeof term === "string" && term.trim()) {
-      const safeTerm = term.trim();
+      const normalizedTerm = term.trim().slice(0, 120);
+      const escapedTerm = escapeRegex(normalizedTerm);
       queryList.$or = [
-        { title: { $regex: safeTerm, $options: "i" } },
-        { content: { $regex: safeTerm, $options: "i" } },
+        { title: { $regex: escapedTerm, $options: "i" } },
+        { content: { $regex: escapedTerm, $options: "i" } },
       ];
     }
 
@@ -168,8 +173,10 @@ export const DiscussionRepository = {
 
   //This is currently searching by the title field.
   async search(searchTerm) {
+    const normalizedTerm = String(searchTerm ?? "").trim().slice(0, 120);
+    const escapedTerm = escapeRegex(normalizedTerm);
     return await Discussion.find({
-      title: { $regex: searchTerm, $options: "i" },
+      title: { $regex: escapedTerm, $options: "i" },
     }).sort({ timestamp: -1 });
   },
 

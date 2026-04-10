@@ -1,13 +1,56 @@
 import * as commonService from "../services/commonService.js";
 import * as voteService from "../services/voteService.js";
+import mongoose from "mongoose";
+
+const SEARCH_ALLOWED_TYPES = new Set(["discussion", "course"]);
 
 function parseCsv(value) {
-    if (!value || typeof value !== "string") return [];
+    if (!value) return [];
 
-    return value
-        .split(",")
+    if (Array.isArray(value)) {
+        return value
+            .map((item) => String(item).trim())
+            .map((item) => item.replace(/^['"]+|['"]+$/g, ""))
+            .filter(Boolean);
+    }
+
+    if (typeof value !== "string") return [];
+
+    const raw = value.trim();
+    if (!raw) return [];
+
+    if (raw.startsWith("[") && raw.endsWith("]")) {
+        try {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) {
+                return parsed
+                    .map((item) => String(item).trim())
+                    .map((item) => item.replace(/^['"]+|['"]+$/g, ""))
+                    .filter(Boolean);
+            }
+        } catch {
+            // fall through to CSV parsing
+        }
+    }
+
+    return raw
+        .split(/[\n,]/)
         .map((item) => item.trim())
+        .map((item) => item.replace(/^['"]+|['"]+$/g, ""))
         .filter(Boolean);
+}
+
+function hasInvalidObjectId(ids = []) {
+    return ids.some((id) => !mongoose.Types.ObjectId.isValid(id));
+}
+
+function parseSearchTypes(value) {
+    const parsed = parseCsv(value).map((item) => item.toLowerCase());
+    if (parsed.length === 0) return ["discussion", "course"];
+
+    const types = parsed.filter((type) => SEARCH_ALLOWED_TYPES.has(type));
+    if (types.length === 0) return null;
+    return types;
 }
 
 function parseBoolean(value) {
@@ -34,18 +77,37 @@ export async function search(req, res) {
         return;
     }
 
-    const results = await commonService.search({
-        term: searchTerm,
-        courseIds: parseCsv(req.query.courseIds),
-        sortOrder: req.query.sortOrder === "asc" ? "asc" : "desc",
-        page: parsePositiveInt(req.query.page, 1),
-        limit: Math.min(parsePositiveInt(req.query.limit, 20), 100),
-        deleted: parseBoolean(req.query.deleted),
-        edited: parseBoolean(req.query.edited),
-        hasReplies: parseBoolean(req.query.hasReplies),
-        topLevelOnly: parseBoolean(req.query.topLevelOnly) ?? true,
-    });
-    res.json({ searchResults: results });
+    const courseIds = parseCsv(req.query.courseIds);
+    if (courseIds.length && hasInvalidObjectId(courseIds)) {
+        return res.status(400).json({
+            error: "Invalid courseIds. Use comma-separated Mongo ObjectIds.",
+        });
+    }
+
+    const types = parseSearchTypes(req.query.types);
+    if (!types) {
+        return res.status(400).json({ error: "Invalid types query param" });
+    }
+
+    try {
+        const results = await commonService.search({
+            term: searchTerm,
+            courseIds,
+            types,
+            sortOrder: req.query.sortOrder === "asc" ? "asc" : "desc",
+            page: parsePositiveInt(req.query.page, 1),
+            limit: Math.min(parsePositiveInt(req.query.limit, 20), 100),
+            deleted: parseBoolean(req.query.deleted),
+            edited: parseBoolean(req.query.edited),
+            hasReplies: parseBoolean(req.query.hasReplies),
+            topLevelOnly: parseBoolean(req.query.topLevelOnly) ?? true,
+        });
+
+        return res.json({ searchResults: results });
+    } catch (error) {
+        const message = error instanceof Error ? error.message : "Unknown error";
+        return res.status(500).json({ error: message });
+    }
 }
 
 export async function feed(req, res) {

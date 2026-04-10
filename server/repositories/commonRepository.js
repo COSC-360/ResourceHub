@@ -2,10 +2,11 @@ import { DiscussionRepository } from "./discussionRepository.js";
 import * as ResourceRepository from "./resource.repository.js";
 import courseRepository from "./courseRepository.js";
 
-export async function search(searchTerm) {
+export async function search(searchParams) {
     const defaults = {
         term: "",
         courseIds: [],
+        types: ["discussion", "course"],
         sortOrder: "desc",
         page: 1,
         limit: 20,
@@ -16,34 +17,42 @@ export async function search(searchTerm) {
     };
 
     const input =
-        typeof searchTerm === "string"
-            ? { ...defaults, term: searchTerm }
-            : { ...defaults, ...(searchTerm ?? {}) };
+        typeof searchParams === "string"
+            ? { ...defaults, term: searchParams }
+            : { ...defaults, ...(searchParams ?? {}) };
+
+    const types = Array.isArray(input.types) ? input.types : defaults.types;
+    const includeDiscussions = types.includes("discussion");
+    const includeCourses = types.includes("course");
 
     const scopedCourseIds = Array.isArray(input.courseIds)
         ? input.courseIds.filter(Boolean)
         : [];
 
-    const discussions = await DiscussionRepository.findByFilters({
-        courseIds: scopedCourseIds,
-        deleted: input.deleted,
-        edited: input.edited,
-        hasReplies: input.hasReplies,
-        parentId: input.topLevelOnly === false ? undefined : null,
-        term: input.term,
-        sortBy: "createdAt",
-        sortOrder: input.sortOrder,
-        page: input.page,
-        limit: input.limit,
-    });
+    const discussions = includeDiscussions
+        ? await DiscussionRepository.findByFilters({
+              courseIds: scopedCourseIds,
+              deleted: input.deleted,
+              edited: input.edited,
+              hasReplies: input.hasReplies,
+              parentId: input.topLevelOnly === false ? undefined : null,
+              term: input.term,
+              sortBy: "createdAt",
+              sortOrder: input.sortOrder,
+              page: input.page,
+              limit: input.limit,
+          })
+        : [];
 
-    const courses = await courseRepository.search({
-        term: input.term,
-        scopedCourseIds,
-        page: input.page,
-        limit: input.limit,
-        sortOrder: input.sortOrder,
-    });
+    const courses = includeCourses
+        ? await courseRepository.search({
+              term: input.term,
+              scopedCourseIds,
+              page: input.page,
+              limit: input.limit,
+              sortOrder: input.sortOrder,
+          })
+        : [];
 
     return { discussions, courses };
 }

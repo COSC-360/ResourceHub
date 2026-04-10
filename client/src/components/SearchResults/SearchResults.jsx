@@ -26,7 +26,7 @@ export function SearchResults() {
 
       try {
         const data = await apiClient(
-          `/api/common/search?term=${encodeURIComponent(term)}`,
+          `/api/common/search?term=${encodeURIComponent(term)}&types=course`,
           {
             method: "GET",
           },

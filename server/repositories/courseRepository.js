@@ -1,5 +1,9 @@
 import { Course } from "../models/course.js";
 
+function escapeRegex(value) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 export const courseRepository = {
     async findById(id) {
         return Course.findById(id);
@@ -103,11 +107,12 @@ export const courseRepository = {
         }
 
         if (typeof term === "string" && term.trim()) {
-            const safeTerm = term.trim();
+            const normalizedTerm = term.trim().slice(0, 120);
+            const escapedTerm = escapeRegex(normalizedTerm);
             query.$or = [
-                { name: { $regex: safeTerm, $options: "i" } },
-                { code: { $regex: safeTerm, $options: "i" } },
-                { description: { $regex: safeTerm, $options: "i" } },
+                { name: { $regex: escapedTerm, $options: "i" } },
+                { code: { $regex: escapedTerm, $options: "i" } },
+                { description: { $regex: escapedTerm, $options: "i" } },
             ];
         }
 
