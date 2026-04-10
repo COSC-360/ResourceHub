@@ -86,4 +86,9 @@ If there are issues with npm packages not resolving while the docker container i
 
 docker compose exec client npm install
 
-While the docker container is running in a different terminal window.
+or
+
+docker compose exec server npm install
+
+
+While the docker container is running in a different terminal window. Client or server keyword dependent on where the package needs to be installed.
