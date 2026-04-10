@@ -11,6 +11,8 @@ import Comment from "../Comment/Comment";
 import ProfileAvatar from "../ProfileAvatar/ProfileAvatar.jsx";
 import { useNavigate } from "react-router-dom";
 import { LOGIN_ROUTE } from "../../constants/RouteConstants.jsx";
+import { createdAtFromObjectId } from "../../lib/dateUtils";
+import { displayFaculty } from "../../lib/userUtils";
 import {
   LIMITS,
   trimStr,
@@ -33,7 +35,7 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
   const [hasDownvote, setHasDownvote] = useState(post_props.hasDownvote);
   const [replies, setReplies] = useState(post_props.replies);
   const [username, setUsername] = useState("Unknown User");
-  const [faculty, setFaculty] = useState("None");
+  const [faculty, setFaculty] = useState("No Faculty");
 
   const [comments, setComments] = useState([]);
   const [showComments, setShowComments] = useState(false);
@@ -42,6 +44,13 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
   const router = useNavigate();
   const seenReplyIdsRef = useRef(new Set());
   const showCommentsRef = useRef(showComments);
+  const [postedAt] = useState(
+    () =>
+      post_props.createdAt ||
+      createdAtFromObjectId(post_props._id || post_props.id) ||
+      post_props.timeline ||
+      null,
+  );
 
   useEffect(() => {
     showCommentsRef.current = showComments;
@@ -60,7 +69,11 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
       const transformedData = rows.map((discussion) => ({
         username: discussion.username,
         title: discussion.title,
-        timeline: discussion.updatedAt,
+        timeline:
+          discussion.createdAt ||
+          createdAtFromObjectId(discussion._id || discussion.id),
+        createdAt: discussion.createdAt,
+        updatedAt: discussion.updatedAt,
         faculty: discussion.faculty,
         comment: discussion.content,
         up_votes: discussion.upvotes,
@@ -292,8 +305,8 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
   };
 
   const date = useMemo(
-    () => timeAgo(new Date(post_props.timeline), new Date()),
-    [post_props.timeline],
+    () => (postedAt ? timeAgo(new Date(postedAt), new Date()) : "Undefined"),
+    [postedAt],
   );
 
   useEffect(() => {
@@ -358,7 +371,7 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
           `http://localhost:3000/api/user/getUserById/${post_props.authorid}`,
         );
         setUsername(response.data.username);
-        setFaculty(response.data.faculty);
+        setFaculty(displayFaculty(response.data.faculty));
       } catch (err) {
         console.log(err);
       }
