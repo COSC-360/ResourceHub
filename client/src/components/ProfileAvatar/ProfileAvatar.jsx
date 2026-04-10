@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import defaultAvatar from "../../assets/profile.svg";
 import "./ProfileAvatar.css";
 
@@ -23,22 +23,16 @@ export default function ProfileAvatar({
   onError,
   ...imgProps
 }) {
-  const [errored, setErrored] = useState(false);
-  const [filePreviewUrl, setFilePreviewUrl] = useState("");
+  const filePreviewUrl = useMemo(
+    () => (file ? URL.createObjectURL(file) : ""),
+    [file],
+  );
 
   useEffect(() => {
-    if (!file) {
-      setFilePreviewUrl("");
-      return;
-    }
-    const previewUrl = URL.createObjectURL(file);
-    setFilePreviewUrl(previewUrl);
-    return () => URL.revokeObjectURL(previewUrl);
-  }, [file]);
-
-  useEffect(() => {
-    setErrored(false);
-  }, [userId, src, version, filePreviewUrl]);
+    return () => {
+      if (filePreviewUrl) URL.revokeObjectURL(filePreviewUrl);
+    };
+  }, [filePreviewUrl]);
 
   const resolvedSrc = useMemo(() => {
     if (filePreviewUrl) return filePreviewUrl;
@@ -57,11 +51,13 @@ export default function ProfileAvatar({
 
   return (
     <img
-      src={errored ? defaultAvatar : resolvedSrc}
+      src={resolvedSrc}
       alt={alt}
       className={avatarClassName}
       onError={(event) => {
-        setErrored(true);
+        if (event.currentTarget.src !== defaultAvatar) {
+          event.currentTarget.src = defaultAvatar;
+        }
         onError?.(event);
       }}
       {...imgProps}
