@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import "./CourseForm.css";
+import { LIMITS } from "../../lib/formValidation.js";
 
 export default function CourseForm({
   asModal = false,
@@ -97,6 +98,7 @@ export default function CourseForm({
             value={formData.name}
             onChange={onChange}
             required
+            maxLength={LIMITS.COURSE_NAME_MAX}
             disabled={controlsDisabled}
           />
         </fieldset>
@@ -113,6 +115,7 @@ export default function CourseForm({
             value={formData.code}
             onChange={onChange}
             required
+            maxLength={LIMITS.COURSE_CODE_MAX}
             disabled={controlsDisabled}
           />
         </fieldset>
@@ -128,6 +131,7 @@ export default function CourseForm({
             className="course-form__textarea"
             value={formData.description}
             onChange={onChange}
+            maxLength={LIMITS.COURSE_DESC_MAX}
             disabled={controlsDisabled}
           />
         </fieldset>

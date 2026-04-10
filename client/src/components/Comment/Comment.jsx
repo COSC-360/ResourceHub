@@ -4,6 +4,7 @@ import "./Comment.css";
 import { apiClient } from "../../lib/api-client";
 import { useNavigate } from "react-router-dom";
 import { LOGIN_ROUTE } from "../../constants/RouteConstants.jsx";
+import { LIMITS, trimStr, validateMaxLength } from "../../lib/formValidation.js";
 
 const Comment = ({ onSubmit, parentid, parentUsername, courseId: _courseId }) => {
   const [formData, setFormData] = useState({ content: "" });
@@ -22,30 +23,46 @@ const Comment = ({ onSubmit, parentid, parentUsername, courseId: _courseId }) =>
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
+    const trimmed = trimStr(formData.content);
+    if (!trimmed && !file) {
+      setError("Enter a comment or attach an image.");
+      return;
+    }
+    if (!parentid) {
+      setError("Cannot post comment without reference.");
+      return;
+    }
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      router(LOGIN_ROUTE);
+      return;
+    }
+    const fullContent = `@${parentUsername} ${trimmed}`.trimEnd();
+    const lenErr = validateMaxLength(
+      fullContent,
+      LIMITS.DISCUSSION_CONTENT_MAX,
+      "Comment",
+    );
+    if (lenErr) {
+      setError(lenErr);
+      return;
+    }
+    setLoading(true);
     try {
-      (async () => {
-        const token = localStorage.getItem("access_token");
-        const data = new FormData();
-        if (!token) {
-          router(LOGIN_ROUTE);
-          return;
-        }
-        data.append("content", `@${parentUsername} ${formData.content}`);
-        if (!parentid)
-          throw new Error("Cannot post comment without reference.");
-        data.append("parentid", parentid);
-        if (file) data.append("file", file);
-        await apiClient(`/api/discussion`, {
-          method: "POST",
-          body: data,
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        onSubmit();
-      })();
+      const data = new FormData();
+      data.append("content", fullContent);
+      data.append("parentid", parentid);
+      if (file) data.append("file", file);
+      await apiClient(`/api/discussion`, {
+        method: "POST",
+        body: data,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setFormData({ content: "" });
+      onSubmit();
     } catch (err) {
       setError(err?.message || "Failed to post comment");
     } finally {
@@ -91,6 +108,7 @@ const Comment = ({ onSubmit, parentid, parentUsername, courseId: _courseId }) =>
           onChange={handleChange}
           value={formData.content}
           name="content"
+          maxLength={LIMITS.DISCUSSION_CONTENT_MAX}
         />
         <input type="submit" />
       </div>

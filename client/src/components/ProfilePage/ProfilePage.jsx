@@ -8,6 +8,11 @@ import {
   courseDiscussionPath,
   LOGIN_ROUTE,
 } from "../../constants/RouteConstants.jsx";
+import {
+  isValidEmail,
+  validateProfileTextFields,
+  validateUsername,
+} from "../../lib/formValidation.js";
 
 function token() {
   return localStorage.getItem("access_token");
@@ -192,8 +197,22 @@ export function ProfilePage() {
   const save = async () => {
     const username = draft.username.trim();
     const email = draft.email.trim();
-    if (!username || !email) {
-      setSaveErr("Username and email required.");
+    const userErr = validateUsername(username);
+    if (userErr) {
+      setSaveErr(userErr);
+      return;
+    }
+    if (!email) {
+      setSaveErr("Email is required.");
+      return;
+    }
+    if (!isValidEmail(email)) {
+      setSaveErr("Please enter a valid email address.");
+      return;
+    }
+    const textErr = validateProfileTextFields(draft.faculty, draft.bio);
+    if (textErr) {
+      setSaveErr(textErr);
       return;
     }
     setSaveErr(null);
@@ -282,6 +301,7 @@ export function ProfilePage() {
                 onChange={(e) =>
                   setDraft((d) => ({ ...d, username: e.target.value }))
                 }
+                maxLength={64}
               />
             </label>
             <label>
@@ -292,6 +312,7 @@ export function ProfilePage() {
                 onChange={(e) =>
                   setDraft((d) => ({ ...d, email: e.target.value }))
                 }
+                autoComplete="email"
               />
             </label>
             <label>
@@ -302,6 +323,7 @@ export function ProfilePage() {
                   setDraft((d) => ({ ...d, faculty: e.target.value }))
                 }
                 placeholder="e.g. Engineering"
+                maxLength={200}
               />
             </label>
             <label>
@@ -312,6 +334,7 @@ export function ProfilePage() {
                 onChange={(e) =>
                   setDraft((d) => ({ ...d, bio: e.target.value }))
                 }
+                maxLength={2000}
               />
             </label>
           </div>
