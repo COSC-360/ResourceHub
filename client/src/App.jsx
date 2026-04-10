@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { Routes, Route, Outlet, Navigate } from "react-router-dom";
+import { Routes, Route, Outlet } from "react-router-dom";
 import "./components/Feed/FeedPost.jsx";
 import "./App.css";
 import Header from "./components/Header/Header.jsx";
@@ -92,9 +92,6 @@ function App() {
               </AdminRoute>
             }
           />
-
-          {/* redirect /courses to home */}
-          <Route path="/courses" element={<Navigate to="/" replace />} />
         </Route>
 
         <Route
