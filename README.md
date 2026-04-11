@@ -56,7 +56,7 @@ docker compose up --build
 #### Access the application
 
 - Frontend: http://localhost:5173  
-- Backend: http://localhost:3000  
+- Backend: http://localhost:3000/api-docs  
 
 #### Stop the application
 
@@ -90,7 +90,7 @@ If you downloaded a release tarball instead of cloning the repository:
 tar -xzf ResourceHub-v1.0.0.tar.gz
 ~~~
 
-2. Move into the extracted folder.
+2. After extraction, in your terminal, move to the root directory of that extracted file (e.g., ResourceHub-v1.0.0)
 
 3. Create the backend environment file if needed:
 
@@ -98,7 +98,7 @@ tar -xzf ResourceHub-v1.0.0.tar.gz
 cp server/.env.example server/.env
 ~~~
 
-4. Fill in the required environment variables in `server/.env`.
+4. Fill in the required environment variables in `server/.env` (see [Environment Variables](#environment-variables)).
 
 5. Start the app with Docker:
 
