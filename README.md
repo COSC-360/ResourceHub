@@ -53,6 +53,24 @@ These accounts are auto-created on backend startup:
 	- Email: zanderholo@gmail.com
 	- Password: 12345678Up
 
+#### Sample users and courses
+
+The database also auto-populates with sample data on startup:
+
+**Sample User Accounts**
+- alice_wang (alice.wang@example.com) - Engineering, enrolled in COSC360, COSC221
+- bob_smith (bob.smith@example.com) - Science, enrolled in COSC360
+- charlie_lee (charlie.lee@example.com) - Engineering, enrolled in COSC360, COSC221, MATH201
+- diana_jones (diana.jones@example.com) - Science, enrolled in COSC111, MATH201
+
+**Sample Courses**
+- COSC360: Database Systems
+- COSC221: Data Structures
+- COSC111: Introduction to Programming
+- MATH201: Discrete Mathematics
+
+Each sample user has created discussions within their enrolled courses (passwords are their names + numbers, e.g., SecurePass123).
+
 #### Stop the application
 
 ~~~
