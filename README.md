@@ -6,6 +6,15 @@ ResourceHub is a website for students to post course resources, hold discussions
 
 ## Features
 
+- Creating discussions
+- Replying to other users discussions (given that you are a member of the course that discussion belongs to)
+- Searching for discussions
+- Upvoting, downvoting discussions
+- Changing your profile info
+- Creating a course
+- Joining courses
+- etc.
+
 ## How to Run
 
 ### Running with Docker (Recommended)
@@ -103,6 +112,8 @@ docker compose up --build
 MONGO_URI=mongodb://mongo:27017/resourcehub
 ~~~
 
+**FOR TA** the MONGO_URI is for the local Docker mongodb. to use the non-local version, see submission.
+
 ##### JWT
 ~~~
 ACCESS_TOKEN_SECRET_KEY=your_access_token_secret
@@ -177,6 +188,19 @@ ResourceHub/
 - **Docker Compose** - Multi-container orchestration
 
 ## Troubleshooting
+
+Always run `npm i` or 
+~~~
+docker compose exec client npm install
+~~~
+
+or 
+
+~~~
+docker compose exec server npm install
+~~~
+
+before trying to run the Docker/program.
 
 ## Development
 
