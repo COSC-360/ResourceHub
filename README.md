@@ -87,7 +87,7 @@ If you downloaded a release tarball instead of cloning the repository:
 1. Get a release from the [releases folder](releases/) and extract the archive:
 
 ~~~
-tar -xzf ResourceHub-alpha-YYYY-MM-DD-HHMM.tar.gz
+tar -xzf ResourceHub-v1.0.0.tar.gz
 ~~~
 
 2. Move into the extracted folder.
