@@ -382,9 +382,8 @@ export default function DiscussionCard({
                 alt=""
                 width={100}
                 onError={(event) => {
-                  if (event.currentTarget.src !== noImage) {
-                    event.currentTarget.src = noImage;
-                  }
+                  event.currentTarget.onerror = null;
+                  event.currentTarget.src = noImage;
                 }}
               />
               <button type="button" className="discussion-card__remove-image" onClick={resetFile}>
@@ -408,9 +407,8 @@ export default function DiscussionCard({
               alt="Discussion image"
               className="discussion-card__image"
               onError={(event) => {
-                if (event.currentTarget.src !== noImage) {
-                  event.currentTarget.src = noImage;
-                }
+                event.currentTarget.onerror = null;
+                event.currentTarget.src = noImage;
               }}
             />
           )}

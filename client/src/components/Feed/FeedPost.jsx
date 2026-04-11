@@ -499,9 +499,8 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
                       alt="preview"
                       width={100}
                       onError={(event) => {
-                        if (event.currentTarget.src !== noImage) {
-                          event.currentTarget.src = noImage;
-                        }
+                        event.currentTarget.onerror = null;
+                        event.currentTarget.src = noImage;
                       }}
                     />
                     <button
@@ -525,9 +524,8 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
                   src={`http://localhost:3000/api/discussion/${post_props._id}/image`}
                   alt="attached image"
                   onError={(event) => {
-                    if (event.currentTarget.src !== noImage) {
-                      event.currentTarget.src = noImage;
-                    }
+                    event.currentTarget.onerror = null;
+                    event.currentTarget.src = noImage;
                   }}
                 />
               ) : null}

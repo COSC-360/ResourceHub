@@ -16,7 +16,11 @@ export const FACULTY_OPTIONS = [
 
 export function facultySelectionFromValue(value) {
   const text = value == null ? "" : String(value).trim();
-  if (!text) return { selected: "", custom: "" };
+  const normalizedText = text.toLowerCase();
+  const sentinelValues = new Set(["none", "n/a"]);
+  if (!text || sentinelValues.has(normalizedText)) {
+    return { selected: "", custom: "" };
+  }
   if (FACULTY_OPTIONS.includes(text)) return { selected: text, custom: "" };
   return { selected: CUSTOM_FACULTY_VALUE, custom: text };
 }

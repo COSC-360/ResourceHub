@@ -157,9 +157,8 @@ const CreateDiscussion = ({
                   alt="preview"
                   width={100}
                   onError={(event) => {
-                    if (event.currentTarget.src !== noImage) {
-                      event.currentTarget.src = noImage;
-                    }
+                    event.currentTarget.onerror = null;
+                    event.currentTarget.src = noImage;
                   }}
                 />
               )}

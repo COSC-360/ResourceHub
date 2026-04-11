@@ -43,7 +43,15 @@ function resolveLocalUploadPath(rawPath) {
 
   const relativeUploadPath = normalized.slice("uploads/".length);
   const absolutePath = path.resolve(uploadsDir, relativeUploadPath);
-  if (!absolutePath.startsWith(uploadsDir)) return null;
+  const relativeToUploads = path.relative(uploadsDir, absolutePath);
+  if (
+    !relativeToUploads ||
+    relativeToUploads === ".." ||
+    relativeToUploads.startsWith(`..${path.sep}`) ||
+    path.isAbsolute(relativeToUploads)
+  ) {
+    return null;
+  }
   return absolutePath;
 }
 
