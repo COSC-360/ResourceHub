@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import "./CourseForm.css";
 import { LIMITS } from "../../lib/formValidation.js";
+import { DEFAULT_COURSE_COVER } from "../../lib/course-cover.js";
 
 export default function CourseForm({
   asModal = false,
@@ -66,6 +67,10 @@ export default function CourseForm({
                 className="course-form__image"
                 src={imageUrl}
                 alt="Course"
+                onError={(event) => {
+                  event.currentTarget.onerror = null;
+                  event.currentTarget.src = DEFAULT_COURSE_COVER;
+                }}
               />
             ) : null}
             <button

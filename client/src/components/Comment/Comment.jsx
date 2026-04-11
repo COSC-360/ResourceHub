@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { LOGIN_ROUTE } from "../../constants/RouteConstants.jsx";
 import { LIMITS, trimStr, validateMaxLength } from "../../lib/formValidation.js";
 import ProfileAvatar from "../ProfileAvatar/ProfileAvatar.jsx";
+import noImage from "../../assets/no-image.png";
 
 const Comment = ({ onSubmit, parentid, parentUsername, courseId: _courseId }) => {
   const [formData, setFormData] = useState({ content: "" });
@@ -124,7 +125,14 @@ const Comment = ({ onSubmit, parentid, parentUsername, courseId: _courseId }) =>
           />
           {file && (
             <div className="preview_container">
-              <img src={URL.createObjectURL(file)} className="preview" />
+              <img
+                src={URL.createObjectURL(file)}
+                className="preview"
+                onError={(event) => {
+                  event.currentTarget.onerror = null;
+                  event.currentTarget.src = noImage;
+                }}
+              />
               <button
                 className="remove_image"
                 type="button"

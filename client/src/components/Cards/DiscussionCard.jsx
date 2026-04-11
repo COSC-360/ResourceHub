@@ -6,6 +6,7 @@ import { apiClient } from "../../lib/api-client";
 import AuthContext from "../../AuthContext.jsx";
 import VoteControls from "../VoteControls/VoteControls.jsx";
 import ProfileAvatar from "../ProfileAvatar/ProfileAvatar.jsx";
+import noImage from "../../assets/no-image.png";
 import {
   courseDiscussionPath,
   coursePath,
@@ -374,10 +375,16 @@ export default function DiscussionCard({
                 src={
                   file
                     ? URL.createObjectURL(file)
-                    : `/api/discussion/${discussionId}/image`
+                    : hasImage
+                      ? `/api/discussion/${discussionId}/image`
+                      : noImage
                 }
                 alt=""
                 width={100}
+                onError={(event) => {
+                  event.currentTarget.onerror = null;
+                  event.currentTarget.src = noImage;
+                }}
               />
               <button type="button" className="discussion-card__remove-image" onClick={resetFile}>
                 <i className="bi bi-trash3-fill" /> Remove image
@@ -399,6 +406,10 @@ export default function DiscussionCard({
               src={`/api/discussion/${discussionId}/image`}
               alt="Discussion image"
               className="discussion-card__image"
+              onError={(event) => {
+                event.currentTarget.onerror = null;
+                event.currentTarget.src = noImage;
+              }}
             />
           )}
         </>

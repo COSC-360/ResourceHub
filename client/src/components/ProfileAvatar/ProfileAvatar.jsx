@@ -57,9 +57,8 @@ export default function ProfileAvatar({
       alt={alt}
       className={avatarClassName}
       onError={(event) => {
-        if (event.currentTarget.src !== defaultAvatar) {
-          event.currentTarget.src = defaultAvatar;
-        }
+        event.currentTarget.onerror = null;
+        event.currentTarget.src = defaultAvatar;
         onError?.(event);
       }}
       {...imgProps}

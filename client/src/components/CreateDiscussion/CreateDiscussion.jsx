@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { apiClient } from "../../lib/api-client";
 import "../CreateDiscussion/CreateDiscussion.css";
+import noImage from "../../assets/no-image.png";
 import {
   LIMITS,
   trimStr,
@@ -150,7 +151,17 @@ const CreateDiscussion = ({
                 <input type="file" id="file" name="file" accept="image/*" onChange={handleFileChange} disabled={loading} />
               </div>
 
-              {file && <img src={URL.createObjectURL(file)} alt="preview" width={100} />}
+              {file && (
+                <img
+                  src={URL.createObjectURL(file)}
+                  alt="preview"
+                  width={100}
+                  onError={(event) => {
+                    event.currentTarget.onerror = null;
+                    event.currentTarget.src = noImage;
+                  }}
+                />
+              )}
 
               <button type="submit" className="submit-btn" disabled={loading}>
                 {loading ? "Posting..." : "Post Discussion"}

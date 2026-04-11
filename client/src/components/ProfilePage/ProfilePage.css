@@ -57,6 +57,7 @@
 }
 
 .profile-form input,
+.profile-form select,
 .profile-form textarea {
   font: inherit;
   padding: 0.4rem 0.5rem;

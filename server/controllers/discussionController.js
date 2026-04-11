@@ -3,6 +3,7 @@ import * as voteService from "../services/voteService.js";
 import mongoose from "mongoose";
 import { getIO } from "../socket.js";
 import { pushNewDiscussionNotification } from "../services/notificationPush.js";
+import { resolveLocalUploadPath } from "../utils/uploads.js";
 
 import {
   hasInvalidObjectId,
@@ -11,9 +12,24 @@ import {
   parsePositiveInt,
 } from "../utils/inputParsers.js";
 
+const DEFAULT_DISCUSSION_IMAGE_SVG = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="No image available">
+  <rect width="640" height="360" fill="#F0EEF5"/>
+  <rect x="196" y="94" width="248" height="172" rx="18" fill="#E1DBEE"/>
+  <circle cx="272" cy="164" r="22" fill="#A57DDF"/>
+  <path d="M228 238l58-54a10 10 0 0 1 14 0l32 30 24-22a10 10 0 0 1 14 0l42 46z" fill="#A57DDF"/>
+  <text x="320" y="304" text-anchor="middle" fill="#7A5BAF" font-size="20" font-family="Arial, sans-serif">No image</text>
+</svg>
+`;
+
 function parsePopulate(value) {
   const allowed = new Set(["courseId", "authorId"]);
   return parseCsv(value).filter((entry) => allowed.has(entry));
+}
+
+function sendDefaultDiscussionImage(res) {
+  res.set("Content-Type", "image/svg+xml; charset=utf-8");
+  return res.status(200).send(DEFAULT_DISCUSSION_IMAGE_SVG.trim());
 }
 
 function discussionHasImage(image) {
@@ -176,14 +192,36 @@ export async function getById(req, res) {
 
 export async function getImage(req, res) {
   const { id } = req.params;
-  const found = await discussionService.findImageById(id);
+  let found;
+  try {
+    found = await discussionService.findImageById(id);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "";
+    if (message.includes("No discussion")) {
+      return sendDefaultDiscussionImage(res);
+    }
+    return res.status(500).json({ error: "Failed to load discussion image" });
+  }
 
   if (!found) {
-    return res.status(404).json({ error: "Discussion image not found" });
+    return sendDefaultDiscussionImage(res);
   }
 
   if (typeof found === "string") {
-    return res.redirect(found);
+    const localUploadPath = resolveLocalUploadPath(found);
+    if (localUploadPath) {
+      return res.sendFile(localUploadPath, (err) => {
+        if (err && !res.headersSent) {
+          sendDefaultDiscussionImage(res);
+        }
+      });
+    }
+
+    if (/^https?:\/\//i.test(found)) {
+      return res.redirect(found);
+    }
+
+    return sendDefaultDiscussionImage(res);
   }
 
   res.set("Content-Type", found.contentType);
