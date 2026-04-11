@@ -33,6 +33,17 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
+      "/api-docs": {
+        target: "http://server:3000",
+        changeOrigin: true,
+        secure: false,
+      },
+      "/socket.io": {
+        target: "http://server:3000",
+        changeOrigin: true,
+        ws: true,
+        secure: false,
+      },
     },
   },
 })

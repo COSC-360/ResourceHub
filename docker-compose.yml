@@ -1,20 +1,21 @@
 services:
   mongo:
     image: mongo:7
-    container_name: resourcehub-mongo
-    ports:
-      - "27017:27017"
     volumes:
       - mongo_data:/data/db
 
   server:
     build:
       context: ./server
-    container_name: resourcehub-server
-    ports:
-      - "3000:3000"
-    env_file:
-      - ./server/.env
+    expose:
+      - "3000"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/resourcehub
+      - MONGODB_URI=mongodb://mongo:27017/resourcehub
+      - ACCESS_TOKEN_SECRET_KEY=anyrandomstring
+      - JWT_SECRET=anyrandomstring
+      - CLIENT_ORIGIN=http://localhost:4000
+      - PORT=3000
     command: npm run dev -- --legacy-watch
     depends_on:
       - mongo
@@ -26,13 +27,12 @@ services:
   client:
     build:
       context: ./client
-    container_name: resourcehub-client
     ports:
-      - "5173:5173"
+      - "4000:4000"
     environment:
-      - VITE_API_BASE_URL=http://server:3000
       - CHOKIDAR_USEPOLLING=true
       - WATCHPACK_POLLING=true
+    command: npm run dev -- --host 0.0.0.0 --port 4000
     depends_on:
       - server
     volumes:

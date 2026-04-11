@@ -8,7 +8,7 @@ import { HOMEROUTE, INFORMATION_ROUTE } from "./constants/RouteConstants.jsx";
 
 const AuthContext = createContext();
 
-const VERIFY_URL = "http://localhost:3000/api/user/verifytoken/";
+const VERIFY_URL = "/api/user/verifytoken/";
 
 const decodeTokenPayload = (token) => {
   const payload = JSON.parse(atob(token.split(".")[1]));
