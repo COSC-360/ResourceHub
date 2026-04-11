@@ -175,15 +175,18 @@ const InformationForm = () => {
             </select>
 
             {selectedFaculty === CUSTOM_FACULTY_VALUE && (
-              <input
-                className="information-form__textarea information-form__textarea--short"
-                id="faculty-custom"
-                name="facultyCustom"
-                onChange={handleCustomFacultyChange}
-                value={customFaculty}
-                maxLength={200}
-                placeholder="Enter your faculty"
-              />
+              <>
+                <label htmlFor="faculty-custom">Custom faculty</label>
+                <input
+                  className="information-form__textarea information-form__textarea--short"
+                  id="faculty-custom"
+                  name="facultyCustom"
+                  onChange={handleCustomFacultyChange}
+                  value={customFaculty}
+                  maxLength={200}
+                  placeholder="Enter your faculty"
+                />
+              </>
             )}
           </div>
         </section>

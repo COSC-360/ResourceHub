@@ -1,10 +1,9 @@
 import * as discussionService from "../services/discussionService.js";
 import * as voteService from "../services/voteService.js";
 import mongoose from "mongoose";
-import path from "path";
-import { fileURLToPath } from "url";
 import { getIO } from "../socket.js";
 import { pushNewDiscussionNotification } from "../services/notificationPush.js";
+import { resolveLocalUploadPath } from "../utils/uploads.js";
 
 import {
   hasInvalidObjectId,
@@ -26,33 +25,6 @@ const DEFAULT_DISCUSSION_IMAGE_SVG = `
 function parsePopulate(value) {
   const allowed = new Set(["courseId", "authorId"]);
   return parseCsv(value).filter((entry) => allowed.has(entry));
-}
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const uploadsDir = path.resolve(__dirname, "..", "uploads");
-
-function resolveLocalUploadPath(rawPath) {
-  if (typeof rawPath !== "string") return null;
-  const value = rawPath.trim();
-  if (!value) return null;
-  if (/^https?:\/\//i.test(value)) return null;
-
-  const normalized = value.replace(/^\/+/, "");
-  if (!normalized.startsWith("uploads/")) return null;
-
-  const relativeUploadPath = normalized.slice("uploads/".length);
-  const absolutePath = path.resolve(uploadsDir, relativeUploadPath);
-  const relativeToUploads = path.relative(uploadsDir, absolutePath);
-  if (
-    !relativeToUploads ||
-    relativeToUploads === ".." ||
-    relativeToUploads.startsWith(`..${path.sep}`) ||
-    path.isAbsolute(relativeToUploads)
-  ) {
-    return null;
-  }
-  return absolutePath;
 }
 
 function sendDefaultDiscussionImage(res) {
@@ -220,7 +192,16 @@ export async function getById(req, res) {
 
 export async function getImage(req, res) {
   const { id } = req.params;
-  const found = await discussionService.findImageById(id);
+  let found;
+  try {
+    found = await discussionService.findImageById(id);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "";
+    if (message.includes("No discussion")) {
+      return sendDefaultDiscussionImage(res);
+    }
+    return res.status(500).json({ error: "Failed to load discussion image" });
+  }
 
   if (!found) {
     return sendDefaultDiscussionImage(res);

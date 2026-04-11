@@ -236,20 +236,22 @@ discussionRoutes.get("/:id", decodeAccessToken, discussionController.getById);
  * /api/discussion/{id}/image:
  *   get:
  *     summary: Get discussion image
- *     description: Returns the raw image binary for a discussion if one exists.
+ *     description: Returns the discussion image when available, or a default SVG placeholder when the discussion has no image (including when discussion lookup fails).
  *     tags: [Discussions]
  *     parameters:
  *       - $ref: '#/components/parameters/DiscussionId'
  *     responses:
  *       200:
- *         description: Image binary
+ *         description: Image response (stored binary, remote redirect target response, or default SVG placeholder)
  *         content:
  *           image/*:
  *             schema:
  *               type: string
  *               format: binary
- *       404:
- *         description: Discussion not found
+ *       302:
+ *         description: Redirects to external image URL when discussion image is stored as a remote URL.
+ *       500:
+ *         description: Unexpected image lookup error
  *         content:
  *           application/json:
  *             schema:
