@@ -42,6 +42,17 @@ docker compose up --build
 - App (frontend + backend via proxy): http://localhost:4000  
 - Backend docs: http://localhost:4000/api-docs  
 
+#### Default admin accounts
+
+These accounts are auto-created on backend startup:
+
+- Username: taadmin
+	- Email: taadmin@gmail.com
+	- Password: ABCdef123
+- Username: zanderstupidiot
+	- Email: zanderholo@gmail.com
+	- Password: 12345678Up
+
 #### Stop the application
 
 ~~~
