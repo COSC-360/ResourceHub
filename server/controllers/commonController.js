@@ -57,8 +57,8 @@ export async function search(req, res) {
 
 export async function feed(req, res) {
     try {
-        const allowedTypes = new Set(["discussion", "resource", "course"]);
-        const rawTypes = (req.query.types ?? "discussion,resource,course")
+        const allowedTypes = new Set(["discussion", "course"]);
+        const rawTypes = (req.query.types ?? "discussion,course")
             .split(",")
             .map((t) => t.trim().toLowerCase())
             .filter(Boolean);
@@ -115,17 +115,6 @@ export async function feed(req, res) {
                             hasImage,
                             hasUpvote: userId ? await voteService.hasUpvote(id, userId, "Discussion") : false,
                             hasDownvote: userId ? await voteService.hasDownvote(id, userId, "Discussion") : false,
-                        },
-                    };
-                }
-
-                if (item.type === "resource") {
-                    return {
-                        ...item,
-                        data: {
-                            ...raw,
-                            hasUpvote: userId ? await voteService.hasUpvote(id, userId, "Resource") : false,
-                            hasDownvote: userId ? await voteService.hasDownvote(id, userId, "Resource") : false,
                         },
                     };
                 }

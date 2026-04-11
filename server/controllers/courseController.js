@@ -214,11 +214,3 @@ export async function getDiscussions(req, res) {
     const discussions = await discussionService.getAllDiscussionsByCourse(id);
     return res.status(200).json({ data: discussions });
 }
-
-export async function getResources(_req, _res) {
-    //empty
-}
-
-export async function getMembers(_req, _res) {
-    //empty
-}

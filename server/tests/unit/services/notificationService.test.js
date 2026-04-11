@@ -8,12 +8,6 @@ jest.unstable_mockModule("../../../models/discussion.js", () => ({
   },
 }));
 
-jest.unstable_mockModule("../../../models/resource.js", () => ({
-  Resource: {
-    find: jest.fn(),
-  },
-}));
-
 jest.unstable_mockModule(
   "../../../repositories/membershipRepository.js",
   () => ({
@@ -22,7 +16,6 @@ jest.unstable_mockModule(
 );
 
 const { Discussion } = await import("../../../models/discussion.js");
-const { Resource } = await import("../../../models/resource.js");
 const membershipRepository =
   await import("../../../repositories/membershipRepository.js");
 const NotificationService =
@@ -70,12 +63,8 @@ describe("Notification Service (unstable_mockModule)", () => {
     const mockDiscussions = [
       { _id: "d1", title: "Disc 1", createdAt: new Date("2023-01-02") },
     ];
-    const mockResources = [
-      { _id: "r1", name: "Res 1", createdAt: new Date("2023-01-03") },
-    ];
 
     Discussion.find.mockReturnValue(mockMongooseQuery(mockDiscussions));
-    Resource.find.mockReturnValue(mockMongooseQuery(mockResources));
 
     const result = await NotificationService.getNotifications(mockSince, {
       isAdmin: true,
@@ -85,9 +74,8 @@ describe("Notification Service (unstable_mockModule)", () => {
       expect.not.objectContaining({ courseId: expect.any(Object) }),
     );
 
-    expect(result.count).toBe(2);
-    expect(result.items[0].type).toBe("resource");
-    expect(result.items[1].type).toBe("discussion");
+    expect(result.count).toBe(1);
+    expect(result.items[0].type).toBe("discussion");
   });
 
   it("should apply course filters and exclude user's own discussions", async () => {
@@ -95,7 +83,6 @@ describe("Notification Service (unstable_mockModule)", () => {
     membershipRepository.findCourseIdsByUser.mockResolvedValue([courseId]);
 
     Discussion.find.mockReturnValue(mockMongooseQuery([]));
-    Resource.find.mockReturnValue(mockMongooseQuery([]));
 
     await NotificationService.getNotifications(mockSince, {
       userId: mockUserId,
@@ -118,7 +105,6 @@ describe("Notification Service (unstable_mockModule)", () => {
     }));
 
     Discussion.find.mockReturnValue(mockMongooseQuery(manyDiscussions));
-    Resource.find.mockReturnValue(mockMongooseQuery([]));
 
     const result = await NotificationService.getNotifications(mockSince, {
       isAdmin: true,

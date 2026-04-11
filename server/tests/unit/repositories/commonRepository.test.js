@@ -11,13 +11,6 @@ jest.unstable_mockModule(
   }),
 );
 
-jest.unstable_mockModule(
-  "../../../repositories/resource.repository.js",
-  () => ({
-    findRecent: jest.fn(),
-  }),
-);
-
 jest.unstable_mockModule("../../../repositories/courseRepository.js", () => ({
   default: {
     findRecent: jest.fn(),
@@ -27,8 +20,6 @@ jest.unstable_mockModule("../../../repositories/courseRepository.js", () => ({
 // 2. Dynamic Imports
 const { DiscussionRepository } =
   await import("../../../repositories/discussionRepository.js");
-const ResourceRepository =
-  await import("../../../repositories/resource.repository.js");
 const courseRepository = (
   await import("../../../repositories/courseRepository.js")
 ).default;
@@ -58,19 +49,19 @@ describe("Feed Service (unstable_mockModule)", () => {
 
     it("should merge and transform results from multiple repositories", async () => {
       const disc = [{ _id: "d1", createdAt: mockDateOld }];
-      const res = [{ _id: "r1", createdAt: mockDateNew }];
+      const courses = [{ _id: "c1", createdAt: mockDateNew }];
 
       DiscussionRepository.findRecent.mockResolvedValue(disc);
-      ResourceRepository.findRecent.mockResolvedValue(res);
+      courseRepository.findRecent.mockResolvedValue(courses);
 
       const result = await commonRepository.feed({
-        types: ["discussion", "resource"],
+        types: ["discussion", "course"],
         limit: 10,
       });
 
       expect(result).toHaveLength(2);
-      expect(result[0].id).toBe("r1");
-      expect(result[0].type).toBe("resource");
+      expect(result[0].id).toBe("c1");
+      expect(result[0].type).toBe("course");
       expect(result[1].type).toBe("discussion");
     });
 
@@ -89,14 +80,14 @@ describe("Feed Service (unstable_mockModule)", () => {
     });
 
     it("should use courseIds array if individual courseId is missing", async () => {
-      ResourceRepository.findRecent.mockResolvedValue([]);
+      DiscussionRepository.findRecent.mockResolvedValue([]);
 
       await commonRepository.feed({
-        types: ["resource"],
+        types: ["discussion"],
         courseIds: ["id-A", "id-B"],
       });
 
-      expect(ResourceRepository.findRecent).toHaveBeenCalledWith(
+      expect(DiscussionRepository.findRecent).toHaveBeenCalledWith(
         expect.objectContaining({ scopedCourseIds: ["id-A", "id-B"] }),
       );
     });
@@ -106,10 +97,10 @@ describe("Feed Service (unstable_mockModule)", () => {
       const newItem = { _id: "new", createdAt: mockDateNew };
 
       DiscussionRepository.findRecent.mockResolvedValue([newItem]);
-      ResourceRepository.findRecent.mockResolvedValue([oldItem]);
+      courseRepository.findRecent.mockResolvedValue([oldItem]);
 
       const result = await commonRepository.feed({
-        types: ["discussion", "resource"],
+        types: ["discussion", "course"],
         sort: "oldest",
         limit: 10,
       });

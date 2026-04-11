@@ -250,32 +250,6 @@ describe("VoteControls", () => {
     });
   });
 
-  it("handles different target types (Resource vs Discussion)", async () => {
-    const user = userEvent.setup();
-    apiClientMock.mockResolvedValue({});
-
-    render(
-      <VoteControls
-        targetId="res1"
-        targetType="Resource"
-        initialUpvotes={3}
-        initialDownvotes={1}
-      />,
-    );
-
-    const buttons = screen.getAllByRole("button");
-    await user.click(buttons[0]);
-
-    await waitFor(() => {
-      expect(apiClientMock).toHaveBeenCalledWith(
-        "/api/vote/up",
-        expect.objectContaining({
-          body: { targetType: "Resource", targetId: "res1" },
-        }),
-      );
-    });
-  });
-
   it("uses default vote counts when not provided", () => {
     render(<VoteControls targetId="post1" targetType="Discussion" />);
 

@@ -80,7 +80,7 @@ describe("common controller", () => {
 
   test("search - invalid types", async () => {
     req.query.term = "test";
-    req.query.types = "resource";
+    req.query.types = "invalid-type";
 
     await controller.search(req, res);
 
@@ -108,7 +108,7 @@ describe("common controller", () => {
 
   test("feed - success with enrichment", async () => {
     req.query = {
-      types: "discussion,resource",
+      types: "discussion,course",
       limit: "10",
     };
 
@@ -122,10 +122,10 @@ describe("common controller", () => {
         },
       },
       {
-        type: "resource",
+        type: "course",
         data: {
-          _id: "r1",
-          toJSON: () => ({ _id: "r1" }),
+          _id: "c1",
+          toJSON: () => ({ _id: "c1" }),
         },
       },
     ];
@@ -138,7 +138,7 @@ describe("common controller", () => {
     await controller.feed(req, res);
 
     expect(mockCommonService.feed).toHaveBeenCalledWith({
-      types: ["discussion", "resource"],
+      types: ["discussion", "course"],
       courseId: null,
       courseIds: [],
       sort: "newest",
@@ -159,9 +159,7 @@ describe("common controller", () => {
     });
 
     expect(response.data[1].data).toMatchObject({
-      _id: "r1",
-      hasUpvote: true,
-      hasDownvote: false,
+      _id: "c1",
     });
   });
 
