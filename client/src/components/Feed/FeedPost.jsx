@@ -369,7 +369,7 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
     (async () => {
       try {
         const response = await apiClient(
-          `http://localhost:3000/api/user/getUserById/${post_props.authorid}`,
+          `/api/user/getUserById/${post_props.authorid}`,
         );
         setUsername(response.data.username);
         setFaculty(displayFaculty(response.data.faculty));
@@ -493,7 +493,7 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
                         file
                           ? URL.createObjectURL(file)
                           : post_props.hasImage && !removeImage
-                            ? `http://localhost:3000/api/discussion/${post_props._id}/image`
+                            ? `/api/discussion/${post_props._id}/image`
                             : noImage
                       }
                       alt="preview"
@@ -521,7 +521,7 @@ export const FeedPost = ({ post_props, depth, expandDown }) => {
               </form>
               {!edit && post_props.hasImage ? (
                 <img
-                  src={`http://localhost:3000/api/discussion/${post_props._id}/image`}
+                  src={`/api/discussion/${post_props._id}/image`}
                   alt="attached image"
                   onError={(event) => {
                     event.currentTarget.onerror = null;

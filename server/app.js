@@ -17,10 +17,11 @@ const app = express();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const clientOrigin = process.env.CLIENT_ORIGIN || "http://localhost:4000";
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: clientOrigin,
     credentials: true,
   })
 );

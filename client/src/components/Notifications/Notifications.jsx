@@ -25,7 +25,7 @@ export function Notifications() {
                     new Date(0).toISOString();
 
                 const response = await fetch(
-                    `http://localhost:3000/api/notifications?since=${encodeURIComponent(since)}`,
+                    `/api/notifications?since=${encodeURIComponent(since)}`,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`,

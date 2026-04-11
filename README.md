@@ -27,23 +27,7 @@ This project can be run using Docker, which starts the frontend, backend, and Mo
 
 #### Setup
 
-1. Create a `.env` file for the backend by copying the example:
-
-~~~
-cp server/.env.example server/.env
-~~~
-
-2. Add the required environment variables inside `server/.env`:
-
-##### Database
-~~~
-MONGO_URI=mongodb://mongo:27017/resourcehub
-~~~
-
-##### JWT
-~~~
-ACCESS_TOKEN_SECRET_KEY=your_access_token_secret
-~~~
+No manual setup is required. All runtime environment variables are defined in `docker-compose.yml`.
 
 #### Run the application
 
@@ -55,8 +39,8 @@ docker compose up --build
 
 #### Access the application
 
-- Frontend: http://localhost:5173  
-- Backend: http://localhost:3000/api-docs  
+- App (frontend + backend via proxy): http://localhost:4000  
+- Backend docs: http://localhost:4000/api-docs  
 
 #### Stop the application
 
@@ -92,15 +76,7 @@ tar -xzf ResourceHub-v1.0.0.tar.gz
 
 2. After extraction, in your terminal, move to the root directory of that extracted file (e.g., ResourceHub-v1.0.0)
 
-3. Create the backend environment file if needed:
-
-~~~
-cp server/.env.example server/.env
-~~~
-
-4. Fill in the required environment variables in `server/.env` (see [Environment Variables](#environment-variables)).
-
-5. Start the app with Docker:
+3. Start the app with Docker:
 
 ~~~
 docker compose up --build
@@ -108,8 +84,8 @@ docker compose up --build
 
 #### Access the application
 
-- Frontend: http://localhost:5173  
-- Backend: http://localhost:3000/api-docs  
+- App (frontend + backend via proxy): http://localhost:4000  
+- Backend docs: http://localhost:4000/api-docs  
 
 #### Stop the application
 
@@ -123,7 +99,7 @@ docker compose down
 MONGO_URI=mongodb://mongo:27017/resourcehub
 ~~~
 
-**FOR TA** the MONGO_URI is for the local Docker mongodb. to use the non-local version, see submission.
+These are configured directly in `docker-compose.yml` so TAs can run with one command.
 
 ##### JWT
 ~~~

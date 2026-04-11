@@ -1,11 +1,12 @@
 import { Server } from "socket.io";
 
 let io;
+const clientOrigin = process.env.CLIENT_ORIGIN || "http://localhost:4000";
 
 export function initSocket(server) {
   io = new Server(server, {
     cors: {
-      origin: "http://localhost:5173",
+      origin: clientOrigin,
       methods: ["GET", "POST", "PUT", "DELETE"],
       credentials: true,
     },
