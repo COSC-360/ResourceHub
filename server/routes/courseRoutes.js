@@ -25,10 +25,8 @@ courseRoutes.patch(
 
 courseRoutes.delete("/:id", verifyAccessToken, requireAdminOrCourseInstructor, courseController.deleteCourse);
 
-// additional routes for discussions, resources, and members specific pages
+// additional route for the course discussions page
 courseRoutes.get("/:id/discussions", courseController.getDiscussions); // get all discussions for a course by id
-courseRoutes.get("/:id/resources", courseController.getResources); // get all resources for a course by id
-courseRoutes.get("/:id/members", courseController.getMembers); // get all members for a course by id
 
 /**
  * @swagger

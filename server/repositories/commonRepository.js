@@ -1,5 +1,4 @@
 import { DiscussionRepository } from "./discussionRepository.js";
-import * as ResourceRepository from "./resource.repository.js";
 import courseRepository from "./courseRepository.js";
 
 export async function search(searchParams) {
@@ -95,15 +94,6 @@ export async function feed({ types, courseId, courseIds, sort, limit }) {
                 scopedCourseIds: hasScope ? scopedCourseIds : null,
                 limit,
             }).then((rows) => rows.map((d) => toFeedItem("discussion", d))),
-        );
-    }
-
-    if (types.includes("resource")) {
-        tasks.push(
-            ResourceRepository.findRecent({
-                scopedCourseIds: hasScope ? scopedCourseIds : null,
-                limit,
-            }).then((rows) => rows.map((r) => toFeedItem("resource", r))),
         );
     }
 

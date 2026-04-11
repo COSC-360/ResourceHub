@@ -65,12 +65,12 @@ describe("GET /common/feed", () => {
     feedMock.mockResolvedValue([]);
 
     const res = await request(app).get(
-      "/common/feed?types=discussion,resource&courseIds=a,b,c&limit=999"
+      "/common/feed?types=discussion,course&courseIds=a,b,c&limit=999"
     );
 
     expect(res.status).toBe(200);
     expect(feedMock).toHaveBeenCalledWith({
-      types: ["discussion", "resource"],
+      types: ["discussion", "course"],
       courseId: null,
       courseIds: ["a", "b", "c"],
       sort: "newest",

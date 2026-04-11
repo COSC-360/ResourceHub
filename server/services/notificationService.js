@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import { Discussion } from "../models/discussion.js";
-import { Resource } from "../models/resource.js";
 import * as membershipRepository from "../repositories/membershipRepository.js";
 
 export async function getNotifications(since, { userId, isAdmin } = {}) {
@@ -48,11 +47,6 @@ export async function getNotifications(since, { userId, isAdmin } = {}) {
     createdAt: -1,
   });
 
-  const resources = await Resource.find({
-    createdAt: { $gt: sinceDate },
-    ...courseFilter,
-  }).sort({ createdAt: -1 });
-
   const discussionItems = discussions.map((item) => ({
     type: "discussion",
     id: item._id,
@@ -60,14 +54,7 @@ export async function getNotifications(since, { userId, isAdmin } = {}) {
     createdAt: item.createdAt,
   }));
 
-  const resourceItems = resources.map((item) => ({
-    type: "resource",
-    id: item._id,
-    text: `New resource: ${item.name || "Untitled resource"}`,
-    createdAt: item.createdAt,
-  }));
-
-  const items = [...discussionItems, ...resourceItems]
+  const items = [...discussionItems]
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     .slice(0, 10);
 
