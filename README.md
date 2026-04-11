@@ -106,6 +106,17 @@ cp server/.env.example server/.env
 docker compose up --build
 ~~~
 
+#### Access the application
+
+- Frontend: http://localhost:5173  
+- Backend: http://localhost:3000/api-docs  
+
+#### Stop the application
+
+~~~
+docker compose down
+~~~
+
 ## Environment Variables
 ##### Database
 ~~~
